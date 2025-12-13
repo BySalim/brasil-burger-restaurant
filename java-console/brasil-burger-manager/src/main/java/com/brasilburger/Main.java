@@ -1,8 +1,7 @@
 package com.brasilburger;
 
-import com.brasilburger.domain.entities.Livreur;
-import com.brasilburger.domain.entities.Quartier;
-import com.brasilburger.domain.entities.Zone;
+import com.brasilburger.domain.entities.*;
+import com.brasilburger.domain.entities.enums.TypeComplement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +18,8 @@ public class Main {
         // Afficher le banner
         afficherBanner();
 
-        // TEST DES ENTITES
-        testerEntites();
+        // TEST DES ENTITES ARTICLE
+        testerArticles();
 
         logger.info("Tests termines avec succes !");
     }
@@ -50,97 +49,89 @@ public class Main {
     }
 
     /**
-     * Test des entites de base
+     * Test des entites Article
      */
-    private static void testerEntites() {
-        System.out.println("=== TEST DES ENTITES ===\n");
+    private static void testerArticles() {
+        System.out.println("=== TEST DES ENTITES ARTICLE ===\n");
 
-        // Test Zone
-        System.out.println("--- Test Zone ---");
-        Zone zone1 = new Zone("Plateau", 2000);
-        zone1.setId(1L);
-        System.out.println("Zone creee:  " + zone1);
-        System.out.println("Zone active ?  " + zone1.estActive());
+        // Test Burger
+        System.out.println("--- Test Burger ---");
+        Burger burger = new Burger("BRG001", "Burger Classic", "burgers/classic",
+                "Delicieux burger avec steak hache", 5000);
+        burger.setId(1L);
 
-        zone1.modifierPrixLivraison(2500);
-        System.out.println("Nouveau prix: " + zone1.getPrixLivraison() + " FCFA");
+        System.out.println("Burger cree:  " + burger);
+        System.out.println("Categorie: " + burger.getCategorie());
+        System.out.println("Prix: " + burger.getPrix() + " FCFA");
+        System.out.println("Est burger ?  " + burger.estBurger());
+        System.out.println("Disponible ? " + burger.estDisponible());
 
-        zone1.archiver();
-        System.out.println("Apres archivage: " + zone1);
-        System.out.println("Zone active ? " + zone1.estActive());
+        burger.setPrix(5500);
+        System.out.println("Nouveau prix: " + burger.getPrix() + " FCFA");
 
-        zone1.restaurer();
-        System.out.println("Apres restauration, active ? " + zone1.estActive());
+        burger.archiver();
+        System.out.println("Apres archivage, disponible ? " + burger.estDisponible());
+        burger.restaurer();
 
         // Test validation
-        System.out.println("\nTest validation prix negatif:");
+        System.out.println("\nTest validation burger sans prix:");
         try {
-            zone1.modifierPrixLivraison(-100);
+            Burger burgerInvalide = new Burger("BRG002", "Test", "test", "desc", null);
         } catch (IllegalArgumentException e) {
             System.out.println("  Erreur capturee: " + e.getMessage());
         }
 
         System.out.println();
 
-        // Test Quartier
-        System.out.println("--- Test Quartier ---");
-        Quartier quartier1 = new Quartier("Mermoz", 1L);
-        quartier1.setId(1L);
-        System.out.println("Quartier cree: " + quartier1);
-        System.out.println("Appartient a la zone 1 ? " + quartier1.appartientAZone(1L));
-        System.out.println("Appartient a la zone 2 ? " + quartier1.appartientAZone(2L));
+        // Test Complement
+        System.out.println("--- Test Complement ---");
+        Complement boisson = new Complement("CMP001", "Coca-Cola", "complements/coca",
+                TypeComplement.BOISSON, 1000);
+        boisson.setId(2L);
 
-        quartier1.changerZone(2L);
-        System.out.println("Apres changement de zone:  " + quartier1);
-        System.out.println("Appartient a la zone 2 ? " + quartier1.appartientAZone(2L));
+        Complement frites = new Complement("CMP002", "Frites", "complements/frites",
+                TypeComplement.FRITES, 1500);
+        frites.setId(3L);
 
-        // Test validation
-        System.out.println("\nTest validation zone null:");
-        try {
-            quartier1.changerZone(null);
-        } catch (IllegalArgumentException e) {
-            System.out.println("  Erreur capturee: " + e.getMessage());
-        }
+        System.out.println("Boisson creee: " + boisson);
+        System.out.println("Type: " + boisson.getType());
+        System.out.println("Prix: " + boisson.getPrix() + " FCFA");
+        System.out.println("Est boisson ? " + boisson.estBoisson());
+
+        System.out.println("\nFrites creees: " + frites);
+        System.out.println("Est frites ? " + frites.estFrites());
 
         System.out.println();
 
-        // Test Livreur
-        System.out.println("--- Test Livreur ---");
-        Livreur livreur1 = new Livreur("Diop", "Moussa", "771234567");
-        livreur1.setId(1L);
-        System.out.println("Livreur cree: " + livreur1);
-        System.out.println("Nom complet: " + livreur1.getNomComplet());
-        System.out.println("Peut etre affecte ? " + livreur1.peutEtreAffecte());
+        // Test Menu
+        System.out.println("--- Test Menu ---");
+        Menu menu = new Menu("MNU001", "Menu Deluxe", "menus/deluxe",
+                "Menu complet avec burger, frites et boisson");
+        menu.setId(4L);
 
-        livreur1.marquerOccupe();
-        System.out.println("\nApres marquage occupe:");
-        System.out.println("  Disponible ? " + livreur1.isEstDisponible());
-        System.out.println("  Peut etre affecte ? " + livreur1.peutEtreAffecte());
+        System.out.println("Menu cree: " + menu);
+        System.out.println("Prix initial (vide): " + menu.getPrix() + " FCFA");
+        System.out.println("Nombre d'articles: " + menu.getNombreArticles());
 
-        livreur1.marquerDisponible();
-        System.out.println("\nApres marquage disponible:");
-        System.out.println("  Disponible ? " + livreur1.isEstDisponible());
-        System.out.println("  Peut etre affecte ? " + livreur1.peutEtreAffecte());
+        // Ajout d'articles au menu via ArticleQuantifier
+        ArticleQuantifier aqBurger = new ArticleQuantifier(1, 5000, burger.getId());
+        ArticleQuantifier aqFrites = new ArticleQuantifier(1, 1500, frites.getId());
+        ArticleQuantifier aqBoisson = new ArticleQuantifier(1, 1000, boisson.getId());
 
-        livreur1.archiver();
-        System.out.println("\nApres archivage:");
-        System.out.println("  Archive ? " + livreur1.isEstArchiver());
-        System.out.println("  Disponible ? " + livreur1.isEstDisponible());
-        System.out.println("  Peut etre affecte ? " + livreur1.peutEtreAffecte());
+        menu.ajouterArticle(aqBurger);
+        menu.ajouterArticle(aqFrites);
+        menu.ajouterArticle(aqBoisson);
 
-        // Test validation
-        System.out.println("\nTest validation livreur archive:");
-        try {
-            livreur1.marquerDisponible();
-        } catch (IllegalStateException e) {
-            System.out.println("  Erreur capturee: " + e.getMessage());
-        }
+        System.out.println("\nApres ajout des composants:");
+        System.out.println("Nombre d'articles: " + menu.getNombreArticles());
+        System.out.println("Prix total calcule: " + menu.getPrix() + " FCFA");
+        System.out.println(menu);
 
-        livreur1.restaurer();
-        System.out.println("\nApres restauration:");
-        System.out.println("  Archive ? " + livreur1.isEstArchiver());
-        System.out.println("  Disponible ? " + livreur1.isEstDisponible());
-        System.out.println("  Peut etre affecte ? " + livreur1.peutEtreAffecte());
+        // Test retrait
+        menu.retirerArticle(aqBoisson);
+        System.out.println("\nApres retrait de la boisson:");
+        System.out.println("Nombre d'articles: " + menu.getNombreArticles());
+        System.out.println("Prix total: " + menu.getPrix() + " FCFA");
 
         System.out.println("\n======================");
     }
