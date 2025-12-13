@@ -73,6 +73,13 @@ public class Zone {
         return !estArchiver;
     }
 
+    public void modifierNom(String nouveauNom) {
+        if (nouveauNom == null || nouveauNom.trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom de la zone ne peut pas etre vide");
+        }
+        this.nom = nouveauNom.trim();
+    }
+
     // ===================================
     // Getters et Setters
     // ===================================
