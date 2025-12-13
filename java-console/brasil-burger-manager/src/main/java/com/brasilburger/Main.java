@@ -1,6 +1,8 @@
 package com.brasilburger;
 
-import com.brasilburger.domain.exceptions.*;
+import com.brasilburger.domain.entities.Livreur;
+import com.brasilburger.domain.entities.Quartier;
+import com.brasilburger.domain.entities.Zone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -18,8 +19,8 @@ public class Main {
         // Afficher le banner
         afficherBanner();
 
-        // TEST DES EXCEPTIONS
-        testerExceptions();
+        // TEST DES ENTITES
+        testerEntites();
 
         logger.info("Tests termines avec succes !");
     }
@@ -49,121 +50,97 @@ public class Main {
     }
 
     /**
-     * Test des exceptions personnalisees
+     * Test des entites de base
      */
-    private static void testerExceptions() {
-        System.out.println("=== TEST DES EXCEPTIONS ===\n");
+    private static void testerEntites() {
+        System.out.println("=== TEST DES ENTITES ===\n");
 
-        // Test ArticleNotFoundException
-        System.out.println("--- Test ArticleNotFoundException ---");
+        // Test Zone
+        System.out.println("--- Test Zone ---");
+        Zone zone1 = new Zone("Plateau", 2000);
+        zone1.setId(1L);
+        System.out.println("Zone creee:  " + zone1);
+        System.out.println("Zone active ?  " + zone1.estActive());
+
+        zone1.modifierPrixLivraison(2500);
+        System.out.println("Nouveau prix: " + zone1.getPrixLivraison() + " FCFA");
+
+        zone1.archiver();
+        System.out.println("Apres archivage: " + zone1);
+        System.out.println("Zone active ? " + zone1.estActive());
+
+        zone1.restaurer();
+        System.out.println("Apres restauration, active ? " + zone1.estActive());
+
+        // Test validation
+        System.out.println("\nTest validation prix negatif:");
         try {
-            throw new ArticleNotFoundException(123L);
-        } catch (ArticleNotFoundException e) {
-            System.out.println("Exception capturee:  " + e.getMessage());
-        }
-
-        try {
-            throw new ArticleNotFoundException("code", "BRG001");
-        } catch (ArticleNotFoundException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
-        }
-
-        System.out.println();
-
-        // Test ZoneNotFoundException
-        System.out.println("--- Test ZoneNotFoundException ---");
-        try {
-            throw new ZoneNotFoundException(456L);
-        } catch (ZoneNotFoundException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
-        }
-
-        try {
-            throw new ZoneNotFoundException("nom", "Plateau");
-        } catch (ZoneNotFoundException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
+            zone1.modifierPrixLivraison(-100);
+        } catch (IllegalArgumentException e) {
+            System.out.println("  Erreur capturee: " + e.getMessage());
         }
 
         System.out.println();
 
-        // Test QuartierNotFoundException
-        System.out.println("--- Test QuartierNotFoundException ---");
+        // Test Quartier
+        System.out.println("--- Test Quartier ---");
+        Quartier quartier1 = new Quartier("Mermoz", 1L);
+        quartier1.setId(1L);
+        System.out.println("Quartier cree: " + quartier1);
+        System.out.println("Appartient a la zone 1 ? " + quartier1.appartientAZone(1L));
+        System.out.println("Appartient a la zone 2 ? " + quartier1.appartientAZone(2L));
+
+        quartier1.changerZone(2L);
+        System.out.println("Apres changement de zone:  " + quartier1);
+        System.out.println("Appartient a la zone 2 ? " + quartier1.appartientAZone(2L));
+
+        // Test validation
+        System.out.println("\nTest validation zone null:");
         try {
-            throw new QuartierNotFoundException(789L);
-        } catch (QuartierNotFoundException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
+            quartier1.changerZone(null);
+        } catch (IllegalArgumentException e) {
+            System.out.println("  Erreur capturee: " + e.getMessage());
         }
 
         System.out.println();
 
-        // Test LivreurNotFoundException
-        System.out.println("--- Test LivreurNotFoundException ---");
+        // Test Livreur
+        System.out.println("--- Test Livreur ---");
+        Livreur livreur1 = new Livreur("Diop", "Moussa", "771234567");
+        livreur1.setId(1L);
+        System.out.println("Livreur cree: " + livreur1);
+        System.out.println("Nom complet: " + livreur1.getNomComplet());
+        System.out.println("Peut etre affecte ? " + livreur1.peutEtreAffecte());
+
+        livreur1.marquerOccupe();
+        System.out.println("\nApres marquage occupe:");
+        System.out.println("  Disponible ? " + livreur1.isEstDisponible());
+        System.out.println("  Peut etre affecte ? " + livreur1.peutEtreAffecte());
+
+        livreur1.marquerDisponible();
+        System.out.println("\nApres marquage disponible:");
+        System.out.println("  Disponible ? " + livreur1.isEstDisponible());
+        System.out.println("  Peut etre affecte ? " + livreur1.peutEtreAffecte());
+
+        livreur1.archiver();
+        System.out.println("\nApres archivage:");
+        System.out.println("  Archive ? " + livreur1.isEstArchiver());
+        System.out.println("  Disponible ? " + livreur1.isEstDisponible());
+        System.out.println("  Peut etre affecte ? " + livreur1.peutEtreAffecte());
+
+        // Test validation
+        System.out.println("\nTest validation livreur archive:");
         try {
-            throw new LivreurNotFoundException("telephone", "771234567");
-        } catch (LivreurNotFoundException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
+            livreur1.marquerDisponible();
+        } catch (IllegalStateException e) {
+            System.out.println("  Erreur capturee: " + e.getMessage());
         }
 
-        System.out.println();
-
-        // Test ImageUploadException
-        System.out.println("--- Test ImageUploadException ---");
-        try {
-            throw new ImageUploadException("burger.jpg", "Fichier trop volumineux");
-        } catch (ImageUploadException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
-        }
-
-        try {
-            throw new ImageUploadException("Erreur de connexion a Cloudinary",
-                    new RuntimeException("Connection timeout"));
-        } catch (ImageUploadException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
-            System.out.println("Cause: " + e.getCause().getMessage());
-        }
-
-        System.out.println();
-
-        // Test ValidationException
-        System.out.println("--- Test ValidationException ---");
-        try {
-            throw new ValidationException("libelle", "Le libelle ne peut pas etre vide");
-        } catch (ValidationException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
-            System.out.println("Nombre d'erreurs: " + e.getNombreErreurs());
-        }
-
-        try {
-            throw new ValidationException(Arrays.asList(
-                    "Le nom est obligatoire",
-                    "Le prix doit etre positif",
-                    "L'image est requise"
-            ));
-        } catch (ValidationException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
-            System.out.println("Erreurs detaillees:");
-            e.getErreurs().forEach(erreur -> System.out.println("  - " + erreur));
-        }
-
-        System.out.println();
-
-        // Test DuplicateCodeArticleException
-        System.out.println("--- Test DuplicateCodeArticleException ---");
-        try {
-            throw new DuplicateCodeArticleException("BRG001");
-        } catch (DuplicateCodeArticleException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
-        }
-
-        System.out.println();
-
-        // Test DuplicateZoneException
-        System.out.println("--- Test DuplicateZoneException ---");
-        try {
-            throw new DuplicateZoneException("Parcelles Assainies");
-        } catch (DuplicateZoneException e) {
-            System.out.println("Exception capturee: " + e.getMessage());
-        }
+        livreur1.restaurer();
+        System.out.println("\nApres restauration:");
+        System.out.println("  Archive ? " + livreur1.isEstArchiver());
+        System.out.println("  Disponible ? " + livreur1.isEstDisponible());
+        System.out.println("  Peut etre affecte ? " + livreur1.peutEtreAffecte());
 
         System.out.println("\n======================");
     }
