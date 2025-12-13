@@ -1,6 +1,6 @@
 package com.brasilburger;
 
-import com.brasilburger.config.AppConfig;
+import com.brasilburger.domain.entities.enums.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,28 +17,10 @@ public class Main {
         // Afficher le banner
         afficherBanner();
 
-        // Valider la configuration
-        if (!AppConfig.validateConfiguration()) {
-            logger.error("Configuration invalide !  Verifiez vos variables d'environnement.");
-            System.err.println("\nERREUR:  Variables d'environnement manquantes !");
-            System.err.println("Veuillez definir:  DB_URL, DB_USERNAME, DB_PASSWORD");
-            System.err.println("                  CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET");
-            System.exit(1);
-        }
+        // TEST DES ENUMS
+        testerEnums();
 
-        // Afficher les infos de l'application
-        logger.info("Configuration validee avec succes");
-        logger.info("Demarrage de {} v{}", AppConfig.getAppName(), AppConfig.getAppVersion());
-        logger.info("Environnement: {}", AppConfig.getAppEnvironment());
-
-        System.out.println("\n=== CONFIGURATION CHARGEE ===");
-        System.out.println("Application: " + AppConfig.getAppName());
-        System.out.println("Version: " + AppConfig.getAppVersion());
-        System.out.println("Environnement: " + AppConfig.getAppEnvironment());
-        System.out.println("Pool Size: " + AppConfig.getDatabasePoolSize());
-        System.out.println("==============================\n");
-
-        logger.info("Application prete !");
+        logger.info("Tests termines avec succes !");
     }
 
     /**
@@ -46,7 +28,8 @@ public class Main {
      */
     private static void afficherBanner() {
         try {
-            InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("banner.txt");
+            InputStream inputStream = Main.class.getClassLoader()
+                    .getResourceAsStream("banner.txt");
 
             if (inputStream != null) {
                 String banner = new BufferedReader(
@@ -62,5 +45,62 @@ public class Main {
         } catch (Exception e) {
             logger.warn("Impossible d'afficher le banner: {}", e.getMessage());
         }
+    }
+
+    /**
+     * Test des enums du domaine
+     */
+    private static void testerEnums() {
+        System.out.println("=== TEST DES ENUMS ===\n");
+
+        // Test CategorieArticle
+        System.out.println("Categories d'articles:");
+        for (CategorieArticle cat : CategorieArticle.values()) {
+            System.out.println("  - " + cat.name() + ": " + cat.getLibelle());
+        }
+
+        // Test TypeComplement
+        System.out.println("\nTypes de complements:");
+        for (TypeComplement type : TypeComplement.values()) {
+            System.out.println("  - " + type.name() + ": " + type.getLibelle());
+        }
+
+        // Test RoleUtilisateur
+        System.out.println("\nRoles utilisateurs:");
+        for (RoleUtilisateur role : RoleUtilisateur.values()) {
+            System.out.println("  - " + role.name() + ": " + role.getLibelle());
+        }
+
+        // Test EtatCommande
+        System.out.println("\nEtats de commande:");
+        for (EtatCommande etat : EtatCommande.values()) {
+            System.out.println("  - " + etat.name() + ": " + etat.getLibelle());
+        }
+
+        // Test TypeRecuperation
+        System.out.println("\nTypes de recuperation:");
+        for (TypeRecuperation type : TypeRecuperation.values()) {
+            System.out.println("  - " + type.name() + ": " + type.getLibelle());
+        }
+
+        // Test ModePaiement
+        System.out.println("\nModes de paiement:");
+        for (ModePaiement mode :  ModePaiement.values()) {
+            System.out.println("  - " + mode.name() + ": " + mode.getLibelle());
+        }
+
+        // Test StatutLivraison
+        System.out.println("\nStatuts de livraison:");
+        for (StatutLivraison statut : StatutLivraison.values()) {
+            System.out.println("  - " + statut.name() + ": " + statut.getLibelle());
+        }
+
+        // Test CategoriePanier
+        System.out.println("\nCategories de panier:");
+        for (CategoriePanier cat :  CategoriePanier.values()) {
+            System.out.println("  - " + cat.name() + ": " + cat.getLibelle());
+        }
+
+        System.out.println("\n======================");
     }
 }
