@@ -1,18 +1,20 @@
 package com.brasilburger;
 
 import com.brasilburger.config.AppConfig;
-import com.brasilburger.domain.entities.Zone;
-import com.brasilburger.domain.exceptions.DuplicateZoneException;
+import com. brasilburger.domain.entities.Quartier;
+import com.brasilburger.domain. entities.Zone;
+import com.brasilburger.domain.repositories. IQuartierRepository;
 import com.brasilburger.domain.repositories.IZoneRepository;
-import com.brasilburger.domain.repositories.impl.NeonZoneRepository;
-import com.brasilburger.infrastructure.database.NeonConnectionManager;
+import com. brasilburger.domain.repositories.impl.NeonQuartierRepository;
+import com. brasilburger.domain.repositories.impl.NeonZoneRepository;
+import com.brasilburger.infrastructure.database. NeonConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io. InputStream;
+import java.io. InputStreamReader;
+import java. nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,8 +40,8 @@ public class Main {
 
         logger.info("Configuration validee et connexion etablie");
 
-        // TEST DU REPOSITORY ZONE
-        testerZoneRepository();
+        // TEST DU REPOSITORY QUARTIER (Commit 10)
+        testerQuartierRepository();
 
         logger.info("Tests termines avec succes!");
     }
@@ -62,114 +64,130 @@ public class Main {
                 System.out.println();
             }
         } catch (Exception e) {
-            logger.warn("Impossible d'afficher le banner:  {}", e.getMessage());
+            logger. warn("Impossible d'afficher le banner:  {}", e.getMessage());
         }
     }
 
     /**
-     * Test du repository Zone
+     * Test du repository Quartier (Commit 10)
      */
-    private static void testerZoneRepository() {
-        System.out.println("=== TEST DU REPOSITORY ZONE ===\n");
+    private static void testerQuartierRepository() {
+        System.out.println("=== TEST DU REPOSITORY QUARTIER ===\n");
 
         IZoneRepository zoneRepo = new NeonZoneRepository();
+        IQuartierRepository quartierRepo = new NeonQuartierRepository();
 
         try {
+            // Preparation:  Creer des zones de test
+            System.out.println("Preparation:  Creation de zones de test...");
+            Zone zonePlateau = new Zone("Plateau Test", 2000);
+            Zone zoneParcelles = new Zone("Parcelles Test", 3000);
+
+            zonePlateau = zoneRepo.save(zonePlateau);
+            zoneParcelles = zoneRepo.save(zoneParcelles);
+
+            System.out.println("  ✓ Zone 1:  " + zonePlateau.getNom() + " (ID=" + zonePlateau.getId() + ")");
+            System.out.println("  ✓ Zone 2: " + zoneParcelles.getNom() + " (ID=" + zoneParcelles.getId() + ")");
+
             // Test 1: CREATE (INSERT)
-            System.out.println("Test 1: Creation de zones.. .");
-            Zone zone1 = new Zone("Plateau", 2000);
-            Zone zone2 = new Zone("Parcelles Assainies", 3000);
-            Zone zone3 = new Zone("Almadies", 4000);
+            System.out.println("\nTest 1: Creation de quartiers...");
+            Quartier q1 = new Quartier("Mermoz", zonePlateau. getId());
+            Quartier q2 = new Quartier("Point E", zonePlateau.getId());
+            Quartier q3 = new Quartier("Unite 10", zoneParcelles.getId());
+            Quartier q4 = new Quartier("Unite 15", zoneParcelles.getId());
 
-            zone1 = zoneRepo.save(zone1);
-            zone2 = zoneRepo.save(zone2);
-            zone3 = zoneRepo.save(zone3);
+            q1 = quartierRepo.save(q1);
+            q2 = quartierRepo.save(q2);
+            q3 = quartierRepo.save(q3);
+            q4 = quartierRepo.save(q4);
 
-            System.out.println("  ✓ Zone 1 creee:  " + zone1);
-            System.out.println("  ✓ Zone 2 creee: " + zone2);
-            System.out.println("  ✓ Zone 3 creee: " + zone3);
+            System.out.println("  ✓ Quartier 1: " + q1);
+            System.out.println("  ✓ Quartier 2: " + q2);
+            System.out.println("  ✓ Quartier 3: " + q3);
+            System.out.println("  ✓ Quartier 4: " + q4);
 
             // Test 2: COUNT
-            System.out.println("\nTest 2: Comptage des zones...");
-            long count = zoneRepo.count();
-            System.out.println("  Nombre total de zones: " + count);
+            System.out.println("\nTest 2: Comptage des quartiers...");
+            long count = quartierRepo.count();
+            System.out.println("  Nombre total de quartiers: " + count);
 
             // Test 3: FIND BY ID
-            System.out.println("\nTest 3: Recherche par ID...");
-            Optional<Zone> found = zoneRepo.findById(zone1.getId());
+            System. out.println("\nTest 3: Recherche par ID...");
+            Optional<Quartier> found = quartierRepo.findById(q1.getId());
             if (found.isPresent()) {
-                System.out.println("  ✓ Zone trouvee:  " + found.get());
+                System.out.println("  ✓ Quartier trouve: " + found.get());
             } else {
-                System.out.println("  ✗ Zone non trouvee");
+                System. out.println("  ✗ Quartier non trouve");
             }
 
             // Test 4: FIND BY NOM
             System.out.println("\nTest 4: Recherche par nom...");
-            Optional<Zone> foundByNom = zoneRepo.findByNom("Plateau");
+            Optional<Quartier> foundByNom = quartierRepo. findByNom("Mermoz");
             if (foundByNom.isPresent()) {
-                System.out.println("  ✓ Zone trouvee:  " + foundByNom.get());
+                System.out.println("  ✓ Quartier trouve: " + foundByNom.get());
             } else {
-                System.out.println("  ✗ Zone non trouvee");
+                System.out.println("  ✗ Quartier non trouve");
             }
 
             // Test 5: FIND ALL
-            System.out.println("\nTest 5: Liste de toutes les zones...");
-            List<Zone> allZones = zoneRepo.findAll();
-            System.out.println("  Nombre de zones: " + allZones.size());
-            allZones.forEach(z -> System.out.println("    - " + z.getNom() + " (" + z.getPrixLivraison() + " FCFA)"));
+            System.out.println("\nTest 5: Liste de tous les quartiers...");
+            List<Quartier> allQuartiers = quartierRepo.findAll();
+            System.out.println("  Nombre de quartiers: " + allQuartiers.size());
+            allQuartiers.forEach(q -> System.out.println("    - " + q.getNom() + " (Zone ID:  " + q.getIdZone() + ")"));
 
-            // Test 6: UPDATE
-            System.out.println("\nTest 6: Mise a jour d'une zone...");
-            zone1.setPrixLivraison(2500);
-            zone1.modifierNom("Plateau - Centre Ville");
-            zoneRepo.save(zone1);
-            System.out.println("  ✓ Zone mise a jour: " + zone1);
+            // Test 6: FIND BY ZONE ID
+            System.out.println("\nTest 6: Quartiers de la zone Plateau.. .");
+            List<Quartier> quartiersPlateau = quartierRepo.findByZoneId(zonePlateau.getId());
+            System.out.println("  Nombre de quartiers:  " + quartiersPlateau. size());
+            quartiersPlateau.forEach(q -> System. out.println("    - " + q.getNom()));
 
-            // Test 7: ARCHIVAGE
-            System.out.println("\nTest 7: Archivage d'une zone...");
-            zone2.archiver();
-            zoneRepo.save(zone2);
-            System.out.println("  ✓ Zone archivee: " + zone2);
+            System.out.println("\n  Quartiers de la zone Parcelles.. .");
+            List<Quartier> quartiersParcelles = quartierRepo.findByZoneId(zoneParcelles.getId());
+            System.out.println("  Nombre de quartiers: " + quartiersParcelles.size());
+            quartiersParcelles.forEach(q -> System.out.println("    - " + q.getNom()));
 
-            // Test 8: FIND BY EST_ARCHIVER
-            System.out.println("\nTest 8: Liste des zones non archivees...");
-            List<Zone> zonesActives = zoneRepo.findByEstArchiver(false);
-            System.out.println("  Zones actives:  " + zonesActives.size());
-            zonesActives.forEach(z -> System.out.println("    - " + z.getNom()));
+            // Test 7: COUNT BY ZONE ID
+            System. out.println("\nTest 7: Comptage par zone...");
+            long countPlateau = quartierRepo.countByZoneId(zonePlateau.getId());
+            long countParcelles = quartierRepo.countByZoneId(zoneParcelles.getId());
+            System.out.println("  Quartiers dans Plateau: " + countPlateau);
+            System.out.println("  Quartiers dans Parcelles: " + countParcelles);
 
-            System.out.println("\n  Liste des zones archivees.. .");
-            List<Zone> zonesArchivees = zoneRepo.findByEstArchiver(true);
-            System.out.println("  Zones archivees: " + zonesArchivees.size());
-            zonesArchivees.forEach(z -> System.out.println("    - " + z.getNom()));
+            // Test 8: UPDATE
+            System.out.println("\nTest 8: Mise a jour d'un quartier...");
+            q1.setNom("Mermoz Pyrotechnie");
+            quartierRepo. save(q1);
+            System.out.println("  ✓ Quartier mis a jour: " + q1);
 
-            // Test 9: EXISTS BY NOM
-            System.out.println("\nTest 9: Verification d'existence...");
-            boolean exists = zoneRepo.existsByNom("Plateau");
-            System.out.println("  'Plateau' existe ?  " + (exists ? "Oui" : "Non"));
+            // Test 9: CHANGER DE ZONE
+            System.out. println("\nTest 9: Changement de zone...");
+            System.out.println("  Avant: " + q2.getNom() + " appartient a la zone " + q2.getIdZone());
+            q2.changerZone(zoneParcelles.getId());
+            quartierRepo.save(q2);
+            System.out.println("  Apres: " + q2.getNom() + " appartient a la zone " + q2.getIdZone());
 
-            boolean notExists = zoneRepo.existsByNom("Zone Inexistante");
-            System.out.println("  'Zone Inexistante' existe ? " + (notExists ? "Oui" : "Non"));
+            // Test 10: EXISTS BY NOM
+            System.out.println("\nTest 10: Verification d'existence...");
+            boolean exists = quartierRepo. existsByNom("Mermoz Pyrotechnie");
+            System.out.println("  'Mermoz Pyrotechnie' existe ?  " + (exists ? "Oui" :  "Non"));
 
-            // Test 10: DUPLICATE
-            System.out.println("\nTest 10: Test de duplication.. .");
-            try {
-                // Tester avec le nom mis a jour de zone1
-                Zone duplicate = new Zone("Plateau", 5000);
-                zoneRepo.save(duplicate);
-                System.out.println("  ✗ La duplication aurait du echouer!");
-            } catch (DuplicateZoneException e) {
-                System.out.println("  ✓ Duplication detectee: " + e.getMessage());
-            }
+            boolean notExists = quartierRepo.existsByNom("Quartier Inexistant");
+            System.out.println("  'Quartier Inexistant' existe ? " + (notExists ? "Oui" : "Non"));
 
-            long finalCount = zoneRepo.count();
-            System.out.println("  Nombre de zones restantes: " + finalCount);
+            // Test 11: DELETE
+            System.out.println("\nTest 11: Suppression d'un quartier...");
+            quartierRepo.delete(q4.getId());
+            System.out.println("  ✓ Quartier supprime: " + q4.getNom());
+
+            long finalCount = quartierRepo.count();
+            System.out.println("  Nombre de quartiers restants: " + finalCount);
 
             System.out.println("\n===============================================");
-            System.out.println("TOUS LES TESTS DU REPOSITORY ZONE SONT REUSSIS !");
-            System.out.println("===============================================");
+            System.out.println("TOUS LES TESTS DU REPOSITORY QUARTIER SONT REUSSIS !");
+            System. out.println("===============================================");
 
         } catch (Exception e) {
-            System.err.println("\n✗ ERREUR:  " + e.getMessage());
+            System.err.println("\n✗ ERREUR: " + e.getMessage());
             logger.error("Erreur lors des tests", e);
             e.printStackTrace();
         }
