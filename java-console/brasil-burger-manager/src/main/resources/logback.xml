@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Console Appender - Affiche les logs dans la console -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File Appender - Sauvegarde les logs dans un fichier -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/brasil-burger.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Rotation quotidienne -->
+            <fileNamePattern>logs/brasil-burger.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- Garde les logs 30 jours -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Configuration par package -->
+
+    <!-- Logs de votre application -->
+    <logger name="com.brasilburger" level="INFO" />
+
+    <!-- Logs de la base de donnees (SQL) -->
+    <logger name="com.brasilburger.infrastructure.database" level="DEBUG" />
+
+    <!-- Logs Cloudinary (moins verbeux) -->
+    <logger name="com.cloudinary" level="WARN" />
+
+    <!-- Logs PostgreSQL Driver (moins verbeux) -->
+    <logger name="org.postgresql" level="WARN" />
+
+    <!-- Logs HikariCP -->
+    <logger name="com.zaxxer.hikari" level="INFO" />
+
+    <!-- Configuration racine -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>

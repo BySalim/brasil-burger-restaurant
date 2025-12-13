@@ -37,3 +37,15 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Log files
+logs/
+*.log
+
+# Variables d'environnement locales
+.env
+.env.local
+.env.*.local
+
+# Configuration sensitive
+src/main/resources/application.properties.local

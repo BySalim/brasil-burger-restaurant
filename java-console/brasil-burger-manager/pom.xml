@@ -75,6 +75,13 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.14.0</version>
         </dependency>
+
+        <!-- Dotenv - Chargement des variables depuis . env -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -123,6 +130,8 @@
                 </configuration>
             </plugin>
 
+
         </plugins>
+
     </build>
 </project>
