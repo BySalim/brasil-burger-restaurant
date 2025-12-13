@@ -1,6 +1,7 @@
 package com.brasilburger;
 
-import com.brasilburger.domain.entities.enums.*;
+import com.brasilburger.domain.valueobjects.ImageInfo;
+import com.brasilburger.domain.valueobjects.Prix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +18,8 @@ public class Main {
         // Afficher le banner
         afficherBanner();
 
-        // TEST DES ENUMS
-        testerEnums();
+        // TEST DES VALUE OBJECTS
+        testerValueObjects();
 
         logger.info("Tests termines avec succes !");
     }
@@ -48,57 +49,97 @@ public class Main {
     }
 
     /**
-     * Test des enums du domaine
+     * Test des Value Objects
      */
-    private static void testerEnums() {
-        System.out.println("=== TEST DES ENUMS ===\n");
+    private static void testerValueObjects() {
+        System.out.println("=== TEST DES VALUE OBJECTS ===\n");
 
-        // Test CategorieArticle
-        System.out.println("Categories d'articles:");
-        for (CategorieArticle cat : CategorieArticle.values()) {
-            System.out.println("  - " + cat.name() + ": " + cat.getLibelle());
+        // Test Prix
+        System.out.println("--- Test Prix ---");
+        try {
+            Prix prix1 = new Prix(5000);
+            Prix prix2 = new Prix(3500);
+            Prix prix3 = Prix.zero();
+
+            System.out.println("Prix 1: " + prix1.formater());
+            System.out.println("Prix 2: " + prix2.formater());
+            System.out.println("Prix nul: " + prix3.formater());
+
+            // Operations
+            Prix somme = prix1.ajouter(prix2);
+            System.out.println("Somme (5000 + 3500): " + somme.formater());
+
+            Prix difference = prix1.soustraire(prix2);
+            System.out.println("Difference (5000 - 3500): " + difference.formater());
+
+            Prix multiple = prix1.multiplier(3);
+            System.out.println("Multiple (5000 x 3): " + multiple.formater());
+
+            // Comparaisons
+            System.out.println("5000 > 3500 ? " + prix1.estSuperieurA(prix2));
+            System.out.println("5000 < 3500 ? " + prix1.estInferieurA(prix2));
+            System.out.println("Prix nul ? " + prix3.estNul());
+            System.out.println("Prix positif ? " + prix1.estPositif());
+
+            // Test validation
+            System.out.println("\nTest validation (prix negatif):");
+            try {
+                Prix prixInvalide = new Prix(-100);
+            } catch (IllegalArgumentException e) {
+                System.out.println("  Erreur capturee: " + e.getMessage());
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors du test Prix: " + e.getMessage());
         }
 
-        // Test TypeComplement
-        System.out.println("\nTypes de complements:");
-        for (TypeComplement type : TypeComplement.values()) {
-            System.out.println("  - " + type.name() + ": " + type.getLibelle());
-        }
+        System.out.println();
 
-        // Test RoleUtilisateur
-        System.out.println("\nRoles utilisateurs:");
-        for (RoleUtilisateur role : RoleUtilisateur.values()) {
-            System.out.println("  - " + role.name() + ": " + role.getLibelle());
-        }
+        // Test ImageInfo
+        System.out.println("--- Test ImageInfo ---");
+        try {
+            ImageInfo image1 = new ImageInfo(
+                    "brasil-burger/articles/burger_classic",
+                    "https://res.cloudinary.com/dkmrexigc/image/upload/v1766198145/burger_brazil_nmfggy.jpg",
+                    "jpg"
+            );
 
-        // Test EtatCommande
-        System.out.println("\nEtats de commande:");
-        for (EtatCommande etat : EtatCommande.values()) {
-            System.out.println("  - " + etat.name() + ": " + etat.getLibelle());
-        }
+            ImageInfo image2 = new ImageInfo(
+                    "brasil-burger/articles/menu_deluxe",
+                    "https://res.cloudinary.com/demo/image/upload/v1234567/brasil-burger/articles/menu_deluxe.png"
+            );
 
-        // Test TypeRecuperation
-        System.out.println("\nTypes de recuperation:");
-        for (TypeRecuperation type : TypeRecuperation.values()) {
-            System.out.println("  - " + type.name() + ": " + type.getLibelle());
-        }
+            System.out.println("Image 1:  " + image1);
+            System.out.println("Public ID: " + image1.getPublicId());
+            System.out.println("URL: " + image1.getUrl());
+            System.out.println("Format: " + image1.getFormat());
+            System.out.println("Format valide ?  " + image1.estFormatValide());
 
-        // Test ModePaiement
-        System.out.println("\nModes de paiement:");
-        for (ModePaiement mode :  ModePaiement.values()) {
-            System.out.println("  - " + mode.name() + ": " + mode.getLibelle());
-        }
+            System.out.println("\nImage 2: " + image2);
+            System.out.println("Format par defaut: " + image2.getFormat());
 
-        // Test StatutLivraison
-        System.out.println("\nStatuts de livraison:");
-        for (StatutLivraison statut : StatutLivraison.values()) {
-            System.out.println("  - " + statut.name() + ": " + statut.getLibelle());
-        }
+            // Transformations
+            System.out.println("\nTransformations:");
+            System.out.println("URL miniature (150x150): " + image1.getUrlMiniature());
+            System.out.println("URL redimensionnee (300x200): " + image1.getUrlAvecTransformation(300, 200));
 
-        // Test CategoriePanier
-        System.out.println("\nCategories de panier:");
-        for (CategoriePanier cat :  CategoriePanier.values()) {
-            System.out.println("  - " + cat.name() + ": " + cat.getLibelle());
+            // Test validation
+            System.out.println("\nTest validation (publicId vide):");
+            try {
+                ImageInfo imageInvalide = new ImageInfo("", "http://example.com/image.jpg");
+            } catch (IllegalArgumentException e) {
+                System.out.println("  Erreur capturee: " + e.getMessage());
+            }
+
+            System.out.println("\nTest validation (URL vide):");
+            try {
+                ImageInfo imageInvalide = new ImageInfo("test_id", "");
+            } catch (IllegalArgumentException e) {
+                System.out.println("  Erreur capturee: " + e.getMessage());
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors du test ImageInfo: " + e.getMessage());
         }
 
         System.out.println("\n======================");
