@@ -52,14 +52,20 @@ public class NeonZoneRepository implements IZoneRepository {
             throw new IllegalArgumentException("La zone ne peut pas etre null");
         }
 
-        // Verifier si le nom existe deja (sauf si c'est une mise a jour de la meme zone)
-        if (zone.getId() == null && existsByNom(zone.getNom())) {
-            throw new DuplicateZoneException(zone.getNom());
-        }
+        // Verifier si le nom existe deja
+        Optional<Zone> existingByNom = findByNom(zone.getNom());
 
         if (zone.getId() == null) {
+            // Mode INSERT :  verifier qu'aucune zone avec ce nom n'existe
+            if (existingByNom.isPresent()) {
+                throw new DuplicateZoneException(zone.getNom());
+            }
             return insert(zone);
         } else {
+            // Mode UPDATE : verifier qu'aucune AUTRE zone avec ce nom n'existe
+            if (existingByNom.isPresent() && !existingByNom.get().getId().equals(zone.getId())) {
+                throw new DuplicateZoneException(zone.getNom());
+            }
             return update(zone);
         }
     }

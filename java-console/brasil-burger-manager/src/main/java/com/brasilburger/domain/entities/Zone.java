@@ -4,7 +4,6 @@ import java.util.Objects;
 
 /**
  * Entite Zone
- * Represente une zone de livraison avec un prix associe
  */
 public class Zone {
     private Long id;
@@ -67,17 +66,20 @@ public class Zone {
     }
 
     /**
+     * Modifie le nom de la zone
+     */
+    public void modifierNom(String nouveauNom) {
+        if (nouveauNom == null || nouveauNom.trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom ne peut pas etre vide");
+        }
+        this.nom = nouveauNom.trim();
+    }
+
+    /**
      * Verifie si la zone est active (non archivee)
      */
     public boolean estActive() {
         return !estArchiver;
-    }
-
-    public void modifierNom(String nouveauNom) {
-        if (nouveauNom == null || nouveauNom.trim().isEmpty()) {
-            throw new IllegalArgumentException("Le nom de la zone ne peut pas etre vide");
-        }
-        this.nom = nouveauNom.trim();
     }
 
     // ===================================

@@ -2,18 +2,23 @@ package com.brasilburger;
 
 import com.brasilburger.config.AppConfig;
 import com.brasilburger.domain.entities.Livreur;
+import com.brasilburger.domain.entities.Quartier;
+import com.brasilburger.domain.entities.Zone;
+import com.brasilburger.domain.exceptions.DuplicateZoneException;
 import com.brasilburger.domain.repositories.ILivreurRepository;
+import com.brasilburger.domain.repositories.IQuartierRepository;
+import com.brasilburger.domain.repositories.IZoneRepository;
 import com.brasilburger.domain.repositories.impl.NeonLivreurRepository;
-import com.brasilburger. infrastructure.database.NeonConnectionManager;
+import com.brasilburger.domain.repositories.impl.NeonQuartierRepository;
+import com.brasilburger.domain.repositories.impl.NeonZoneRepository;
+import com.brasilburger.infrastructure.database.NeonConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io. InputStream;
-import java.io. InputStreamReader;
-import java. nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -24,7 +29,7 @@ public class Main {
         afficherBanner();
 
         // Valider la configuration
-        if (! AppConfig.validateConfiguration()) {
+        if (!AppConfig.validateConfiguration()) {
             logger.error("Configuration invalide!");
             System.exit(1);
         }
@@ -37,8 +42,8 @@ public class Main {
 
         logger.info("Configuration validee et connexion etablie");
 
-        // TEST DU REPOSITORY LIVREUR (Commit 11)
-        testerLivreurRepository();
+        // TESTS DE CORRECTION DE BUGS (Commit 12)
+        testerCorrectionBugs();
 
         logger.info("Tests termines avec succes!");
     }
@@ -61,139 +66,143 @@ public class Main {
                 System.out.println();
             }
         } catch (Exception e) {
-            logger. warn("Impossible d'afficher le banner:  {}", e.getMessage());
+            logger.warn("Impossible d'afficher le banner:  {}", e.getMessage());
         }
     }
 
     /**
-     * Test du repository Livreur (Commit 11)
+     * Tests de correction des bugs (Commit 12)
      */
-    private static void testerLivreurRepository() {
-        System.out.println("=== TEST DU REPOSITORY LIVREUR ===\n");
+    private static void testerCorrectionBugs() {
+        System.out.println("=== TESTS DE CORRECTION DE BUGS ===\n");
 
+        IZoneRepository zoneRepo = new NeonZoneRepository();
+        IQuartierRepository quartierRepo = new NeonQuartierRepository();
         ILivreurRepository livreurRepo = new NeonLivreurRepository();
 
         try {
-            // Test 1: CREATE (INSERT)
-            System.out.println("Test 1: Creation de livreurs.. .");
-            Livreur l1 = new Livreur("Diop", "Moussa", "771234567");
-            Livreur l2 = new Livreur("Fall", "Aminata", "772345678");
-            Livreur l3 = new Livreur("Ndiaye", "Ibrahima", "773456789");
+            // ==========================================
+            // Test 1: Bug de duplication Zone (INSERT)
+            // ==========================================
+            System.out.println("Test 1: Verification duplication Zone (INSERT)...");
+            Zone zone1 = new Zone("Test Duplication", 2000);
+            zone1 = zoneRepo.save(zone1);
+            System.out.println("  ✓ Zone creee: " + zone1.getNom());
 
-            l1 = livreurRepo.save(l1);
-            l2 = livreurRepo.save(l2);
-            l3 = livreurRepo.save(l3);
-
-            System.out.println("  ✓ Livreur 1: " + l1);
-            System.out.println("  ✓ Livreur 2: " + l2);
-            System.out.println("  ✓ Livreur 3: " + l3);
-
-            // Test 2: COUNT
-            System.out.println("\nTest 2: Comptage des livreurs...");
-            long count = livreurRepo.count();
-            System.out.println("  Nombre total de livreurs: " + count);
-
-            long countAvailable = livreurRepo. countAvailable();
-            System. out.println("  Nombre de livreurs disponibles: " + countAvailable);
-
-            // Test 3: FIND BY ID
-            System.out.println("\nTest 3: Recherche par ID...");
-            Optional<Livreur> found = livreurRepo.findById(l1.getId());
-            if (found.isPresent()) {
-                System.out.println("  ✓ Livreur trouve: " + found.get().getNomComplet());
-            } else {
-                System.out.println("  ✗ Livreur non trouve");
+            try {
+                Zone zoneDuplicate = new Zone("Test Duplication", 3000);
+                zoneRepo.save(zoneDuplicate);
+                System.out.println("  ✗ ERREUR: La duplication aurait du etre detectee!");
+            } catch (DuplicateZoneException e) {
+                System.out.println("  ✓ Duplication detectee correctement:  " + e.getMessage());
             }
 
-            // Test 4: FIND BY TELEPHONE
-            System.out.println("\nTest 4: Recherche par telephone...");
-            Optional<Livreur> foundByTel = livreurRepo. findByTelephone("771234567");
-            if (foundByTel.isPresent()) {
-                System.out.println("  ✓ Livreur trouve: " + foundByTel.get().getNomComplet());
-            } else {
-                System.out.println("  ✗ Livreur non trouve");
+            // ==========================================
+            // Test 2: Bug de duplication Zone (UPDATE)
+            // ==========================================
+            System.out.println("\nTest 2: Verification duplication Zone (UPDATE)...");
+            Zone zone2 = new Zone("Zone Unique", 2500);
+            zone2 = zoneRepo.save(zone2);
+            System.out.println("  ✓ Zone 2 creee: " + zone2.getNom());
+
+            // Tenter de renommer zone2 avec le nom de zone1
+            try {
+                zone2.modifierNom("Test Duplication");
+                zoneRepo.save(zone2);
+                System.out.println("  ✗ ERREUR: La duplication lors de l'UPDATE aurait du etre detectee!");
+            } catch (DuplicateZoneException e) {
+                System.out.println("  ✓ Duplication lors UPDATE detectee: " + e.getMessage());
+                // Restaurer le nom original
+                zone2.setNom("Zone Unique");
             }
 
-            // Test 5: FIND ALL
-            System.out.println("\nTest 5: Liste de tous les livreurs...");
-            List<Livreur> allLivreurs = livreurRepo.findAll();
-            System.out.println("  Nombre de livreurs: " + allLivreurs.size());
-            allLivreurs.forEach(l -> System.out.println("    - " + l.getNomComplet() +
-                    " (" + l.getTelephone() + ") - Dispo: " + l.isEstDisponible()));
+            // ==========================================
+            // Test 3: Modification nom Zone (sans duplication)
+            // ==========================================
+            System.out.println("\nTest 3: Modification nom Zone (cas valide)...");
+            String ancienNom = zone2.getNom();
+            zone2.modifierNom("Zone Unique Modifiee");
+            zone2 = zoneRepo.save(zone2);
+            System.out.println("  ✓ Nom modifie: '" + ancienNom + "' -> '" + zone2.getNom() + "'");
 
-            // Test 6: UPDATE
-            System.out.println("\nTest 6: Mise a jour d'un livreur...");
-            l1.setTelephone("779999999");
-            livreurRepo.save(l1);
-            System.out.println("  ✓ Telephone mis a jour: " + l1.getTelephone());
+            // ==========================================
+            // Test 4: Modification prix Zone
+            // ==========================================
+            System.out.println("\nTest 4: Modification prix Zone.. .");
+            int ancienPrix = zone1.getPrixLivraison();
+            zone1.modifierPrixLivraison(2800);
+            zone1 = zoneRepo.save(zone1);
+            System.out.println("  ✓ Prix modifie: " + ancienPrix + " -> " + zone1.getPrixLivraison() + " FCFA");
 
-            // Test 7: MARQUER OCCUPE
-            System.out.println("\nTest 7: Marquer un livreur comme occupe...");
-            System.out.println("  Avant: " + l2.getNomComplet() + " - Disponible: " + l2.isEstDisponible());
-            l2.marquerOccupe();
-            livreurRepo.save(l2);
-            System.out.println("  Apres: " + l2.getNomComplet() + " - Disponible: " + l2.isEstDisponible());
+            // ==========================================
+            // Test 5: Test complet Quartier
+            // ==========================================
+            System.out.println("\nTest 5: Test complet Quartier...");
+            Quartier quartier = new Quartier("Quartier Test", zone1.getId());
+            quartier = quartierRepo.save(quartier);
+            System.out.println("  ✓ Quartier cree: " + quartier.getNom() + " (Zone: " + quartier.getIdZone() + ")");
 
-            // Test 8: FIND AVAILABLE
-            System.out.println("\nTest 8: Liste des livreurs disponibles...");
-            List<Livreur> availableLivreurs = livreurRepo.findAvailable();
-            System.out.println("  Nombre de livreurs disponibles: " + availableLivreurs.size());
-            availableLivreurs.forEach(l -> System.out.println("    - " + l.getNomComplet()));
+            // Changer de zone
+            quartier.changerZone(zone2.getId());
+            quartier = quartierRepo.save(quartier);
+            System.out.println("  ✓ Zone changee: " + quartier.getNom() + " -> Zone " + quartier.getIdZone());
 
-            // Test 9:  FIND BY EST DISPONIBLE
-            System.out.println("\nTest 9: Livreurs par statut de disponibilite...");
-            List<Livreur> disponibles = livreurRepo.findByEstDisponible(true);
-            List<Livreur> occupes = livreurRepo.findByEstDisponible(false);
-            System.out.println("  Disponibles: " + disponibles.size());
-            System.out.println("  Occupes: " + occupes.size());
+            // ==========================================
+            // Test 6: Test complet Livreur
+            // ==========================================
+            System.out.println("\nTest 6: Test complet Livreur...");
+            Livreur livreur = new Livreur("Sow", "Fatou", "778888888");
+            livreur = livreurRepo.save(livreur);
+            System.out.println("  ✓ Livreur cree: " + livreur.getNomComplet());
+            System.out.println("    - Disponible: " + livreur.isEstDisponible());
+            System.out.println("    - Peut etre affecte:  " + livreur.peutEtreAffecte());
 
-            // Test 10: ARCHIVAGE
-            System.out.println("\nTest 10: Archivage d'un livreur...");
-            l3.archiver();
-            livreurRepo.save(l3);
-            System.out.println("  ✓ Livreur archive: " + l3.getNomComplet());
-            System.out.println("    Archive: " + l3.isEstArchiver());
-            System.out.println("    Disponible: " + l3.isEstDisponible());
-            System.out.println("    Peut etre affecte: " + l3.peutEtreAffecte());
+            // Marquer occupe
+            livreur.marquerOccupe();
+            livreur = livreurRepo.save(livreur);
+            System.out.println("  ✓ Marque occupe: " + livreur.getNomComplet());
+            System.out.println("    - Disponible: " + livreur.isEstDisponible());
+            System.out.println("    - Peut etre affecte: " + livreur.peutEtreAffecte());
 
-            // Test 11: FIND BY EST ARCHIVER
-            System.out.println("\nTest 11: Livreurs par statut d'archivage...");
-            List<Livreur> actifs = livreurRepo.findByEstArchiver(false);
-            List<Livreur> archives = livreurRepo.findByEstArchiver(true);
-            System.out.println("  Actifs: " + actifs. size());
-            actifs.forEach(l -> System. out.println("    - " + l.getNomComplet()));
-            System.out.println("  Archives: " + archives.size());
-            archives.forEach(l -> System.out.println("    - " + l.getNomComplet()));
+            // Rendre disponible
+            livreur.marquerDisponible();
+            livreur = livreurRepo.save(livreur);
+            System.out.println("  ✓ Rendu disponible: " + livreur.getNomComplet());
+            System.out.println("    - Disponible: " + livreur.isEstDisponible());
+            System.out.println("    - Peut etre affecte: " + livreur.peutEtreAffecte());
 
-            // Test 12: RESTAURATION
-            System.out.println("\nTest 12: Restauration d'un livreur...");
-            l3.restaurer();
-            livreurRepo.save(l3);
-            System.out.println("  ✓ Livreur restaure: " + l3.getNomComplet());
-            System. out.println("    Peut etre affecte: " + l3.peutEtreAffecte());
+            // Archiver
+            livreur.archiver();
+            livreur = livreurRepo.save(livreur);
+            System.out.println("  ✓ Archive: " + livreur.getNomComplet());
+            System.out.println("    - Archive: " + livreur.isEstArchiver());
+            System.out.println("    - Disponible: " + livreur.isEstDisponible());
+            System.out.println("    - Peut etre affecte:  " + livreur.peutEtreAffecte());
 
-            // Test 13: EXISTS BY TELEPHONE
-            System.out.println("\nTest 13: Verification d'existence...");
-            boolean exists = livreurRepo.existsByTelephone("779999999");
-            System.out.println("  '779999999' existe ?  " + (exists ? "Oui" : "Non"));
+            // Tenter de marquer disponible (doit echouer)
+            try {
+                livreur.marquerDisponible();
+                System.out.println("  ✗ ERREUR: Un livreur archive ne devrait pas pouvoir etre marque disponible!");
+            } catch (IllegalStateException e) {
+                System.out.println("  ✓ Erreur correctement detectee: " + e.getMessage());
+            }
 
-            boolean notExists = livreurRepo.existsByTelephone("770000000");
-            System.out.println("  '770000000' existe ? " + (notExists ? "Oui" : "Non"));
-
-            // Test 14: DELETE
-            System.out.println("\nTest 14: Suppression d'un livreur...");
-            livreurRepo.delete(l3.getId());
-            System.out.println("  ✓ Livreur supprime: " + l3.getNomComplet());
-
-            long finalCount = livreurRepo.count();
-            System.out.println("  Nombre de livreurs restants: " + finalCount);
+            // ==========================================
+            // Test 7: Nettoyage
+            // ==========================================
+            System.out.println("\nTest 7: Nettoyage des donnees de test...");
+            livreurRepo.delete(livreur.getId());
+            quartierRepo.delete(quartier.getId());
+            zoneRepo.delete(zone1.getId());
+            zoneRepo.delete(zone2.getId());
+            System.out.println("  ✓ Donnees de test supprimees");
 
             System.out.println("\n===============================================");
-            System.out.println("TOUS LES TESTS DU REPOSITORY LIVREUR SONT REUSSIS !");
+            System.out.println("TOUS LES TESTS DE CORRECTION SONT REUSSIS !");
             System.out.println("===============================================");
 
         } catch (Exception e) {
-            System.err.println("\n✗ ERREUR:  " + e.getMessage());
+            System.err.println("\n✗ ERREUR: " + e.getMessage());
             logger.error("Erreur lors des tests", e);
             e.printStackTrace();
         }
