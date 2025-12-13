@@ -1,13 +1,10 @@
 package com.brasilburger;
 
 import com.brasilburger.config.AppConfig;
-import com. brasilburger.domain.entities.Quartier;
-import com.brasilburger.domain. entities.Zone;
-import com.brasilburger.domain.repositories. IQuartierRepository;
-import com.brasilburger.domain.repositories.IZoneRepository;
-import com. brasilburger.domain.repositories.impl.NeonQuartierRepository;
-import com. brasilburger.domain.repositories.impl.NeonZoneRepository;
-import com.brasilburger.infrastructure.database. NeonConnectionManager;
+import com.brasilburger.domain.entities.Livreur;
+import com.brasilburger.domain.repositories.ILivreurRepository;
+import com.brasilburger.domain.repositories.impl.NeonLivreurRepository;
+import com.brasilburger. infrastructure.database.NeonConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +37,8 @@ public class Main {
 
         logger.info("Configuration validee et connexion etablie");
 
-        // TEST DU REPOSITORY QUARTIER (Commit 10)
-        testerQuartierRepository();
+        // TEST DU REPOSITORY LIVREUR (Commit 11)
+        testerLivreurRepository();
 
         logger.info("Tests termines avec succes!");
     }
@@ -69,125 +66,134 @@ public class Main {
     }
 
     /**
-     * Test du repository Quartier (Commit 10)
+     * Test du repository Livreur (Commit 11)
      */
-    private static void testerQuartierRepository() {
-        System.out.println("=== TEST DU REPOSITORY QUARTIER ===\n");
+    private static void testerLivreurRepository() {
+        System.out.println("=== TEST DU REPOSITORY LIVREUR ===\n");
 
-        IZoneRepository zoneRepo = new NeonZoneRepository();
-        IQuartierRepository quartierRepo = new NeonQuartierRepository();
+        ILivreurRepository livreurRepo = new NeonLivreurRepository();
 
         try {
-            // Preparation:  Creer des zones de test
-            System.out.println("Preparation:  Creation de zones de test...");
-            Zone zonePlateau = new Zone("Plateau Test", 2000);
-            Zone zoneParcelles = new Zone("Parcelles Test", 3000);
-
-            zonePlateau = zoneRepo.save(zonePlateau);
-            zoneParcelles = zoneRepo.save(zoneParcelles);
-
-            System.out.println("  ✓ Zone 1:  " + zonePlateau.getNom() + " (ID=" + zonePlateau.getId() + ")");
-            System.out.println("  ✓ Zone 2: " + zoneParcelles.getNom() + " (ID=" + zoneParcelles.getId() + ")");
-
             // Test 1: CREATE (INSERT)
-            System.out.println("\nTest 1: Creation de quartiers...");
-            Quartier q1 = new Quartier("Mermoz", zonePlateau. getId());
-            Quartier q2 = new Quartier("Point E", zonePlateau.getId());
-            Quartier q3 = new Quartier("Unite 10", zoneParcelles.getId());
-            Quartier q4 = new Quartier("Unite 15", zoneParcelles.getId());
+            System.out.println("Test 1: Creation de livreurs.. .");
+            Livreur l1 = new Livreur("Diop", "Moussa", "771234567");
+            Livreur l2 = new Livreur("Fall", "Aminata", "772345678");
+            Livreur l3 = new Livreur("Ndiaye", "Ibrahima", "773456789");
 
-            q1 = quartierRepo.save(q1);
-            q2 = quartierRepo.save(q2);
-            q3 = quartierRepo.save(q3);
-            q4 = quartierRepo.save(q4);
+            l1 = livreurRepo.save(l1);
+            l2 = livreurRepo.save(l2);
+            l3 = livreurRepo.save(l3);
 
-            System.out.println("  ✓ Quartier 1: " + q1);
-            System.out.println("  ✓ Quartier 2: " + q2);
-            System.out.println("  ✓ Quartier 3: " + q3);
-            System.out.println("  ✓ Quartier 4: " + q4);
+            System.out.println("  ✓ Livreur 1: " + l1);
+            System.out.println("  ✓ Livreur 2: " + l2);
+            System.out.println("  ✓ Livreur 3: " + l3);
 
             // Test 2: COUNT
-            System.out.println("\nTest 2: Comptage des quartiers...");
-            long count = quartierRepo.count();
-            System.out.println("  Nombre total de quartiers: " + count);
+            System.out.println("\nTest 2: Comptage des livreurs...");
+            long count = livreurRepo.count();
+            System.out.println("  Nombre total de livreurs: " + count);
+
+            long countAvailable = livreurRepo. countAvailable();
+            System. out.println("  Nombre de livreurs disponibles: " + countAvailable);
 
             // Test 3: FIND BY ID
-            System. out.println("\nTest 3: Recherche par ID...");
-            Optional<Quartier> found = quartierRepo.findById(q1.getId());
+            System.out.println("\nTest 3: Recherche par ID...");
+            Optional<Livreur> found = livreurRepo.findById(l1.getId());
             if (found.isPresent()) {
-                System.out.println("  ✓ Quartier trouve: " + found.get());
+                System.out.println("  ✓ Livreur trouve: " + found.get().getNomComplet());
             } else {
-                System. out.println("  ✗ Quartier non trouve");
+                System.out.println("  ✗ Livreur non trouve");
             }
 
-            // Test 4: FIND BY NOM
-            System.out.println("\nTest 4: Recherche par nom...");
-            Optional<Quartier> foundByNom = quartierRepo. findByNom("Mermoz");
-            if (foundByNom.isPresent()) {
-                System.out.println("  ✓ Quartier trouve: " + foundByNom.get());
+            // Test 4: FIND BY TELEPHONE
+            System.out.println("\nTest 4: Recherche par telephone...");
+            Optional<Livreur> foundByTel = livreurRepo. findByTelephone("771234567");
+            if (foundByTel.isPresent()) {
+                System.out.println("  ✓ Livreur trouve: " + foundByTel.get().getNomComplet());
             } else {
-                System.out.println("  ✗ Quartier non trouve");
+                System.out.println("  ✗ Livreur non trouve");
             }
 
             // Test 5: FIND ALL
-            System.out.println("\nTest 5: Liste de tous les quartiers...");
-            List<Quartier> allQuartiers = quartierRepo.findAll();
-            System.out.println("  Nombre de quartiers: " + allQuartiers.size());
-            allQuartiers.forEach(q -> System.out.println("    - " + q.getNom() + " (Zone ID:  " + q.getIdZone() + ")"));
+            System.out.println("\nTest 5: Liste de tous les livreurs...");
+            List<Livreur> allLivreurs = livreurRepo.findAll();
+            System.out.println("  Nombre de livreurs: " + allLivreurs.size());
+            allLivreurs.forEach(l -> System.out.println("    - " + l.getNomComplet() +
+                    " (" + l.getTelephone() + ") - Dispo: " + l.isEstDisponible()));
 
-            // Test 6: FIND BY ZONE ID
-            System.out.println("\nTest 6: Quartiers de la zone Plateau.. .");
-            List<Quartier> quartiersPlateau = quartierRepo.findByZoneId(zonePlateau.getId());
-            System.out.println("  Nombre de quartiers:  " + quartiersPlateau. size());
-            quartiersPlateau.forEach(q -> System. out.println("    - " + q.getNom()));
+            // Test 6: UPDATE
+            System.out.println("\nTest 6: Mise a jour d'un livreur...");
+            l1.setTelephone("779999999");
+            livreurRepo.save(l1);
+            System.out.println("  ✓ Telephone mis a jour: " + l1.getTelephone());
 
-            System.out.println("\n  Quartiers de la zone Parcelles.. .");
-            List<Quartier> quartiersParcelles = quartierRepo.findByZoneId(zoneParcelles.getId());
-            System.out.println("  Nombre de quartiers: " + quartiersParcelles.size());
-            quartiersParcelles.forEach(q -> System.out.println("    - " + q.getNom()));
+            // Test 7: MARQUER OCCUPE
+            System.out.println("\nTest 7: Marquer un livreur comme occupe...");
+            System.out.println("  Avant: " + l2.getNomComplet() + " - Disponible: " + l2.isEstDisponible());
+            l2.marquerOccupe();
+            livreurRepo.save(l2);
+            System.out.println("  Apres: " + l2.getNomComplet() + " - Disponible: " + l2.isEstDisponible());
 
-            // Test 7: COUNT BY ZONE ID
-            System. out.println("\nTest 7: Comptage par zone...");
-            long countPlateau = quartierRepo.countByZoneId(zonePlateau.getId());
-            long countParcelles = quartierRepo.countByZoneId(zoneParcelles.getId());
-            System.out.println("  Quartiers dans Plateau: " + countPlateau);
-            System.out.println("  Quartiers dans Parcelles: " + countParcelles);
+            // Test 8: FIND AVAILABLE
+            System.out.println("\nTest 8: Liste des livreurs disponibles...");
+            List<Livreur> availableLivreurs = livreurRepo.findAvailable();
+            System.out.println("  Nombre de livreurs disponibles: " + availableLivreurs.size());
+            availableLivreurs.forEach(l -> System.out.println("    - " + l.getNomComplet()));
 
-            // Test 8: UPDATE
-            System.out.println("\nTest 8: Mise a jour d'un quartier...");
-            q1.setNom("Mermoz Pyrotechnie");
-            quartierRepo. save(q1);
-            System.out.println("  ✓ Quartier mis a jour: " + q1);
+            // Test 9:  FIND BY EST DISPONIBLE
+            System.out.println("\nTest 9: Livreurs par statut de disponibilite...");
+            List<Livreur> disponibles = livreurRepo.findByEstDisponible(true);
+            List<Livreur> occupes = livreurRepo.findByEstDisponible(false);
+            System.out.println("  Disponibles: " + disponibles.size());
+            System.out.println("  Occupes: " + occupes.size());
 
-            // Test 9: CHANGER DE ZONE
-            System.out. println("\nTest 9: Changement de zone...");
-            System.out.println("  Avant: " + q2.getNom() + " appartient a la zone " + q2.getIdZone());
-            q2.changerZone(zoneParcelles.getId());
-            quartierRepo.save(q2);
-            System.out.println("  Apres: " + q2.getNom() + " appartient a la zone " + q2.getIdZone());
+            // Test 10: ARCHIVAGE
+            System.out.println("\nTest 10: Archivage d'un livreur...");
+            l3.archiver();
+            livreurRepo.save(l3);
+            System.out.println("  ✓ Livreur archive: " + l3.getNomComplet());
+            System.out.println("    Archive: " + l3.isEstArchiver());
+            System.out.println("    Disponible: " + l3.isEstDisponible());
+            System.out.println("    Peut etre affecte: " + l3.peutEtreAffecte());
 
-            // Test 10: EXISTS BY NOM
-            System.out.println("\nTest 10: Verification d'existence...");
-            boolean exists = quartierRepo. existsByNom("Mermoz Pyrotechnie");
-            System.out.println("  'Mermoz Pyrotechnie' existe ?  " + (exists ? "Oui" :  "Non"));
+            // Test 11: FIND BY EST ARCHIVER
+            System.out.println("\nTest 11: Livreurs par statut d'archivage...");
+            List<Livreur> actifs = livreurRepo.findByEstArchiver(false);
+            List<Livreur> archives = livreurRepo.findByEstArchiver(true);
+            System.out.println("  Actifs: " + actifs. size());
+            actifs.forEach(l -> System. out.println("    - " + l.getNomComplet()));
+            System.out.println("  Archives: " + archives.size());
+            archives.forEach(l -> System.out.println("    - " + l.getNomComplet()));
 
-            boolean notExists = quartierRepo.existsByNom("Quartier Inexistant");
-            System.out.println("  'Quartier Inexistant' existe ? " + (notExists ? "Oui" : "Non"));
+            // Test 12: RESTAURATION
+            System.out.println("\nTest 12: Restauration d'un livreur...");
+            l3.restaurer();
+            livreurRepo.save(l3);
+            System.out.println("  ✓ Livreur restaure: " + l3.getNomComplet());
+            System. out.println("    Peut etre affecte: " + l3.peutEtreAffecte());
 
-            // Test 11: DELETE
-            System.out.println("\nTest 11: Suppression d'un quartier...");
-            quartierRepo.delete(q4.getId());
-            System.out.println("  ✓ Quartier supprime: " + q4.getNom());
+            // Test 13: EXISTS BY TELEPHONE
+            System.out.println("\nTest 13: Verification d'existence...");
+            boolean exists = livreurRepo.existsByTelephone("779999999");
+            System.out.println("  '779999999' existe ?  " + (exists ? "Oui" : "Non"));
 
-            long finalCount = quartierRepo.count();
-            System.out.println("  Nombre de quartiers restants: " + finalCount);
+            boolean notExists = livreurRepo.existsByTelephone("770000000");
+            System.out.println("  '770000000' existe ? " + (notExists ? "Oui" : "Non"));
+
+            // Test 14: DELETE
+            System.out.println("\nTest 14: Suppression d'un livreur...");
+            livreurRepo.delete(l3.getId());
+            System.out.println("  ✓ Livreur supprime: " + l3.getNomComplet());
+
+            long finalCount = livreurRepo.count();
+            System.out.println("  Nombre de livreurs restants: " + finalCount);
 
             System.out.println("\n===============================================");
-            System.out.println("TOUS LES TESTS DU REPOSITORY QUARTIER SONT REUSSIS !");
-            System. out.println("===============================================");
+            System.out.println("TOUS LES TESTS DU REPOSITORY LIVREUR SONT REUSSIS !");
+            System.out.println("===============================================");
 
         } catch (Exception e) {
-            System.err.println("\n✗ ERREUR: " + e.getMessage());
+            System.err.println("\n✗ ERREUR:  " + e.getMessage());
             logger.error("Erreur lors des tests", e);
             e.printStackTrace();
         }
