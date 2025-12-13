@@ -1,7 +1,6 @@
 package com.brasilburger;
 
-import com.brasilburger.domain.valueobjects.ImageInfo;
-import com.brasilburger.domain.valueobjects.Prix;
+import com.brasilburger.domain.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -18,8 +18,8 @@ public class Main {
         // Afficher le banner
         afficherBanner();
 
-        // TEST DES VALUE OBJECTS
-        testerValueObjects();
+        // TEST DES EXCEPTIONS
+        testerExceptions();
 
         logger.info("Tests termines avec succes !");
     }
@@ -44,102 +44,125 @@ public class Main {
                 logger.warn("Fichier banner.txt introuvable");
             }
         } catch (Exception e) {
-            logger.warn("Impossible d'afficher le banner: {}", e.getMessage());
+            logger.warn("Impossible d'afficher le banner:  {}", e.getMessage());
         }
     }
 
     /**
-     * Test des Value Objects
+     * Test des exceptions personnalisees
      */
-    private static void testerValueObjects() {
-        System.out.println("=== TEST DES VALUE OBJECTS ===\n");
+    private static void testerExceptions() {
+        System.out.println("=== TEST DES EXCEPTIONS ===\n");
 
-        // Test Prix
-        System.out.println("--- Test Prix ---");
+        // Test ArticleNotFoundException
+        System.out.println("--- Test ArticleNotFoundException ---");
         try {
-            Prix prix1 = new Prix(5000);
-            Prix prix2 = new Prix(3500);
-            Prix prix3 = Prix.zero();
+            throw new ArticleNotFoundException(123L);
+        } catch (ArticleNotFoundException e) {
+            System.out.println("Exception capturee:  " + e.getMessage());
+        }
 
-            System.out.println("Prix 1: " + prix1.formater());
-            System.out.println("Prix 2: " + prix2.formater());
-            System.out.println("Prix nul: " + prix3.formater());
-
-            // Operations
-            Prix somme = prix1.ajouter(prix2);
-            System.out.println("Somme (5000 + 3500): " + somme.formater());
-
-            Prix difference = prix1.soustraire(prix2);
-            System.out.println("Difference (5000 - 3500): " + difference.formater());
-
-            Prix multiple = prix1.multiplier(3);
-            System.out.println("Multiple (5000 x 3): " + multiple.formater());
-
-            // Comparaisons
-            System.out.println("5000 > 3500 ? " + prix1.estSuperieurA(prix2));
-            System.out.println("5000 < 3500 ? " + prix1.estInferieurA(prix2));
-            System.out.println("Prix nul ? " + prix3.estNul());
-            System.out.println("Prix positif ? " + prix1.estPositif());
-
-            // Test validation
-            System.out.println("\nTest validation (prix negatif):");
-            try {
-                Prix prixInvalide = new Prix(-100);
-            } catch (IllegalArgumentException e) {
-                System.out.println("  Erreur capturee: " + e.getMessage());
-            }
-
-        } catch (Exception e) {
-            System.err.println("Erreur lors du test Prix: " + e.getMessage());
+        try {
+            throw new ArticleNotFoundException("code", "BRG001");
+        } catch (ArticleNotFoundException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
         }
 
         System.out.println();
 
-        // Test ImageInfo
-        System.out.println("--- Test ImageInfo ---");
+        // Test ZoneNotFoundException
+        System.out.println("--- Test ZoneNotFoundException ---");
         try {
-            ImageInfo image1 = new ImageInfo(
-                    "brasil-burger/articles/burger_classic",
-                    "https://res.cloudinary.com/dkmrexigc/image/upload/v1766198145/burger_brazil_nmfggy.jpg",
-                    "jpg"
-            );
+            throw new ZoneNotFoundException(456L);
+        } catch (ZoneNotFoundException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
+        }
 
-            ImageInfo image2 = new ImageInfo(
-                    "brasil-burger/articles/menu_deluxe",
-                    "https://res.cloudinary.com/demo/image/upload/v1234567/brasil-burger/articles/menu_deluxe.png"
-            );
+        try {
+            throw new ZoneNotFoundException("nom", "Plateau");
+        } catch (ZoneNotFoundException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
+        }
 
-            System.out.println("Image 1:  " + image1);
-            System.out.println("Public ID: " + image1.getPublicId());
-            System.out.println("URL: " + image1.getUrl());
-            System.out.println("Format: " + image1.getFormat());
-            System.out.println("Format valide ?  " + image1.estFormatValide());
+        System.out.println();
 
-            System.out.println("\nImage 2: " + image2);
-            System.out.println("Format par defaut: " + image2.getFormat());
+        // Test QuartierNotFoundException
+        System.out.println("--- Test QuartierNotFoundException ---");
+        try {
+            throw new QuartierNotFoundException(789L);
+        } catch (QuartierNotFoundException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
+        }
 
-            // Transformations
-            System.out.println("\nTransformations:");
-            System.out.println("URL miniature (150x150): " + image1.getUrlMiniature());
-            System.out.println("URL redimensionnee (300x200): " + image1.getUrlAvecTransformation(300, 200));
+        System.out.println();
 
-            // Test validation
-            System.out.println("\nTest validation (publicId vide):");
-            try {
-                ImageInfo imageInvalide = new ImageInfo("", "http://example.com/image.jpg");
-            } catch (IllegalArgumentException e) {
-                System.out.println("  Erreur capturee: " + e.getMessage());
-            }
+        // Test LivreurNotFoundException
+        System.out.println("--- Test LivreurNotFoundException ---");
+        try {
+            throw new LivreurNotFoundException("telephone", "771234567");
+        } catch (LivreurNotFoundException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
+        }
 
-            System.out.println("\nTest validation (URL vide):");
-            try {
-                ImageInfo imageInvalide = new ImageInfo("test_id", "");
-            } catch (IllegalArgumentException e) {
-                System.out.println("  Erreur capturee: " + e.getMessage());
-            }
+        System.out.println();
 
-        } catch (Exception e) {
-            System.err.println("Erreur lors du test ImageInfo: " + e.getMessage());
+        // Test ImageUploadException
+        System.out.println("--- Test ImageUploadException ---");
+        try {
+            throw new ImageUploadException("burger.jpg", "Fichier trop volumineux");
+        } catch (ImageUploadException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
+        }
+
+        try {
+            throw new ImageUploadException("Erreur de connexion a Cloudinary",
+                    new RuntimeException("Connection timeout"));
+        } catch (ImageUploadException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
+            System.out.println("Cause: " + e.getCause().getMessage());
+        }
+
+        System.out.println();
+
+        // Test ValidationException
+        System.out.println("--- Test ValidationException ---");
+        try {
+            throw new ValidationException("libelle", "Le libelle ne peut pas etre vide");
+        } catch (ValidationException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
+            System.out.println("Nombre d'erreurs: " + e.getNombreErreurs());
+        }
+
+        try {
+            throw new ValidationException(Arrays.asList(
+                    "Le nom est obligatoire",
+                    "Le prix doit etre positif",
+                    "L'image est requise"
+            ));
+        } catch (ValidationException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
+            System.out.println("Erreurs detaillees:");
+            e.getErreurs().forEach(erreur -> System.out.println("  - " + erreur));
+        }
+
+        System.out.println();
+
+        // Test DuplicateCodeArticleException
+        System.out.println("--- Test DuplicateCodeArticleException ---");
+        try {
+            throw new DuplicateCodeArticleException("BRG001");
+        } catch (DuplicateCodeArticleException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
+        }
+
+        System.out.println();
+
+        // Test DuplicateZoneException
+        System.out.println("--- Test DuplicateZoneException ---");
+        try {
+            throw new DuplicateZoneException("Parcelles Assainies");
+        } catch (DuplicateZoneException e) {
+            System.out.println("Exception capturee: " + e.getMessage());
         }
 
         System.out.println("\n======================");
