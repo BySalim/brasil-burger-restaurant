@@ -5,6 +5,8 @@ import com.brasilburger.domain.entities.*;
 import com.brasilburger.domain.entities.enums.TypeComplement;
 import com.brasilburger.domain.repositories.IArticleRepository;
 import com.brasilburger.domain.repositories.impl.NeonArticleRepository;
+import com.brasilburger.domain.services.ICodeArticleGenerator;  // Interface
+import com.brasilburger.domain.services.impl.CodeArticleGeneratorImpl;  // Implementation
 import com.brasilburger.domain.services.IImageStorageService;
 import com.brasilburger.domain.services.impl.CloudinaryImageStorageService;
 import com.brasilburger.domain.valueobjects.ImageInfo;
@@ -83,7 +85,9 @@ public class Main {
     private static void testerServiceImageStorage() {
         System.out.println("\n=== TESTS UNITAIRES :  SERVICE IMAGE STORAGE ===\n");
 
+        IArticleRepository articleRepo = new NeonArticleRepository();
         IImageStorageService imageService = new CloudinaryImageStorageService();
+        ICodeArticleGenerator codeGenerator = new CodeArticleGeneratorImpl(articleRepo);  // Interface
 
         try {
             System.out.println("Test 1: Configuration.. .");
@@ -95,13 +99,22 @@ public class Main {
             System.out.println("  Burgers: " + CloudinaryFolders.getBurgers());
             System.out.println("  ✓ Dossiers OK");
 
-            System.out.println("\nTest 3: Generation URL...");
+            System.out.println("\nTest 3: Generateur de codes...");
+            String codeBurger = codeGenerator.genererCodeBurger();
+            String codeMenu = codeGenerator.genererCodeMenu();
+            String codeComplement = codeGenerator.genererCodeComplement();
+            System.out.println("  Code Burger:       " + codeBurger);
+            System.out.println("  Code Menu:       " + codeMenu);
+            System.out.println("  Code Complement:  " + codeComplement);
+            System.out.println("  ✓ Generateur OK");
+
+            System.out.println("\nTest 4: Generation URL...");
             String testId = CloudinaryFolders.getBurgers() + "/test";
             String url = imageService.getImageUrl(testId);
             System.out.println("  URL:  " + url);
             System.out.println("  ✓ URL OK");
 
-            System.out.println("\nTest 4: Validation format...");
+            System.out.println("\nTest 5: Validation format...");
             CloudinaryImageStorageService service = (CloudinaryImageStorageService) imageService;
             assert service.estFormatImageValide("test.jpg");
             assert service.estFormatImageValide("test.png");
@@ -111,7 +124,7 @@ public class Main {
             System.out.println("\n✓ TOUS LES TESTS REUSSIS\n");
 
         } catch (Exception e) {
-            System.err.println("✗ ERREUR:  " + e.getMessage());
+            System.err.println("✗ ERREUR: " + e.getMessage());
             logger.error("Erreur tests", e);
         }
     }
@@ -121,12 +134,13 @@ public class Main {
 
         IArticleRepository articleRepo = new NeonArticleRepository();
         IImageStorageService imageService = new CloudinaryImageStorageService();
+        ICodeArticleGenerator codeGenerator = new CodeArticleGeneratorImpl(articleRepo);  // Interface
 
         while (true) {
             System.out.println("\n=== MENU ===");
-            System.out.println("1.Creer burger");
-            System.out.println("2.Creer complement");
-            System.out.println("3.Creer menu");
+            System.out.println("1.Creer burger (code auto)");
+            System.out.println("2.Creer complement (code auto)");
+            System.out.println("3.Creer menu (code auto)");
             System.out.println("4.Lister articles");
             System.out.println("5.Rechercher article");
             System.out.println("6.Modifier article");
@@ -138,13 +152,13 @@ public class Main {
             String choix = scanner.nextLine().trim();
 
             switch (choix) {
-                case "1":  creerBurger(articleRepo, imageService); break;
-                case "2": creerComplement(articleRepo, imageService); break;
-                case "3":  creerMenu(articleRepo, imageService); break;
+                case "1":  creerBurger(articleRepo, imageService, codeGenerator); break;
+                case "2": creerComplement(articleRepo, imageService, codeGenerator); break;
+                case "3": creerMenu(articleRepo, imageService, codeGenerator); break;
                 case "4": listerArticles(articleRepo); break;
                 case "5":  rechercherArticle(articleRepo); break;
                 case "6": modifierArticle(articleRepo, imageService); break;
-                case "7": supprimerArticle(articleRepo, imageService); break;
+                case "7":  supprimerArticle(articleRepo, imageService); break;
                 case "8": listerImages(imageService); break;
                 case "0": return;
                 default: System.out.println("Choix invalide!");
@@ -152,12 +166,14 @@ public class Main {
         }
     }
 
-    private static void creerBurger(IArticleRepository repo, IImageStorageService imageService) {
+    private static void creerBurger(IArticleRepository repo, IImageStorageService imageService,
+                                    ICodeArticleGenerator codeGenerator) {
         System.out.println("\n=== CREER BURGER ===");
 
         try {
-            System.out.print("Code:  ");
-            String code = scanner.nextLine().trim();
+            // Generation automatique du code
+            String code = codeGenerator.genererCodeBurger();
+            System.out.println("Code genere: " + code);
 
             System.out.print("Libelle: ");
             String libelle = scanner.nextLine().trim();
@@ -165,7 +181,7 @@ public class Main {
             System.out.print("Description: ");
             String description = scanner.nextLine().trim();
 
-            System.out.print("Prix: ");
+            System.out.print("Prix (FCFA): ");
             int prix = Integer.parseInt(scanner.nextLine().trim());
 
             System.out.print("Chemin image (ENTER pour sauter): ");
@@ -184,19 +200,20 @@ public class Main {
 
             Burger burger = new Burger(code, libelle, publicId, description, prix);
             repo.save(burger);
-            System.out.println("\n✓ BURGER CREE!");
+            System.out.println("\n✓ BURGER CREE:  " + code + " - " + libelle);
 
         } catch (Exception e) {
             System.out.println("✗ ERREUR: " + e.getMessage());
         }
     }
 
-    private static void creerComplement(IArticleRepository repo, IImageStorageService imageService) {
+    private static void creerComplement(IArticleRepository repo, IImageStorageService imageService,
+                                        ICodeArticleGenerator codeGenerator) {
         System.out.println("\n=== CREER COMPLEMENT ===");
 
         try {
-            System.out.print("Code: ");
-            String code = scanner.nextLine().trim();
+            String code = codeGenerator.genererCodeComplement();
+            System.out.println("Code genere: " + code);
 
             System.out.print("Libelle: ");
             String libelle = scanner.nextLine().trim();
@@ -205,7 +222,7 @@ public class Main {
             TypeComplement type = scanner.nextLine().trim().equals("1") ?
                     TypeComplement.BOISSON : TypeComplement.FRITES;
 
-            System.out.print("Prix: ");
+            System.out.print("Prix (FCFA): ");
             int prix = Integer.parseInt(scanner.nextLine().trim());
 
             System.out.print("Chemin image (ENTER pour sauter): ");
@@ -224,19 +241,20 @@ public class Main {
 
             Complement complement = new Complement(code, libelle, publicId, type, prix);
             repo.save(complement);
-            System.out.println("\n✓ COMPLEMENT CREE!");
+            System.out.println("\n✓ COMPLEMENT CREE:  " + code + " - " + libelle);
 
         } catch (Exception e) {
             System.out.println("✗ ERREUR: " + e.getMessage());
         }
     }
 
-    private static void creerMenu(IArticleRepository repo, IImageStorageService imageService) {
+    private static void creerMenu(IArticleRepository repo, IImageStorageService imageService,
+                                  ICodeArticleGenerator codeGenerator) {
         System.out.println("\n=== CREER MENU ===");
 
         try {
-            System.out.print("Code: ");
-            String code = scanner.nextLine().trim();
+            String code = codeGenerator.genererCodeMenu();
+            System.out.println("Code genere: " + code);
 
             System.out.print("Libelle: ");
             String libelle = scanner.nextLine().trim();
@@ -260,7 +278,7 @@ public class Main {
 
             Menu menu = new Menu(code, libelle, publicId, description);
             repo.save(menu);
-            System.out.println("\n✓ MENU CREE!");
+            System.out.println("\n✓ MENU CREE: " + code + " - " + libelle);
 
         } catch (Exception e) {
             System.out.println("✗ ERREUR: " + e.getMessage());
@@ -276,11 +294,13 @@ public class Main {
             return;
         }
 
+        System.out.println("\nTotal:  " + articles.size() + " article(s)\n");
+
         for (Article a : articles) {
-            System.out.println("\n" + a.getCode() + " - " + a.getLibelle());
+            System.out.println(a.getCode() + " - " + a.getLibelle());
             System.out.println("  Type: " + a.getCategorie());
             if (a.getImagePublicId() != null) {
-                System.out.println("  Image: " + a.getImagePublicId());
+                System.out.println("  Image:  Oui");
             }
         }
     }
@@ -293,8 +313,9 @@ public class Main {
         if (opt.isPresent()) {
             Article a = opt.get();
             System.out.println("\n✓ TROUVE:");
-            System.out.println("  " + a.getLibelle());
-            System.out.println("  " + a.getCategorie());
+            System.out.println("  Code: " + a.getCode());
+            System.out.println("  Libelle: " + a.getLibelle());
+            System.out.println("  Type: " + a.getCategorie());
             if (a.getImagePublicId() != null) {
                 System.out.println("  Image: " + a.getImagePublicId());
             }
@@ -375,7 +396,7 @@ public class Main {
 
         String folder;
         switch (scanner.nextLine().trim()) {
-            case "1":  folder = CloudinaryFolders.getBurgers(); break;
+            case "1": folder = CloudinaryFolders.getBurgers(); break;
             case "2": folder = CloudinaryFolders.getMenus(); break;
             case "3": folder = CloudinaryFolders.getComplements(); break;
             default: folder = CloudinaryFolders.getArticlesBase();
