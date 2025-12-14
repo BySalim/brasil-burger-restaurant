@@ -7,3 +7,8 @@
 # OS
 .DS_Store
 Thumbs.db
+
+# ignorer les autres dossiers branch
+.java-console/
+.csharp-client/
+.symfony-gestionnaire/
