@@ -4,11 +4,19 @@ import com.brasilburger.config.AppConfig;
 import com.brasilburger.domain.entities.*;
 import com.brasilburger.domain.entities.enums.TypeComplement;
 import com.brasilburger.domain.repositories.IArticleRepository;
+import com.brasilburger.domain.repositories.IQuartierRepository;
+import com.brasilburger.domain.repositories.IZoneRepository;
 import com.brasilburger.domain.repositories.impl.NeonArticleRepository;
-import com.brasilburger.domain.services.ICodeArticleGenerator;  // Interface
-import com.brasilburger.domain.services.impl.CodeArticleGeneratorImpl;  // Implementation
+import com.brasilburger.domain.repositories.impl.NeonQuartierRepository;
+import com.brasilburger.domain.repositories.impl.NeonZoneRepository;
+import com.brasilburger.domain.services.ICodeArticleGenerator;
 import com.brasilburger.domain.services.IImageStorageService;
+import com.brasilburger.domain.services.IQuartierService;
+import com.brasilburger.domain.services.IZoneService;
+import com.brasilburger.domain.services.impl.CodeArticleGeneratorImpl;
 import com.brasilburger.domain.services.impl.CloudinaryImageStorageService;
+import com.brasilburger.domain.services.impl.QuartierServiceImpl;
+import com.brasilburger.domain.services.impl.ZoneServiceImpl;
 import com.brasilburger.domain.valueobjects.ImageInfo;
 import com.brasilburger.infrastructure.cloudinary.CloudinaryConfig;
 import com.brasilburger.infrastructure.cloudinary.CloudinaryFolders;
@@ -52,9 +60,10 @@ public class Main {
 
         // Tests unitaires
         testerServiceImageStorage();
+        testerServicesZoneEtQuartier();
 
         // Tests interactifs
-        System.out.print("\nVoulez-vous lancer les tests interactifs ? (o/n): ");
+        System.out.print("\nVoulez-vous lancer les tests interactifs ?  (o/n): ");
         String reponse = scanner.nextLine().trim().toLowerCase();
         if (reponse.equals("o") || reponse.equals("oui")) {
             testerArticlesAvecImages();
@@ -63,6 +72,9 @@ public class Main {
         logger.info("Tests termines avec succes!");
     }
 
+    /**
+     * Affiche le banner de demarrage depuis banner.txt
+     */
     private static void afficherBanner() {
         try {
             InputStream inputStream = Main.class.getClassLoader()
@@ -82,12 +94,15 @@ public class Main {
         }
     }
 
+    /**
+     * Test des services Image Storage et Code Generator
+     */
     private static void testerServiceImageStorage() {
-        System.out.println("\n=== TESTS UNITAIRES :  SERVICE IMAGE STORAGE ===\n");
+        System.out.println("\n=== TESTS UNITAIRES : SERVICE IMAGE STORAGE ===\n");
 
         IArticleRepository articleRepo = new NeonArticleRepository();
         IImageStorageService imageService = new CloudinaryImageStorageService();
-        ICodeArticleGenerator codeGenerator = new CodeArticleGeneratorImpl(articleRepo);  // Interface
+        ICodeArticleGenerator codeGenerator = new CodeArticleGeneratorImpl(articleRepo);
 
         try {
             System.out.println("Test 1: Configuration.. .");
@@ -104,17 +119,17 @@ public class Main {
             String codeMenu = codeGenerator.genererCodeMenu();
             String codeComplement = codeGenerator.genererCodeComplement();
             System.out.println("  Code Burger:       " + codeBurger);
-            System.out.println("  Code Menu:       " + codeMenu);
+            System.out.println("  Code Menu:        " + codeMenu);
             System.out.println("  Code Complement:  " + codeComplement);
             System.out.println("  ✓ Generateur OK");
 
             System.out.println("\nTest 4: Generation URL...");
             String testId = CloudinaryFolders.getBurgers() + "/test";
             String url = imageService.getImageUrl(testId);
-            System.out.println("  URL:  " + url);
+            System.out.println("  URL: " + url);
             System.out.println("  ✓ URL OK");
 
-            System.out.println("\nTest 5: Validation format...");
+            System.out.println("\nTest 5: Validation format.. .");
             CloudinaryImageStorageService service = (CloudinaryImageStorageService) imageService;
             assert service.estFormatImageValide("test.jpg");
             assert service.estFormatImageValide("test.png");
@@ -124,17 +139,114 @@ public class Main {
             System.out.println("\n✓ TOUS LES TESTS REUSSIS\n");
 
         } catch (Exception e) {
-            System.err.println("✗ ERREUR: " + e.getMessage());
+            System.err.println("✗ ERREUR:  " + e.getMessage());
             logger.error("Erreur tests", e);
         }
     }
 
+    /**
+     * Test des services Zone et Quartier
+     */
+    private static void testerServicesZoneEtQuartier() {
+        System.out.println("\n=== TESTS :  SERVICES ZONE ET QUARTIER ===\n");
+
+        IZoneRepository zoneRepo = new NeonZoneRepository();
+        IQuartierRepository quartierRepo = new NeonQuartierRepository();
+
+        IZoneService zoneService = new ZoneServiceImpl(zoneRepo);
+        IQuartierService quartierService = new QuartierServiceImpl(quartierRepo, zoneRepo);
+
+        try {
+            // Test Zone Service
+            System.out.println("Test 1: Creation de zones via service.. .");
+            Zone zone1 = zoneService.creerZone("Plateau Service", 2000);
+            Zone zone2 = zoneService.creerZone("Parcelles Service", 3000);
+            System.out.println("  ✓ Zones creees:  " + zone1.getNom() + ", " + zone2.getNom());
+
+            System.out.println("\nTest 2: Liste des zones actives...");
+            List<Zone> zonesActives = zoneService.listerZonesActives();
+            System.out.println("  Nombre de zones actives: " + zonesActives.size());
+
+            System.out.println("\nTest 3: Archivage d'une zone.. .");
+            zoneService.archiverZone(zone2.getId());
+            System.out.println("  ✓ Zone archivee");
+
+            System.out.println("\nTest 4: Restauration d'une zone...");
+            zoneService.restaurerZone(zone2.getId());
+            System.out.println("  ✓ Zone restauree");
+
+            System.out.println("\nTest 5: Modification d'une zone...");
+            zoneService.modifierZone(zone1.getId(), "Plateau Modifie", 2500);
+            Zone zoneModifiee = zoneService.obtenirZoneParId(zone1.getId()).get();
+            System.out.println("  ✓ Zone modifiee:  " + zoneModifiee.getNom() + " - " + zoneModifiee.getPrixLivraison() + " FCFA");
+
+            System.out.println("\nTest 6: Creation de quartiers via service...");
+            Quartier q1 = quartierService.creerQuartier("Mermoz Service", zone1.getId());
+            Quartier q2 = quartierService.creerQuartier("Point E Service", zone1.getId());
+            Quartier q3 = quartierService.creerQuartier("Unite 10 Service", zone2.getId());
+            System.out.println("  ✓ Quartiers crees: " + q1.getNom() + ", " + q2.getNom() + ", " + q3.getNom());
+
+            System.out.println("\nTest 7: Quartiers par zone...");
+            List<Quartier> quartiersZone1 = quartierService.listerQuartiersParZone(zone1.getId());
+            List<Quartier> quartiersZone2 = quartierService.listerQuartiersParZone(zone2.getId());
+            System.out.println("  Quartiers dans " + zone1.getNom() + ": " + quartiersZone1.size());
+            System.out.println("  Quartiers dans " + zone2.getNom() + ": " + quartiersZone2.size());
+
+            System.out.println("\nTest 8: Changement de zone.. .");
+            quartierService.changerZoneQuartier(q2.getId(), zone2.getId());
+            System.out.println("  ✓ Quartier deplace vers " + zone2.getNom());
+
+            // Vérification
+            quartiersZone1 = quartierService.listerQuartiersParZone(zone1.getId());
+            quartiersZone2 = quartierService.listerQuartiersParZone(zone2.getId());
+            System.out.println("  Quartiers dans " + zone1.getNom() + ": " + quartiersZone1.size());
+            System.out.println("  Quartiers dans " + zone2.getNom() + ": " + quartiersZone2.size());
+
+            System.out.println("\nTest 9: Modification d'un quartier...");
+            quartierService.modifierQuartier(q1.getId(), "Mermoz Pyrotechnie Service");
+            Quartier quartierModifie = quartierService.obtenirQuartierParId(q1.getId()).get();
+            System.out.println("  ✓ Quartier modifie: " + quartierModifie.getNom());
+
+            System.out.println("\nTest 10: Verification existence...");
+            boolean zoneExiste = zoneService.zoneExiste(zone1.getNom());
+            boolean quartierExiste = quartierService.quartierExiste(q1.getNom());
+            System.out.println("  Zone existe ?  " + zoneExiste);
+            System.out.println("  Quartier existe ? " + quartierExiste);
+
+            System.out.println("\nTest 11: Comptage.. .");
+            long nbZones = zoneService.compterZones();
+            long nbQuartiers = quartierService.compterQuartiers();
+            long nbQuartiersZone1 = quartierService.compterQuartiersParZone(zone1.getId());
+            System.out.println("  Nombre total de zones: " + nbZones);
+            System.out.println("  Nombre total de quartiers: " + nbQuartiers);
+            System.out.println("  Quartiers dans zone 1: " + nbQuartiersZone1);
+
+            System.out.println("\nTest 12: Nettoyage...");
+            quartierService.supprimerQuartier(q1.getId());
+            quartierService.supprimerQuartier(q2.getId());
+            quartierService.supprimerQuartier(q3.getId());
+            zoneService.supprimerZone(zone1.getId());
+            zoneService.supprimerZone(zone2.getId());
+            System.out.println("  ✓ Nettoyage effectue");
+
+            System.out.println("\n✓ TOUS LES TESTS SERVICES REUSSIS\n");
+
+        } catch (Exception e) {
+            System.err.println("✗ ERREUR: " + e.getMessage());
+            logger.error("Erreur tests services", e);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Tests interactifs :  Articles avec images
+     */
     private static void testerArticlesAvecImages() {
         System.out.println("\n=== TESTS INTERACTIFS ===\n");
 
         IArticleRepository articleRepo = new NeonArticleRepository();
         IImageStorageService imageService = new CloudinaryImageStorageService();
-        ICodeArticleGenerator codeGenerator = new CodeArticleGeneratorImpl(articleRepo);  // Interface
+        ICodeArticleGenerator codeGenerator = new CodeArticleGeneratorImpl(articleRepo);
 
         while (true) {
             System.out.println("\n=== MENU ===");
@@ -157,7 +269,7 @@ public class Main {
                 case "3": creerMenu(articleRepo, imageService, codeGenerator); break;
                 case "4": listerArticles(articleRepo); break;
                 case "5":  rechercherArticle(articleRepo); break;
-                case "6": modifierArticle(articleRepo, imageService); break;
+                case "6":  modifierArticle(articleRepo, imageService); break;
                 case "7":  supprimerArticle(articleRepo, imageService); break;
                 case "8": listerImages(imageService); break;
                 case "0": return;
@@ -171,7 +283,6 @@ public class Main {
         System.out.println("\n=== CREER BURGER ===");
 
         try {
-            // Generation automatique du code
             String code = codeGenerator.genererCodeBurger();
             System.out.println("Code genere: " + code);
 
@@ -188,7 +299,7 @@ public class Main {
             String chemin = scanner.nextLine().trim();
 
             String publicId = null;
-            if (!chemin.isEmpty()) {
+            if (! chemin.isEmpty()) {
                 try {
                     ImageInfo img = imageService.uploadImage(chemin, CloudinaryFolders.getBurgers());
                     publicId = img.getPublicId();
