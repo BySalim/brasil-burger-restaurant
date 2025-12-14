@@ -4,17 +4,21 @@ import com.brasilburger.config.AppConfig;
 import com.brasilburger.domain.entities.*;
 import com.brasilburger.domain.entities.enums.TypeComplement;
 import com.brasilburger.domain.repositories.IArticleRepository;
+import com.brasilburger.domain.repositories.ILivreurRepository;
 import com.brasilburger.domain.repositories.IQuartierRepository;
 import com.brasilburger.domain.repositories.IZoneRepository;
 import com.brasilburger.domain.repositories.impl.NeonArticleRepository;
+import com.brasilburger.domain.repositories.impl.NeonLivreurRepository;
 import com.brasilburger.domain.repositories.impl.NeonQuartierRepository;
 import com.brasilburger.domain.repositories.impl.NeonZoneRepository;
 import com.brasilburger.domain.services.ICodeArticleGenerator;
 import com.brasilburger.domain.services.IImageStorageService;
+import com.brasilburger.domain.services.ILivreurService;
 import com.brasilburger.domain.services.IQuartierService;
 import com.brasilburger.domain.services.IZoneService;
 import com.brasilburger.domain.services.impl.CodeArticleGeneratorImpl;
 import com.brasilburger.domain.services.impl.CloudinaryImageStorageService;
+import com.brasilburger.domain.services.impl.LivreurServiceImpl;
 import com.brasilburger.domain.services.impl.QuartierServiceImpl;
 import com.brasilburger.domain.services.impl.ZoneServiceImpl;
 import com.brasilburger.domain.valueobjects.ImageInfo;
@@ -46,7 +50,7 @@ public class Main {
             System.exit(1);
         }
 
-        if (! NeonConnectionManager.testConnection()) {
+        if (!NeonConnectionManager.testConnection()) {
             logger.error("Impossible de se connecter a la base de donnees");
             System.exit(1);
         }
@@ -60,14 +64,7 @@ public class Main {
 
         // Tests unitaires
         testerServiceImageStorage();
-        testerServicesZoneEtQuartier();
-
-        // Tests interactifs
-        System.out.print("\nVoulez-vous lancer les tests interactifs ?  (o/n): ");
-        String reponse = scanner.nextLine().trim().toLowerCase();
-        if (reponse.equals("o") || reponse.equals("oui")) {
-            testerArticlesAvecImages();
-        }
+        testerServiceLivreur();
 
         logger.info("Tests termines avec succes!");
     }
@@ -126,10 +123,10 @@ public class Main {
             System.out.println("\nTest 4: Generation URL...");
             String testId = CloudinaryFolders.getBurgers() + "/test";
             String url = imageService.getImageUrl(testId);
-            System.out.println("  URL: " + url);
+            System.out.println("  URL:  " + url);
             System.out.println("  ✓ URL OK");
 
-            System.out.println("\nTest 5: Validation format.. .");
+            System.out.println("\nTest 5: Validation format...");
             CloudinaryImageStorageService service = (CloudinaryImageStorageService) imageService;
             assert service.estFormatImageValide("test.jpg");
             assert service.estFormatImageValide("test.png");
@@ -139,382 +136,139 @@ public class Main {
             System.out.println("\n✓ TOUS LES TESTS REUSSIS\n");
 
         } catch (Exception e) {
-            System.err.println("✗ ERREUR:  " + e.getMessage());
+            System.err.println("✗ ERREUR: " + e.getMessage());
             logger.error("Erreur tests", e);
         }
     }
 
     /**
-     * Test des services Zone et Quartier
+     * Test du service Livreur
      */
-    private static void testerServicesZoneEtQuartier() {
-        System.out.println("\n=== TESTS :  SERVICES ZONE ET QUARTIER ===\n");
+    private static void testerServiceLivreur() {
+        System.out.println("\n=== TESTS : SERVICE LIVREUR ===\n");
 
-        IZoneRepository zoneRepo = new NeonZoneRepository();
-        IQuartierRepository quartierRepo = new NeonQuartierRepository();
-
-        IZoneService zoneService = new ZoneServiceImpl(zoneRepo);
-        IQuartierService quartierService = new QuartierServiceImpl(quartierRepo, zoneRepo);
+        ILivreurRepository livreurRepo = new NeonLivreurRepository();
+        ILivreurService livreurService = new LivreurServiceImpl(livreurRepo);
 
         try {
-            // Test Zone Service
-            System.out.println("Test 1: Creation de zones via service.. .");
-            Zone zone1 = zoneService.creerZone("Plateau Service", 2000);
-            Zone zone2 = zoneService.creerZone("Parcelles Service", 3000);
-            System.out.println("  ✓ Zones creees:  " + zone1.getNom() + ", " + zone2.getNom());
+            // Test 1: Création de livreurs
+            System.out.println("Test 1: Creation de livreurs via service...");
+            Livreur l1 = livreurService.creerLivreur("Diop", "Moussa", "771234567");
+            Livreur l2 = livreurService.creerLivreur("Fall", "Aminata", "772345678");
+            Livreur l3 = livreurService.creerLivreur("Ndiaye", "Ibrahima", "773456789");
+            System.out.println("  ✓ Livreurs crees: " + l1.getNomComplet() + ", " +
+                    l2.getNomComplet() + ", " + l3.getNomComplet());
 
-            System.out.println("\nTest 2: Liste des zones actives...");
-            List<Zone> zonesActives = zoneService.listerZonesActives();
-            System.out.println("  Nombre de zones actives: " + zonesActives.size());
+            // Test 2: Liste des livreurs disponibles
+            System.out.println("\nTest 2: Liste des livreurs disponibles...");
+            List<Livreur> disponibles = livreurService.listerLivreursDisponibles();
+            System.out.println("  Nombre de livreurs disponibles: " + disponibles.size());
+            disponibles.forEach(l -> System.out.println("    - " + l.getNomComplet()));
 
-            System.out.println("\nTest 3: Archivage d'une zone.. .");
-            zoneService.archiverZone(zone2.getId());
-            System.out.println("  ✓ Zone archivee");
+            // Test 3: Marquer un livreur comme occupé
+            System.out.println("\nTest 3: Marquer un livreur comme occupe...");
+            livreurService.marquerOccupe(l1.getId());
+            System.out.println("  ✓ Livreur marque occupe:  " + l1.getNomComplet());
 
-            System.out.println("\nTest 4: Restauration d'une zone...");
-            zoneService.restaurerZone(zone2.getId());
-            System.out.println("  ✓ Zone restauree");
+            // Test 4: Vérification disponibilité
+            System.out.println("\nTest 4: Verification disponibilite...");
+            disponibles = livreurService.listerLivreursDisponibles();
+            List<Livreur> occupes = livreurService.listerLivreursOccupes();
+            System.out.println("  Disponibles: " + disponibles.size());
+            System.out.println("  Occupes: " + occupes.size());
 
-            System.out.println("\nTest 5: Modification d'une zone...");
-            zoneService.modifierZone(zone1.getId(), "Plateau Modifie", 2500);
-            Zone zoneModifiee = zoneService.obtenirZoneParId(zone1.getId()).get();
-            System.out.println("  ✓ Zone modifiee:  " + zoneModifiee.getNom() + " - " + zoneModifiee.getPrixLivraison() + " FCFA");
+            // Test 5: Rendre disponible
+            System.out.println("\nTest 5: Rendre un livreur disponible...");
+            livreurService.marquerDisponible(l1.getId());
+            System.out.println("  ✓ Livreur marque disponible: " + l1.getNomComplet());
 
-            System.out.println("\nTest 6: Creation de quartiers via service...");
-            Quartier q1 = quartierService.creerQuartier("Mermoz Service", zone1.getId());
-            Quartier q2 = quartierService.creerQuartier("Point E Service", zone1.getId());
-            Quartier q3 = quartierService.creerQuartier("Unite 10 Service", zone2.getId());
-            System.out.println("  ✓ Quartiers crees: " + q1.getNom() + ", " + q2.getNom() + ", " + q3.getNom());
+            // Test 6: Modification d'un livreur
+            System.out.println("\nTest 6: Modification d'un livreur...");
+            livreurService.modifierLivreur(l2.getId(), null, null, "779999999");
+            Livreur l2Modifie = livreurService.obtenirLivreurParId(l2.getId()).get();
+            System.out.println("  ✓ Telephone modifie: " + l2Modifie.getTelephone());
 
-            System.out.println("\nTest 7: Quartiers par zone...");
-            List<Quartier> quartiersZone1 = quartierService.listerQuartiersParZone(zone1.getId());
-            List<Quartier> quartiersZone2 = quartierService.listerQuartiersParZone(zone2.getId());
-            System.out.println("  Quartiers dans " + zone1.getNom() + ": " + quartiersZone1.size());
-            System.out.println("  Quartiers dans " + zone2.getNom() + ": " + quartiersZone2.size());
+            // Test 7: Archivage
+            System.out.println("\nTest 7: Archivage d'un livreur...");
+            livreurService.archiverLivreur(l3.getId());
+            System.out.println("  ✓ Livreur archive:  " + l3.getNomComplet());
 
-            System.out.println("\nTest 8: Changement de zone.. .");
-            quartierService.changerZoneQuartier(q2.getId(), zone2.getId());
-            System.out.println("  ✓ Quartier deplace vers " + zone2.getNom());
+            // Test 8: Vérification peut être affecté
+            System.out.println("\nTest 8: Verification affectation possible...");
+            boolean l1PeutEtreAffecte = livreurService.peutEtreAffecte(l1.getId());
+            boolean l3PeutEtreAffecte = livreurService.peutEtreAffecte(l3.getId());
+            System.out.println("  " + l1.getNomComplet() + " peut etre affecte ? " + l1PeutEtreAffecte);
+            System.out.println("  " + l3.getNomComplet() + " peut etre affecte ? " + l3PeutEtreAffecte);
 
-            // Vérification
-            quartiersZone1 = quartierService.listerQuartiersParZone(zone1.getId());
-            quartiersZone2 = quartierService.listerQuartiersParZone(zone2.getId());
-            System.out.println("  Quartiers dans " + zone1.getNom() + ": " + quartiersZone1.size());
-            System.out.println("  Quartiers dans " + zone2.getNom() + ": " + quartiersZone2.size());
+            // Test 9: Tentative de marquer disponible un livreur archivé
+            System.out.println("\nTest 9: Tentative marquer disponible un livreur archive...");
+            try {
+                livreurService.marquerDisponible(l3.getId());
+                System.out.println("  ✗ ERREUR: devrait lancer une exception");
+            } catch (IllegalStateException e) {
+                System.out.println("  ✓ Exception correctement levee: " + e.getMessage());
+            }
 
-            System.out.println("\nTest 9: Modification d'un quartier...");
-            quartierService.modifierQuartier(q1.getId(), "Mermoz Pyrotechnie Service");
-            Quartier quartierModifie = quartierService.obtenirQuartierParId(q1.getId()).get();
-            System.out.println("  ✓ Quartier modifie: " + quartierModifie.getNom());
+            // Test 10: Restauration
+            System.out.println("\nTest 10: Restauration d'un livreur...");
+            livreurService.restaurerLivreur(l3.getId());
+            Livreur l3Restaure = livreurService.obtenirLivreurParId(l3.getId()).get();
+            System.out.println("  ✓ Livreur restaure: " + l3Restaure.getNomComplet());
+            System.out.println("    Peut etre affecte maintenant ? " + l3Restaure.peutEtreAffecte());
 
-            System.out.println("\nTest 10: Verification existence...");
-            boolean zoneExiste = zoneService.zoneExiste(zone1.getNom());
-            boolean quartierExiste = quartierService.quartierExiste(q1.getNom());
-            System.out.println("  Zone existe ?  " + zoneExiste);
-            System.out.println("  Quartier existe ? " + quartierExiste);
+            // Test 11: Recherche par téléphone
+            System.out.println("\nTest 11: Recherche par telephone...");
+            Optional<Livreur> trouve = livreurService.obtenirLivreurParTelephone("779999999");
+            if (trouve.isPresent()) {
+                System.out.println("  ✓ Livreur trouve:  " + trouve.get().getNomComplet());
+            }
 
-            System.out.println("\nTest 11: Comptage.. .");
-            long nbZones = zoneService.compterZones();
-            long nbQuartiers = quartierService.compterQuartiers();
-            long nbQuartiersZone1 = quartierService.compterQuartiersParZone(zone1.getId());
-            System.out.println("  Nombre total de zones: " + nbZones);
-            System.out.println("  Nombre total de quartiers: " + nbQuartiers);
-            System.out.println("  Quartiers dans zone 1: " + nbQuartiersZone1);
+            // Test 12: Vérification existence
+            System.out.println("\nTest 12: Verification existence...");
+            boolean existe = livreurService.livreurExiste("779999999");
+            boolean nexistePas = livreurService.livreurExiste("770000000");
+            System.out.println("  779999999 existe ? " + existe);
+            System.out.println("  770000000 existe ? " + nexistePas);
 
-            System.out.println("\nTest 12: Nettoyage...");
-            quartierService.supprimerQuartier(q1.getId());
-            quartierService.supprimerQuartier(q2.getId());
-            quartierService.supprimerQuartier(q3.getId());
-            zoneService.supprimerZone(zone1.getId());
-            zoneService.supprimerZone(zone2.getId());
+            // Test 13: Comptage
+            System.out.println("\nTest 13: Comptage...");
+            long nbTotal = livreurService.compterLivreurs();
+            long nbDisponibles = livreurService.compterLivreursDisponibles();
+            System.out.println("  Nombre total de livreurs: " + nbTotal);
+            System.out.println("  Nombre de livreurs disponibles: " + nbDisponibles);
+
+            // Test 14: Tentative de créer avec téléphone existant
+            System.out.println("\nTest 14: Tentative creation avec telephone existant...");
+            try {
+                livreurService.creerLivreur("Test", "Test", "771234567");
+                System.out.println("  ✗ ERREUR: devrait lancer une exception");
+            } catch (IllegalArgumentException e) {
+                System.out.println("  ✓ Exception correctement levee: " + e.getMessage());
+            }
+
+            // Test 15: Validation format téléphone
+            System.out.println("\nTest 15: Validation format telephone...");
+            try {
+                livreurService.creerLivreur("Test", "Test", "123");
+                System.out.println("  ✗ ERREUR: devrait lancer une exception");
+            } catch (IllegalArgumentException e) {
+                System.out.println("  ✓ Exception correctement levee: " + e.getMessage());
+            }
+
+            // Test 16: Nettoyage
+            System.out.println("\nTest 16: Nettoyage...");
+            livreurService.supprimerLivreur(l1.getId());
+            livreurService.supprimerLivreur(l2.getId());
+            livreurService.supprimerLivreur(l3.getId());
             System.out.println("  ✓ Nettoyage effectue");
 
-            System.out.println("\n✓ TOUS LES TESTS SERVICES REUSSIS\n");
+            System.out.println("\n✓ TOUS LES TESTS SERVICE LIVREUR REUSSIS\n");
 
         } catch (Exception e) {
             System.err.println("✗ ERREUR: " + e.getMessage());
-            logger.error("Erreur tests services", e);
+            logger.error("Erreur tests service livreur", e);
             e.printStackTrace();
         }
     }
 
-    /**
-     * Tests interactifs :  Articles avec images
-     */
-    private static void testerArticlesAvecImages() {
-        System.out.println("\n=== TESTS INTERACTIFS ===\n");
-
-        IArticleRepository articleRepo = new NeonArticleRepository();
-        IImageStorageService imageService = new CloudinaryImageStorageService();
-        ICodeArticleGenerator codeGenerator = new CodeArticleGeneratorImpl(articleRepo);
-
-        while (true) {
-            System.out.println("\n=== MENU ===");
-            System.out.println("1.Creer burger (code auto)");
-            System.out.println("2.Creer complement (code auto)");
-            System.out.println("3.Creer menu (code auto)");
-            System.out.println("4.Lister articles");
-            System.out.println("5.Rechercher article");
-            System.out.println("6.Modifier article");
-            System.out.println("7.Supprimer article");
-            System.out.println("8.Lister images");
-            System.out.println("0.Quitter");
-            System.out.print("\nChoix: ");
-
-            String choix = scanner.nextLine().trim();
-
-            switch (choix) {
-                case "1":  creerBurger(articleRepo, imageService, codeGenerator); break;
-                case "2": creerComplement(articleRepo, imageService, codeGenerator); break;
-                case "3": creerMenu(articleRepo, imageService, codeGenerator); break;
-                case "4": listerArticles(articleRepo); break;
-                case "5":  rechercherArticle(articleRepo); break;
-                case "6":  modifierArticle(articleRepo, imageService); break;
-                case "7":  supprimerArticle(articleRepo, imageService); break;
-                case "8": listerImages(imageService); break;
-                case "0": return;
-                default: System.out.println("Choix invalide!");
-            }
-        }
-    }
-
-    private static void creerBurger(IArticleRepository repo, IImageStorageService imageService,
-                                    ICodeArticleGenerator codeGenerator) {
-        System.out.println("\n=== CREER BURGER ===");
-
-        try {
-            String code = codeGenerator.genererCodeBurger();
-            System.out.println("Code genere: " + code);
-
-            System.out.print("Libelle: ");
-            String libelle = scanner.nextLine().trim();
-
-            System.out.print("Description: ");
-            String description = scanner.nextLine().trim();
-
-            System.out.print("Prix (FCFA): ");
-            int prix = Integer.parseInt(scanner.nextLine().trim());
-
-            System.out.print("Chemin image (ENTER pour sauter): ");
-            String chemin = scanner.nextLine().trim();
-
-            String publicId = null;
-            if (! chemin.isEmpty()) {
-                try {
-                    ImageInfo img = imageService.uploadImage(chemin, CloudinaryFolders.getBurgers());
-                    publicId = img.getPublicId();
-                    System.out.println("  ✓ Image uploadee");
-                } catch (Exception e) {
-                    System.out.println("  ✗ " + e.getMessage());
-                }
-            }
-
-            Burger burger = new Burger(code, libelle, publicId, description, prix);
-            repo.save(burger);
-            System.out.println("\n✓ BURGER CREE:  " + code + " - " + libelle);
-
-        } catch (Exception e) {
-            System.out.println("✗ ERREUR: " + e.getMessage());
-        }
-    }
-
-    private static void creerComplement(IArticleRepository repo, IImageStorageService imageService,
-                                        ICodeArticleGenerator codeGenerator) {
-        System.out.println("\n=== CREER COMPLEMENT ===");
-
-        try {
-            String code = codeGenerator.genererCodeComplement();
-            System.out.println("Code genere: " + code);
-
-            System.out.print("Libelle: ");
-            String libelle = scanner.nextLine().trim();
-
-            System.out.print("Type (1=Boisson, 2=Frites): ");
-            TypeComplement type = scanner.nextLine().trim().equals("1") ?
-                    TypeComplement.BOISSON : TypeComplement.FRITES;
-
-            System.out.print("Prix (FCFA): ");
-            int prix = Integer.parseInt(scanner.nextLine().trim());
-
-            System.out.print("Chemin image (ENTER pour sauter): ");
-            String chemin = scanner.nextLine().trim();
-
-            String publicId = null;
-            if (!chemin.isEmpty()) {
-                try {
-                    ImageInfo img = imageService.uploadImage(chemin, CloudinaryFolders.getComplements());
-                    publicId = img.getPublicId();
-                    System.out.println("  ✓ Image uploadee");
-                } catch (Exception e) {
-                    System.out.println("  ✗ " + e.getMessage());
-                }
-            }
-
-            Complement complement = new Complement(code, libelle, publicId, type, prix);
-            repo.save(complement);
-            System.out.println("\n✓ COMPLEMENT CREE:  " + code + " - " + libelle);
-
-        } catch (Exception e) {
-            System.out.println("✗ ERREUR: " + e.getMessage());
-        }
-    }
-
-    private static void creerMenu(IArticleRepository repo, IImageStorageService imageService,
-                                  ICodeArticleGenerator codeGenerator) {
-        System.out.println("\n=== CREER MENU ===");
-
-        try {
-            String code = codeGenerator.genererCodeMenu();
-            System.out.println("Code genere: " + code);
-
-            System.out.print("Libelle: ");
-            String libelle = scanner.nextLine().trim();
-
-            System.out.print("Description: ");
-            String description = scanner.nextLine().trim();
-
-            System.out.print("Chemin image (ENTER pour sauter): ");
-            String chemin = scanner.nextLine().trim();
-
-            String publicId = null;
-            if (!chemin.isEmpty()) {
-                try {
-                    ImageInfo img = imageService.uploadImage(chemin, CloudinaryFolders.getMenus());
-                    publicId = img.getPublicId();
-                    System.out.println("  ✓ Image uploadee");
-                } catch (Exception e) {
-                    System.out.println("  ✗ " + e.getMessage());
-                }
-            }
-
-            Menu menu = new Menu(code, libelle, publicId, description);
-            repo.save(menu);
-            System.out.println("\n✓ MENU CREE: " + code + " - " + libelle);
-
-        } catch (Exception e) {
-            System.out.println("✗ ERREUR: " + e.getMessage());
-        }
-    }
-
-    private static void listerArticles(IArticleRepository repo) {
-        System.out.println("\n=== LISTE ARTICLES ===");
-        List<Article> articles = repo.findAll();
-
-        if (articles.isEmpty()) {
-            System.out.println("Aucun article");
-            return;
-        }
-
-        System.out.println("\nTotal:  " + articles.size() + " article(s)\n");
-
-        for (Article a : articles) {
-            System.out.println(a.getCode() + " - " + a.getLibelle());
-            System.out.println("  Type: " + a.getCategorie());
-            if (a.getImagePublicId() != null) {
-                System.out.println("  Image:  Oui");
-            }
-        }
-    }
-
-    private static void rechercherArticle(IArticleRepository repo) {
-        System.out.print("\nCode article: ");
-        String code = scanner.nextLine().trim();
-
-        Optional<Article> opt = repo.findByCode(code);
-        if (opt.isPresent()) {
-            Article a = opt.get();
-            System.out.println("\n✓ TROUVE:");
-            System.out.println("  Code: " + a.getCode());
-            System.out.println("  Libelle: " + a.getLibelle());
-            System.out.println("  Type: " + a.getCategorie());
-            if (a.getImagePublicId() != null) {
-                System.out.println("  Image: " + a.getImagePublicId());
-            }
-        } else {
-            System.out.println("✗ Non trouve");
-        }
-    }
-
-    private static void modifierArticle(IArticleRepository repo, IImageStorageService imageService) {
-        System.out.print("\nCode article: ");
-        String code = scanner.nextLine().trim();
-
-        Optional<Article> opt = repo.findByCode(code);
-        if (!opt.isPresent()) {
-            System.out.println("✗ Non trouve");
-            return;
-        }
-
-        Article article = opt.get();
-        System.out.println("Article:  " + article.getLibelle());
-
-        System.out.print("Nouveau libelle (ENTER pour garder): ");
-        String libelle = scanner.nextLine().trim();
-        if (!libelle.isEmpty()) {
-            article.modifierLibelle(libelle);
-        }
-
-        System.out.print("Changer image?  (o/n): ");
-        if (scanner.nextLine().trim().equalsIgnoreCase("o")) {
-            System.out.print("Chemin:  ");
-            String chemin = scanner.nextLine().trim();
-
-            try {
-                if (article.getImagePublicId() != null) {
-                    imageService.deleteImage(article.getImagePublicId());
-                }
-
-                String folder = CloudinaryFolders.getSubfolderForArticle(article.getCategorie().name());
-                ImageInfo img = imageService.uploadImage(chemin, folder);
-                article.setImagePublicId(img.getPublicId());
-                System.out.println("  ✓ Image changee");
-            } catch (Exception e) {
-                System.out.println("  ✗ " + e.getMessage());
-            }
-        }
-
-        repo.save(article);
-        System.out.println("✓ Modifie");
-    }
-
-    private static void supprimerArticle(IArticleRepository repo, IImageStorageService imageService) {
-        System.out.print("\nCode article: ");
-        String code = scanner.nextLine().trim();
-
-        Optional<Article> opt = repo.findByCode(code);
-        if (!opt.isPresent()) {
-            System.out.println("✗ Non trouve");
-            return;
-        }
-
-        Article article = opt.get();
-        System.out.print("Confirmer suppression de '" + article.getLibelle() + "' ?  (o/n): ");
-
-        if (scanner.nextLine().trim().equalsIgnoreCase("o")) {
-            if (article.getImagePublicId() != null) {
-                imageService.deleteImage(article.getImagePublicId());
-            }
-            repo.delete(article.getId());
-            System.out.println("✓ Supprime");
-        }
-    }
-
-    private static void listerImages(IImageStorageService imageService) {
-        System.out.println("\n1.Burgers");
-        System.out.println("2.Menus");
-        System.out.println("3.Complements");
-        System.out.print("Choix: ");
-
-        String folder;
-        switch (scanner.nextLine().trim()) {
-            case "1": folder = CloudinaryFolders.getBurgers(); break;
-            case "2": folder = CloudinaryFolders.getMenus(); break;
-            case "3": folder = CloudinaryFolders.getComplements(); break;
-            default: folder = CloudinaryFolders.getArticlesBase();
-        }
-
-        List<ImageInfo> images = imageService.listImages(folder);
-        System.out.println("\n" + images.size() + " image(s):");
-        images.forEach(img -> System.out.println("  - " + img.getPublicId()));
-    }
 }
