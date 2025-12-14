@@ -152,7 +152,7 @@ public class ArticleMapper {
         complement.setPrix(rs.getInt(prefix + "prix"));
         String typeStr = rs.getString(prefix + "type_complement");
         if (typeStr != null) {
-            complement. setType(TypeComplement.valueOf(typeStr));
+            complement.setType(TypeComplement.valueOf(typeStr));
         }
         return complement;
     }

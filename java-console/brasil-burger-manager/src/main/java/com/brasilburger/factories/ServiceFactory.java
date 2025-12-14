@@ -1,6 +1,6 @@
 package com.brasilburger.factories;
 
-import com.brasilburger.domain. services.*;
+import com.brasilburger.domain.services.*;
 import com.brasilburger.domain.services.impl.*;
 
 /**
@@ -65,7 +65,8 @@ public class ServiceFactory {
         if (articleService == null) {
             articleService = new ArticleServiceImpl(
                     RepositoryFactory.createArticleRepository(),
-                    createCodeArticleGenerator()
+                    createCodeArticleGenerator(),
+                    RepositoryFactory.createArticleQuantifierRepository()  // AJOUTÉ
             );
         }
         return articleService;
@@ -88,7 +89,7 @@ public class ServiceFactory {
         livreurService = null;
         articleService = null;
         codeArticleGenerator = null;
-        ImageStorageFactory.reset();  // Réinitialise aussi ImageStorageFactory
+        ImageStorageFactory.reset();
     }
 
     /**

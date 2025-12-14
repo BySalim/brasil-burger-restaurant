@@ -3,7 +3,6 @@ package com.brasilburger.presentation.console.controllers;
 import com.brasilburger.domain.entities.*;
 import com.brasilburger.domain.entities.enums.CategorieArticle;
 import com.brasilburger.domain.entities.enums.TypeComplement;
-import com.brasilburger.domain.entities.enums.CategorieArticleQuantifier;
 import com.brasilburger.domain.services.IArticleService;
 import com.brasilburger.domain.services.IImageStorageService;
 import com.brasilburger.domain.valueobjects.ImageInfo;
@@ -59,13 +58,14 @@ public class ArticleController {
 
                 System.out.println("\n=== Modification ===");
                 System.out.println("9.Modifier un article");
-                System.out.println("10.Archiver un article");
-                System.out.println("11.Restaurer un article");
-                System.out.println("12.Supprimer un article");
+                System.out.println("10.Gérer les composants d'un menu");
+                System.out.println("11.Archiver un article");
+                System.out.println("12.Restaurer un article");
+                System.out.println("13.Supprimer un article");
 
                 System.out.println("\n0.Retour au menu principal");
 
-                int choix = ConsoleInput.lireChoixMenu(12);
+                int choix = ConsoleInput.lireChoixMenu(13);
 
                 switch (choix) {
                     case 1:
@@ -96,12 +96,15 @@ public class ArticleController {
                         modifierArticle();
                         break;
                     case 10:
-                        archiverArticle();
+                        gererComposantsMenuInteractif();
                         break;
                     case 11:
-                        restaurerArticle();
+                        archiverArticle();
                         break;
                     case 12:
+                        restaurerArticle();
+                        break;
+                    case 13:
                         supprimerArticle();
                         break;
                     case 0:
@@ -130,21 +133,15 @@ public class ArticleController {
         ConsoleOutput.sousTitre("Création d'un burger");
 
         try {
-            // Saisie du libellé
             String libelle = ConsoleInput.lireTexteNonVide("Libellé:  ");
-
-            // Validation du libellé
             List<String> erreursLibelle = ArticleValidator.validerLibelle(libelle);
-            if (!erreursLibelle.isEmpty()) {
+            if (! erreursLibelle.isEmpty()) {
                 ConsoleOutput.erreur("Libellé invalide:");
                 erreursLibelle.forEach(e -> System.out.println("  - " + e));
                 return;
             }
 
-            // Saisie de la description
             String description = ConsoleInput.lireTexteNonVide("Description: ");
-
-            // Validation de la description
             List<String> erreursDesc = ArticleValidator.validerDescription(description);
             if (!erreursDesc.isEmpty()) {
                 ConsoleOutput.erreur("Description invalide:");
@@ -152,10 +149,7 @@ public class ArticleController {
                 return;
             }
 
-            // Saisie du prix
             int prix = ConsoleInput.lireEntierPositif("Prix (FCFA): ");
-
-            // Validation du prix
             List<String> erreursPrix = ArticleValidator.validerPrix(prix);
             if (!erreursPrix.isEmpty()) {
                 ConsoleOutput.erreur("Prix invalide:");
@@ -163,16 +157,14 @@ public class ArticleController {
                 return;
             }
 
-            // Upload de l'image (obligatoire)
             ConsoleOutput.info("L'image est OBLIGATOIRE");
-            String cheminImage = ConsoleInput.lireTexteNonVide("Chemin de l'image: ");
+            String cheminImage = ConsoleInput.lireTexteNonVide("Chemin de l'image:  ");
 
             ConsoleOutput.chargement("Upload de l'image");
             ImageInfo imageInfo = imageService.uploadImage(cheminImage, CloudinaryFolders.getBurgers());
             ConsoleOutput.effacerLigne();
             ConsoleOutput.succes("Image uploadée:  " + imageInfo.getPublicId());
 
-            // Confirmation
             ConsoleOutput.info("Burger à créer:");
             System.out.println("  Libellé:       " + libelle);
             System.out.println("  Description:  " + description);
@@ -180,15 +172,12 @@ public class ArticleController {
             System.out.println("  Image:       " + imageInfo.getPublicId());
 
             if (! ConsoleInput.lireConfirmation("Confirmer la création")) {
-                // Supprimer l'image uploadée
                 imageService.deleteImage(imageInfo.getPublicId());
                 ConsoleOutput.avertissement("Création annulée - Image supprimée");
                 return;
             }
 
-            // Création
             Burger burger = articleService.creerBurger(libelle, description, prix, imageInfo.getPublicId());
-
             ConsoleOutput.succes("Burger créé avec succès!");
             afficherDetailsArticle(burger);
 
@@ -205,10 +194,7 @@ public class ArticleController {
         ConsoleOutput.sousTitre("Création d'un menu");
 
         try {
-            // Saisie du libellé
-            String libelle = ConsoleInput.lireTexteNonVide("Libellé:  ");
-
-            // Validation du libellé
+            String libelle = ConsoleInput.lireTexteNonVide("Libellé: ");
             List<String> erreursLibelle = ArticleValidator.validerLibelle(libelle);
             if (!erreursLibelle.isEmpty()) {
                 ConsoleOutput.erreur("Libellé invalide:");
@@ -216,10 +202,7 @@ public class ArticleController {
                 return;
             }
 
-            // Saisie de la description
             String description = ConsoleInput.lireTexteNonVide("Description: ");
-
-            // Validation de la description
             List<String> erreursDesc = ArticleValidator.validerDescription(description);
             if (!erreursDesc.isEmpty()) {
                 ConsoleOutput.erreur("Description invalide:");
@@ -227,7 +210,6 @@ public class ArticleController {
                 return;
             }
 
-            // Upload de l'image (obligatoire)
             ConsoleOutput.info("L'image est OBLIGATOIRE");
             String cheminImage = ConsoleInput.lireTexteNonVide("Chemin de l'image: ");
 
@@ -236,7 +218,6 @@ public class ArticleController {
             ConsoleOutput.effacerLigne();
             ConsoleOutput.succes("Image uploadée: " + imageInfo.getPublicId());
 
-            // Confirmation
             ConsoleOutput.info("Menu à créer:");
             System.out.println("  Libellé:      " + libelle);
             System.out.println("  Description: " + description);
@@ -248,19 +229,18 @@ public class ArticleController {
                 return;
             }
 
-            // Création
             Menu menu = articleService.creerMenu(libelle, description, imageInfo.getPublicId());
-
             ConsoleOutput.succes("Menu créé avec succès!");
 
-            // NOUVEAU: Proposition d'ajouter des composants
-            if (ConsoleInput.lireConfirmation("Voulez-vous ajouter des composants maintenant?")) {
+            if (ConsoleInput.lireConfirmation("Voulez-vous ajouter des composants maintenant")) {
                 gererComposantsMenu(menu);
-                // Sauvegarder les modifications
-                articleService.modifierArticle(menu.getId(), null, null);
             }
 
-            afficherDetailsArticle(menu);
+            // Recharger pour afficher avec composants
+            Optional<Menu> menuComplet = articleService.chargerMenuAvecComposants(menu.getId());
+            if (menuComplet.isPresent()) {
+                afficherDetailsArticle(menuComplet.get());
+            }
 
         } catch (Exception e) {
             ConsoleOutput.erreur("Erreur lors de la création: " + e.getMessage());
@@ -275,10 +255,7 @@ public class ArticleController {
         ConsoleOutput.sousTitre("Création d'un complément");
 
         try {
-            // Saisie du libellé
-            String libelle = ConsoleInput.lireTexteNonVide("Libellé: ");
-
-            // Validation du libellé
+            String libelle = ConsoleInput.lireTexteNonVide("Libellé:  ");
             List<String> erreursLibelle = ArticleValidator.validerLibelle(libelle);
             if (!erreursLibelle.isEmpty()) {
                 ConsoleOutput.erreur("Libellé invalide:");
@@ -286,17 +263,13 @@ public class ArticleController {
                 return;
             }
 
-            // Saisie du type
             System.out.println("\nType de complément:");
             System.out.println("1.Boisson");
             System.out.println("2.Frites");
             int choixType = ConsoleInput.lireEntier("Votre choix: ", 1, 2);
             TypeComplement type = (choixType == 1) ? TypeComplement.BOISSON :  TypeComplement.FRITES;
 
-            // Saisie du prix
             int prix = ConsoleInput.lireEntierPositif("Prix (FCFA): ");
-
-            // Validation du prix
             List<String> erreursPrix = ArticleValidator.validerPrix(prix);
             if (!erreursPrix.isEmpty()) {
                 ConsoleOutput.erreur("Prix invalide:");
@@ -304,7 +277,6 @@ public class ArticleController {
                 return;
             }
 
-            // Upload de l'image (obligatoire)
             ConsoleOutput.info("L'image est OBLIGATOIRE");
             String cheminImage = ConsoleInput.lireTexteNonVide("Chemin de l'image: ");
 
@@ -313,7 +285,6 @@ public class ArticleController {
             ConsoleOutput.effacerLigne();
             ConsoleOutput.succes("Image uploadée: " + imageInfo.getPublicId());
 
-            // Confirmation
             ConsoleOutput.info("Complément à créer:");
             System.out.println("  Libellé:  " + libelle);
             System.out.println("  Type:    " + type);
@@ -326,9 +297,7 @@ public class ArticleController {
                 return;
             }
 
-            // Création
             Complement complement = articleService.creerComplement(libelle, type, prix, imageInfo.getPublicId());
-
             ConsoleOutput.succes("Complément créé avec succès!");
             afficherDetailsArticle(complement);
 
@@ -354,7 +323,6 @@ public class ArticleController {
 
             afficherTableauArticles(articles);
 
-            // Statistiques
             long nbBurgers = articleService.compterArticlesParCategorie(CategorieArticle.BURGER);
             long nbMenus = articleService.compterArticlesParCategorie(CategorieArticle.MENU);
             long nbComplements = articleService.compterArticlesParCategorie(CategorieArticle.COMPLEMENT);
@@ -461,7 +429,18 @@ public class ArticleController {
 
             if (articleOpt.isPresent()) {
                 ConsoleOutput.succes("Article trouvé:");
-                afficherDetailsArticle(articleOpt.get());
+                // Charger avec composants si c'est un menu
+                Article article = articleOpt.get();
+                if (article instanceof Menu) {
+                    Optional<Menu> menuComplet = articleService.chargerMenuAvecComposants(article.getId());
+                    if (menuComplet.isPresent()) {
+                        afficherDetailsArticle(menuComplet.get());
+                    } else {
+                        afficherDetailsArticle(article);
+                    }
+                } else {
+                    afficherDetailsArticle(article);
+                }
             } else {
                 ConsoleOutput.avertissement("Article non trouvé");
             }
@@ -479,8 +458,7 @@ public class ArticleController {
         ConsoleOutput.sousTitre("Modification d'un article");
 
         try {
-            // Sélection de l'article
-            String code = ConsoleInput.lireTexteNonVide("Code de l'article à modifier: ");
+            String code = ConsoleInput.lireTexteNonVide("Code de l'article à modifier:  ");
             Optional<Article> articleOpt = articleService.obtenirArticleParCode(code);
 
             if (! articleOpt.isPresent()) {
@@ -492,11 +470,10 @@ public class ArticleController {
             ConsoleOutput.info("Article actuel:");
             afficherDetailsArticle(article);
 
-            // Saisie des nouvelles valeurs
             System.out.println("\nLaissez vide pour conserver la valeur actuelle");
 
             String nouveauLibelle = ConsoleInput.lireTexteOptional("Nouveau libellé [" + article.getLibelle() + "]: ");
-            if (! nouveauLibelle.isEmpty()) {
+            if (!nouveauLibelle.isEmpty()) {
                 List<String> erreurs = ArticleValidator.validerLibelle(nouveauLibelle);
                 if (!erreurs.isEmpty()) {
                     ConsoleOutput.erreur("Libellé invalide:");
@@ -505,7 +482,6 @@ public class ArticleController {
                 }
             }
 
-            // Changement d'image
             boolean changerImage = ConsoleInput.lireConfirmation("Changer l'image");
             String nouvelleImageId = null;
 
@@ -521,14 +497,12 @@ public class ArticleController {
                 nouvelleImageId = imageInfo.getPublicId();
             }
 
-            // Vérifier si des modifications ont été faites
             if (nouveauLibelle.isEmpty() && !changerImage) {
                 ConsoleOutput.avertissement("Aucune modification effectuée");
                 return;
             }
 
-            // Confirmation
-            if (! ConsoleInput.lireConfirmation("Confirmer les modifications")) {
+            if (!ConsoleInput.lireConfirmation("Confirmer les modifications")) {
                 if (nouvelleImageId != null) {
                     imageService.deleteImage(nouvelleImageId);
                     ConsoleOutput.info("Nouvelle image supprimée");
@@ -537,22 +511,11 @@ public class ArticleController {
                 return;
             }
 
-            // Supprimer l'ancienne image si changement
             if (nouvelleImageId != null) {
                 imageService.deleteImage(article.getImagePublicId());
                 ConsoleOutput.info("Ancienne image supprimée");
             }
 
-            // NOUVEAU: Gestion spécifique pour les menus
-            if (article instanceof Menu) {
-                Menu menu = (Menu) article;
-
-                if (ConsoleInput.lireConfirmation("Gérer les composants du menu?")) {
-                    gererComposantsMenu(menu);
-                }
-            }
-
-            // Modification
             Article articleModifie = articleService.modifierArticle(
                     article.getId(),
                     nouveauLibelle.isEmpty() ? null : nouveauLibelle,
@@ -569,16 +532,253 @@ public class ArticleController {
     }
 
     /**
+     * Point d'entrée interactif pour gérer les composants d'un menu
+     */
+    private void gererComposantsMenuInteractif() {
+        ConsoleOutput.sousTitre("Gestion des composants d'un menu");
+
+        try {
+            String code = ConsoleInput.lireTexteNonVide("Code du menu: ");
+            Optional<Article> articleOpt = articleService.obtenirArticleParCode(code);
+
+            if (!articleOpt.isPresent() || !(articleOpt.get() instanceof Menu)) {
+                ConsoleOutput.erreur("Menu non trouvé");
+                return;
+            }
+
+            Menu menu = (Menu) articleOpt.get();
+            Optional<Menu> menuComplet = articleService.chargerMenuAvecComposants(menu.getId());
+
+            if (menuComplet.isPresent()) {
+                gererComposantsMenu(menuComplet.get());
+            }
+
+        } catch (Exception e) {
+            ConsoleOutput.erreur("Erreur:  " + e.getMessage());
+            logger.error("Erreur gestion composants menu", e);
+        }
+    }
+
+    /**
+     * Gère les composants d'un menu (ajout/modification/suppression)
+     */
+    private void gererComposantsMenu(Menu menu) {
+        boolean continuer = true;
+
+        while (continuer) {
+            try {
+                ConsoleOutput.sousTitre("Composants du menu: " + menu.getLibelle());
+
+                // Recharger les composants
+                List<ArticleQuantifier> composants = articleService.obtenirComposantsMenu(menu.getId());
+                menu.setArticles(composants);
+
+                if (composants.isEmpty()) {
+                    ConsoleOutput.info("Aucun composant dans ce menu");
+                } else {
+                    System.out.println("\nComposants actuels:");
+                    afficherTableauComposants(composants);
+                    System.out.println("\n  Prix total du menu: " + menu.getPrix() + " FCFA");
+
+                    List<ArticleQuantifier> archives = composants.stream()
+                            .filter(aq -> aq.getArticle() != null && aq.getArticle().isEstArchiver())
+                            .toList();
+
+                    if (!archives.isEmpty()) {
+                        ConsoleOutput.avertissement("⚠ " + archives.size() + " article(s) archivé(s) - exclus du prix total");
+                    }
+                }
+
+                System.out.println("\n1.Ajouter un composant");
+                System.out.println("2.Modifier la quantité");
+                System.out.println("3.Retirer un composant");
+                System.out.println("4.Vider tous les composants");
+                System.out.println("0.Terminer");
+
+                int choix = ConsoleInput.lireEntier("Choix: ", 0, 4);
+
+                switch (choix) {
+                    case 1:
+                        ajouterComposantAuMenu(menu);
+                        break;
+                    case 2:
+                        modifierQuantiteComposant(menu);
+                        break;
+                    case 3:
+                        retirerComposant(menu);
+                        break;
+                    case 4:
+                        viderComposantsMenu(menu);
+                        break;
+                    case 0:
+                        continuer = false;
+                        break;
+                }
+
+            } catch (Exception e) {
+                ConsoleOutput.erreur("Erreur: " + e.getMessage());
+                logger.error("Erreur gestion composants menu", e);
+            }
+        }
+    }
+
+    /**
+     * Ajoute un composant au menu
+     */
+    private void ajouterComposantAuMenu(Menu menu) {
+        ConsoleOutput.sousTitre("Ajouter un composant");
+
+        try {
+            List<Burger> burgers = articleService.listerBurgersDisponibles();
+            List<Complement> complements = articleService.listerComplementsDisponibles();
+
+            if (burgers.isEmpty() && complements.isEmpty()) {
+                ConsoleOutput.erreur("Aucun article disponible");
+                return;
+            }
+
+            System.out.println("\n=== Burgers disponibles ===");
+            for (int i = 0; i < burgers.size(); i++) {
+                Burger b = burgers.get(i);
+                System.out.printf("  %d.%s - %d FCFA\n", i + 1, b.getLibelle(), b.getPrix());
+            }
+
+            System.out.println("\n=== Compléments disponibles ===");
+            for (int i = 0; i < complements.size(); i++) {
+                Complement c = complements.get(i);
+                System.out.printf("  %d.%s - %d FCFA\n",
+                        burgers.size() + i + 1, c.getLibelle(), c.getPrix());
+            }
+
+            int totalArticles = burgers.size() + complements.size();
+            int choix = ConsoleInput.lireEntier("\nChoisir un article (0 pour annuler): ", 0, totalArticles);
+
+            if (choix == 0) {
+                return;
+            }
+
+            Article articleChoisi;
+            if (choix <= burgers.size()) {
+                articleChoisi = burgers.get(choix - 1);
+            } else {
+                articleChoisi = complements.get(choix - burgers.size() - 1);
+            }
+
+            int quantite = ConsoleInput.lireEntierPositif("Quantité: ");
+
+            articleService.ajouterComposantAuMenu(menu.getId(), articleChoisi.getId(), quantite);
+            ConsoleOutput.succes("Composant ajouté au menu");
+
+        } catch (Exception e) {
+            ConsoleOutput.erreur("Erreur lors de l'ajout: " + e.getMessage());
+            logger.error("Erreur ajout composant", e);
+        }
+    }
+
+    /**
+     * Modifie la quantité d'un composant
+     */
+    private void modifierQuantiteComposant(Menu menu) {
+        List<ArticleQuantifier> composants = articleService.obtenirComposantsMenu(menu.getId());
+
+        if (composants.isEmpty()) {
+            ConsoleOutput.erreur("Aucun composant à modifier");
+            return;
+        }
+
+        long id = ConsoleInput.lireLong("ID du composant à modifier: ");
+        int nouvelleQte = ConsoleInput.lireEntierPositif("Nouvelle quantité: ");
+
+        try {
+            articleService.modifierQuantiteComposant(id, nouvelleQte);
+            ConsoleOutput.succes("Quantité modifiée");
+        } catch (Exception e) {
+            ConsoleOutput.erreur("Erreur:  " + e.getMessage());
+        }
+    }
+
+    /**
+     * Retire un composant du menu
+     */
+    private void retirerComposant(Menu menu) {
+        List<ArticleQuantifier> composants = articleService.obtenirComposantsMenu(menu.getId());
+
+        if (composants.isEmpty()) {
+            ConsoleOutput.erreur("Aucun composant à retirer");
+            return;
+        }
+
+        long id = ConsoleInput.lireLong("ID du composant à retirer: ");
+
+        if (ConsoleInput.lireConfirmation("Confirmer le retrait")) {
+            try {
+                articleService.retirerComposantDuMenu(menu.getId(), id);
+                ConsoleOutput.succes("Composant retiré");
+            } catch (Exception e) {
+                ConsoleOutput.erreur("Erreur: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Vide tous les composants d'un menu
+     */
+    private void viderComposantsMenu(Menu menu) {
+        if (! ConsoleInput.lireConfirmation("Supprimer TOUS les composants")) {
+            return;
+        }
+
+        try {
+            int count = articleService.viderComposantsMenu(menu.getId());
+            ConsoleOutput.succes(count + " composant(s) supprimé(s)");
+        } catch (Exception e) {
+            ConsoleOutput.erreur("Erreur: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Affiche un tableau de composants
+     */
+    private void afficherTableauComposants(List<ArticleQuantifier> composants) {
+        TableFormatter table = new TableFormatter(
+                "ID",
+                "Article",
+                "Catégorie",
+                "Qté",
+                "PU",
+                "Montant",
+                "Statut"
+        );
+
+        for (ArticleQuantifier aq : composants) {
+            if (aq.getArticle() != null) {
+                String statut = aq.getArticle().isEstArchiver() ? "Archivé" : "OK";
+                table.ajouterLigne(
+                        String.valueOf(aq.getId()),
+                        aq.getArticle().getLibelle(),
+                        aq.getArticle().getCategorie().toString(),
+                        String.valueOf(aq.getQuantite()),
+                        aq.getArticle().getPrix() + " FCFA",
+                        aq.getMontant() + " FCFA",
+                        statut
+                );
+            }
+        }
+
+        table.afficher();
+    }
+
+    /**
      * Archive un article
      */
     private void archiverArticle() {
         ConsoleOutput.sousTitre("Archivage d'un article");
 
         try {
-            String code = ConsoleInput.lireTexteNonVide("Code de l'article à archiver:  ");
+            String code = ConsoleInput.lireTexteNonVide("Code de l'article à archiver: ");
             Optional<Article> articleOpt = articleService.obtenirArticleParCode(code);
 
-            if (!articleOpt.isPresent()) {
+            if (! articleOpt.isPresent()) {
                 ConsoleOutput.erreur("Article non trouvé");
                 return;
             }
@@ -593,7 +793,7 @@ public class ArticleController {
             ConsoleOutput.info("Article à archiver:");
             afficherDetailsArticle(article);
 
-            if (!ConsoleInput.lireConfirmation("Confirmer l'archivage")) {
+            if (! ConsoleInput.lireConfirmation("Confirmer l'archivage")) {
                 ConsoleOutput.avertissement("Archivage annulé");
                 return;
             }
@@ -629,7 +829,7 @@ public class ArticleController {
                 return;
             }
 
-            if (! ConsoleInput.lireConfirmation("Confirmer la restauration")) {
+            if (!ConsoleInput.lireConfirmation("Confirmer la restauration")) {
                 ConsoleOutput.avertissement("Restauration annulée");
                 return;
             }
@@ -671,17 +871,14 @@ public class ArticleController {
                 return;
             }
 
-            // Double confirmation
-            if (!ConsoleInput.lireConfirmation("Êtes-vous vraiment sûr")) {
+            if (! ConsoleInput.lireConfirmation("Êtes-vous vraiment sûr")) {
                 ConsoleOutput.avertissement("Suppression annulée");
                 return;
             }
 
-            // Supprimer l'image
             imageService.deleteImage(article.getImagePublicId());
             ConsoleOutput.info("Image supprimée de Cloudinary");
 
-            // Supprimer l'article
             articleService.supprimerArticle(article.getId());
             ConsoleOutput.succes("Article supprimé avec succès");
 
@@ -692,178 +889,11 @@ public class ArticleController {
     }
 
     /**
-     * NOUVEAU: Gère les composants d'un menu (ajout/modification/suppression)
-     */
-    public void gererComposantsMenu(Menu menu) {
-        boolean continuer = true;
-
-        while (continuer) {
-            try {
-                ConsoleOutput.sousTitre("Composants du menu: " + menu.getLibelle());
-
-                // Afficher les composants actuels
-                List<ArticleQuantifier> composants = menu.getArticles();
-                if (composants == null || composants.isEmpty()) {
-                    ConsoleOutput.info("Aucun composant dans ce menu");
-                } else {
-                    System.out.println("\nComposants actuels:");
-                    for (int i = 0; i < composants.size(); i++) {
-                        ArticleQuantifier aq = composants.get(i);
-                        System.out.printf("  %d. %s x%d = %d FCFA%n",
-                                i + 1,
-                                aq.getArticle().getLibelle(),
-                                aq.getQuantite(),
-                                aq.getMontant());
-                    }
-                    System.out.println("\n  Prix total du menu: " + menu.getPrix() + " FCFA");
-                }
-
-                // Menu de gestion
-                System.out.println("\n1. Ajouter un composant");
-                System.out.println("2. Modifier la quantité");
-                System.out.println("3. Retirer un composant");
-                System.out.println("0. Terminer");
-
-                int choix = ConsoleInput.lireEntier("Choix: ", 0, 3);
-
-                switch (choix) {
-                    case 1:
-                        ajouterComposantAuMenu(menu);
-                        break;
-                    case 2:
-                        modifierQuantiteComposant(menu);
-                        break;
-                    case 3:
-                        retirerComposant(menu);
-                        break;
-                    case 0:
-                        continuer = false;
-                        break;
-                }
-
-            } catch (Exception e) {
-                ConsoleOutput.erreur("Erreur: " + e.getMessage());
-                logger.error("Erreur gestion composants menu", e);
-            }
-        }
-    }
-
-    /**
-     * NOUVEAU: Ajoute un composant (Burger ou Complement) au menu
-     */
-    private void ajouterComposantAuMenu(Menu menu) {
-        ConsoleOutput.sousTitre("Ajouter un composant");
-
-        try {
-            // Récupérer les articles disponibles (Burgers et Complements)
-            List<Article> articlesDisponibles = articleService.listerArticlesDisponibles().stream()
-                    .filter(a -> a.getCategorie() != CategorieArticle.MENU)
-                    .toList();
-
-            if (articlesDisponibles.isEmpty()) {
-                ConsoleOutput.erreur("Aucun article disponible");
-                return;
-            }
-
-            // Afficher la liste
-            System.out.println("\nArticles disponibles:");
-            for (int i = 0; i < articlesDisponibles.size(); i++) {
-                Article a = articlesDisponibles.get(i);
-                String prix = (a instanceof Burger)
-                    ? ((Burger) a).getPrix() + " FCFA"
-                    : ((Complement) a).getPrix() + " FCFA";
-                System.out.printf("  %d. [%s] %s - %s%n",
-                        i + 1, a.getCategorie(), a.getLibelle(), prix);
-            }
-
-            int choix = ConsoleInput.lireEntier("Choisir un article (0 pour annuler): ", 0, articlesDisponibles.size());
-            if (choix == 0) {
-                return;
-            }
-
-            Article articleChoisi = articlesDisponibles.get(choix - 1);
-            int quantite = ConsoleInput.lireEntierPositif("Quantité: ");
-
-            // Récupérer le prix
-            int prixUnitaire = 0;
-            if (articleChoisi instanceof Burger) {
-                prixUnitaire = ((Burger) articleChoisi).getPrix();
-            } else if (articleChoisi instanceof Complement) {
-                prixUnitaire = ((Complement) articleChoisi).getPrix();
-            }
-
-            // Créer l'ArticleQuantifier
-            ArticleQuantifier aq = new ArticleQuantifier();
-            aq.setArticle(articleChoisi);
-            aq.setQuantite(quantite);
-            aq.setMontant(prixUnitaire * quantite);
-            aq.setCategorie(CategorieArticleQuantifier.MENU);
-            aq.setIdMenu(menu.getId());
-
-            menu.ajouterArticle(aq);
-            ConsoleOutput.succes("Composant ajouté au menu");
-
-        } catch (Exception e) {
-            ConsoleOutput.erreur("Erreur lors de l'ajout: " + e.getMessage());
-            logger.error("Erreur ajout composant", e);
-        }
-    }
-
-    /**
-     * NOUVEAU: Modifie la quantité d'un composant
-     */
-    private void modifierQuantiteComposant(Menu menu) {
-        List<ArticleQuantifier> composants = menu.getArticles();
-        if (composants == null || composants.isEmpty()) {
-            ConsoleOutput.erreur("Aucun composant à modifier");
-            return;
-        }
-
-        int index = ConsoleInput.lireEntier("Numéro du composant à modifier: ", 1, composants.size()) - 1;
-
-        ArticleQuantifier aq = composants.get(index);
-        int nouvelleQte = ConsoleInput.lireEntierPositif("Nouvelle quantité: ");
-
-        // Recalculer le montant
-        int prixUnitaire = 0;
-        Article article = aq.getArticle();
-        if (article instanceof Burger) {
-            prixUnitaire = ((Burger) article).getPrix();
-        } else if (article instanceof Complement) {
-            prixUnitaire = ((Complement) article).getPrix();
-        }
-
-        aq.setQuantite(nouvelleQte);
-        aq.setMontant(prixUnitaire * nouvelleQte);
-        ConsoleOutput.succes("Quantité modifiée");
-    }
-
-    /**
-     * NOUVEAU: Retire un composant du menu
-     */
-    private void retirerComposant(Menu menu) {
-        List<ArticleQuantifier> composants = menu.getArticles();
-        if (composants == null || composants.isEmpty()) {
-            ConsoleOutput.erreur("Aucun composant à retirer");
-            return;
-        }
-
-        int index = ConsoleInput.lireEntier("Numéro du composant à retirer: ", 1, composants.size()) - 1;
-
-        ArticleQuantifier aq = composants.get(index);
-
-        if (ConsoleInput.lireConfirmation("Retirer " + aq.getArticle().getLibelle() + "?")) {
-            menu.retirerArticle(aq);
-            ConsoleOutput.succes("Composant retiré");
-        }
-    }
-
-    /**
      * Affiche les détails d'un article
      */
     private void afficherDetailsArticle(Article article) {
         ConsoleOutput.separateur();
-        System.out.println("  Code:         " + article.getCode());
+        System.out.println("  Code:          " + article.getCode());
         System.out.println("  Libellé:     " + article.getLibelle());
         System.out.println("  Catégorie:   " + article.getCategorie());
 
@@ -876,20 +906,23 @@ public class ArticleController {
             Menu menu = (Menu) article;
             System.out.println("  Description: " + menu.getDescription());
 
-            // NOUVEAU: Afficher les composants
             List<ArticleQuantifier> composants = menu.getArticles();
             if (composants != null && !composants.isEmpty()) {
-                System.out.println("\n  Composants:");
-                for (ArticleQuantifier aq : composants) {
-                    System.out.printf("    - %s x%d = %d FCFA%n",
-                            aq.getArticle().getLibelle(),
-                            aq.getQuantite(),
-                            aq.getMontant());
+                System.out.println("\n  Composants (" + menu.getNombreArticlesDisponibles() + "/" + menu.getNombreArticles() + "):");
+                for (ArticleQuantifier aq :  composants) {
+                    if (aq.getArticle() != null) {
+                        String statut = aq.getArticle().isEstArchiver() ? " [ARCHIVÉ]" : "";
+                        System.out.printf("    - %s x%d = %d FCFA%s\n",
+                                aq.getArticle().getLibelle(),
+                                aq.getQuantite(),
+                                aq.getMontant(),
+                                statut);
+                    }
                 }
-                System.out.println("\n  Prix total:   " + menu.getPrix() + " FCFA");
+                System.out.println("\n  Prix total:    " + menu.getPrix() + " FCFA");
             } else {
                 System.out.println("  Aucun composant");
-                System.out.println("  Prix total:   0 FCFA");
+                System.out.println("  Prix total:  0 FCFA");
             }
 
         } else if (article instanceof Complement) {
@@ -921,6 +954,8 @@ public class ArticleController {
                 prix = ((Burger) article).getPrix() + " FCFA";
             } else if (article instanceof Complement) {
                 prix = ((Complement) article).getPrix() + " FCFA";
+            } else if (article instanceof Menu) {
+                prix = article.getPrix() + " FCFA";
             }
 
             table.ajouterLigne(
@@ -970,18 +1005,20 @@ public class ArticleController {
         TableFormatter table = new TableFormatter(
                 "Code",
                 "Libellé",
+                "Prix",
                 "Description"
         );
 
-        for (Menu menu : menus) {
+        for (Menu menu :  menus) {
             String desc = menu.getDescription();
-            if (desc.length() > 50) {
-                desc = desc.substring(0, 47) + "...";
+            if (desc.length() > 40) {
+                desc = desc.substring(0, 37) + "...";
             }
 
             table.ajouterLigne(
                     menu.getCode(),
                     menu.getLibelle(),
+                    menu.getPrix() + " FCFA",
                     desc
             );
         }

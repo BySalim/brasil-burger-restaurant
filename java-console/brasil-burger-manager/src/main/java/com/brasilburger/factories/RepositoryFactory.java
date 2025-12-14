@@ -13,6 +13,7 @@ public class RepositoryFactory {
     private static IQuartierRepository quartierRepository;
     private static ILivreurRepository livreurRepository;
     private static IArticleRepository articleRepository;
+    private static IArticleQuantifierRepository articleQuantifierRepository;  // NOUVEAU
 
     /**
      * Retourne une instance de ZoneRepository (Singleton)
@@ -55,6 +56,16 @@ public class RepositoryFactory {
     }
 
     /**
+     * Retourne une instance de ArticleQuantifierRepository (Singleton)
+     */
+    public static IArticleQuantifierRepository createArticleQuantifierRepository() {
+        if (articleQuantifierRepository == null) {
+            articleQuantifierRepository = new NeonArticleQuantifierRepository();
+        }
+        return articleQuantifierRepository;
+    }
+
+    /**
      * Réinitialise tous les repositories (utile pour les tests)
      */
     public static void resetAll() {
@@ -62,6 +73,7 @@ public class RepositoryFactory {
         quartierRepository = null;
         livreurRepository = null;
         articleRepository = null;
+        articleQuantifierRepository = null;
     }
 
     /**

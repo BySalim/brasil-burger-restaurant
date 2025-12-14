@@ -1,9 +1,6 @@
 package com.brasilburger.domain.services;
 
-import com.brasilburger.domain.entities.Article;
-import com.brasilburger.domain.entities.Burger;
-import com.brasilburger.domain.entities.Complement;
-import com.brasilburger.domain.entities.Menu;
+import com.brasilburger.domain.entities.*;
 import com.brasilburger.domain.entities.enums.CategorieArticle;
 import com.brasilburger.domain.entities.enums.TypeComplement;
 
@@ -158,4 +155,61 @@ public interface IArticleService {
      * @return true si l'article existe
      */
     boolean articleExiste(String code);
+
+    // ===================================
+    // Gestion des composants de Menu
+    // ===================================
+
+    /**
+     * Ajoute un composant (Burger ou Complément) à un menu
+     * @param menuId ID du menu
+     * @param articleId ID de l'article à ajouter
+     * @param quantite Quantité
+     * @return Menu mis à jour
+     */
+    Menu ajouterComposantAuMenu(Long menuId, Long articleId, Integer quantite);
+
+    /**
+     * Retire un composant d'un menu
+     * @param menuId ID du menu
+     * @param articleQuantifierId ID de l'ArticleQuantifier à retirer
+     * @return Menu mis à jour
+     */
+    Menu retirerComposantDuMenu(Long menuId, Long articleQuantifierId);
+
+    /**
+     * Modifie la quantité d'un composant dans un menu
+     * @param articleQuantifierId ID de l'ArticleQuantifier
+     * @param nouvelleQuantite Nouvelle quantité
+     * @return ArticleQuantifier mis à jour
+     */
+    ArticleQuantifier modifierQuantiteComposant(Long articleQuantifierId, Integer nouvelleQuantite);
+
+    /**
+     * Récupère tous les composants d'un menu avec leurs articles
+     * @param menuId ID du menu
+     * @return Liste des ArticleQuantifier
+     */
+    List<ArticleQuantifier> obtenirComposantsMenu(Long menuId);
+
+    /**
+     * Calcule le prix total d'un menu (en excluant les articles archivés)
+     * @param menuId ID du menu
+     * @return Prix total en FCFA
+     */
+    Integer calculerPrixMenu(Long menuId);
+
+    /**
+     * Charge un menu avec tous ses composants
+     * @param menuId ID du menu
+     * @return Menu avec composants chargés
+     */
+    Optional<Menu> chargerMenuAvecComposants(Long menuId);
+
+    /**
+     * Supprime tous les composants d'un menu
+     * @param menuId ID du menu
+     * @return Nombre de composants supprimés
+     */
+    int viderComposantsMenu(Long menuId);
 }
