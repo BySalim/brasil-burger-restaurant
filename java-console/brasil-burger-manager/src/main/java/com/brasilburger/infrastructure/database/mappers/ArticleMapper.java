@@ -112,4 +112,56 @@ public class ArticleMapper {
     private ArticleMapper() {
         throw new UnsupportedOperationException("Classe utilitaire - pas d'instantiation");
     }
+
+    /**
+     * Mappe un ResultSet vers un Article avec préfixe de colonnes
+     * Utilisé pour les jointures
+     */
+    public static Article mapResultSetToArticle(ResultSet rs, String prefix) throws SQLException {
+        String categorie = rs.getString(prefix + "categorie");
+
+        if ("BURGER".equals(categorie)) {
+            return mapResultSetToBurger(rs, prefix);
+        } else if ("MENU".equals(categorie)) {
+            return mapResultSetToMenu(rs, prefix);
+        } else if ("COMPLEMENT".equals(categorie)) {
+            return mapResultSetToComplement(rs, prefix);
+        }
+
+        throw new IllegalStateException("Categorie article inconnue: " + categorie);
+    }
+
+    private static Burger mapResultSetToBurger(ResultSet rs, String prefix) throws SQLException {
+        Burger burger = new Burger();
+        setCommonFields(burger, rs, prefix);
+        burger.setDescription(rs.getString(prefix + "description"));
+        burger.setPrix(rs.getInt(prefix + "prix"));
+        return burger;
+    }
+
+    private static Menu mapResultSetToMenu(ResultSet rs, String prefix) throws SQLException {
+        Menu menu = new Menu();
+        setCommonFields(menu, rs, prefix);
+        menu.setDescription(rs.getString(prefix + "description"));
+        return menu;
+    }
+
+    private static Complement mapResultSetToComplement(ResultSet rs, String prefix) throws SQLException {
+        Complement complement = new Complement();
+        setCommonFields(complement, rs, prefix);
+        complement.setPrix(rs.getInt(prefix + "prix"));
+        String typeStr = rs.getString(prefix + "type_complement");
+        if (typeStr != null) {
+            complement. setType(TypeComplement.valueOf(typeStr));
+        }
+        return complement;
+    }
+
+    private static void setCommonFields(Article article, ResultSet rs, String prefix) throws SQLException {
+        article.setId(rs.getLong(prefix + "id"));
+        article.setCode(rs.getString(prefix + "code"));
+        article.setLibelle(rs.getString(prefix + "libelle"));
+        article.setImagePublicId(rs.getString(prefix + "image_public_id"));
+        article.setEstArchiver(rs.getBoolean(prefix + "est_archiver"));
+    }
 }

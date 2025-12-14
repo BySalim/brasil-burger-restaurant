@@ -14,6 +14,9 @@ public class ArticleQuantifier {
     private Long idPanier;
     private Long idArticle;
 
+    // Référence vers l'article (pour faciliter l'affichage)
+    private Article article;
+
     /**
      * Constructeur par defaut
      */
@@ -114,6 +117,21 @@ public class ArticleQuantifier {
 
     public void setIdArticle(Long idArticle) {
         this.idArticle = idArticle;
+    }
+
+    public Article getArticle() {
+        return article;
+    }
+
+    public void setArticle(Article article) {
+        this.article = article;
+        if (article != null) {
+            this.idArticle = article.getId();
+        }
+    }
+
+    public void setCategorie(CategorieArticleQuantifier categorie) {
+        this.categorieArticleQuantifier = categorie;
     }
 
     @Override
