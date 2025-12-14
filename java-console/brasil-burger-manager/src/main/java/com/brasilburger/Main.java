@@ -2,11 +2,14 @@ package com.brasilburger;
 
 import com.brasilburger.config.AppConfig;
 import com.brasilburger.domain.entities.*;
-import com.brasilburger.domain.entities.enums.CategorieArticle;
 import com.brasilburger.domain.entities.enums.TypeComplement;
-import com.brasilburger.domain.exceptions.DuplicateCodeArticleException;
 import com.brasilburger.domain.repositories.IArticleRepository;
 import com.brasilburger.domain.repositories.impl.NeonArticleRepository;
+import com.brasilburger.domain.services.IImageStorageService;
+import com.brasilburger.domain.services.impl.CloudinaryImageStorageService;
+import com.brasilburger.domain.valueobjects.ImageInfo;
+import com.brasilburger.infrastructure.cloudinary.CloudinaryConfig;
+import com.brasilburger.infrastructure.cloudinary.CloudinaryFolders;
 import com.brasilburger.infrastructure.database.NeonConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,39 +19,48 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        // Afficher le banner
         afficherBanner();
 
-        // Valider la configuration
         if (! AppConfig.validateConfiguration()) {
             logger.error("Configuration invalide!");
             System.exit(1);
         }
 
-        // Tester la connexion
-        if (!NeonConnectionManager.testConnection()) {
+        if (! NeonConnectionManager.testConnection()) {
             logger.error("Impossible de se connecter a la base de donnees");
             System.exit(1);
         }
 
-        logger.info("Configuration validee et connexion etablie");
+        if (!CloudinaryConfig.testConnection()) {
+            logger.error("Impossible de se connecter a Cloudinary");
+            System.exit(1);
+        }
 
-        // TEST DU REPOSITORY ARTICLE (Commit 13)
-        testerArticleRepository();
+        logger.info("Configuration validee - Connexions etablies");
+
+        // Tests unitaires
+        testerServiceImageStorage();
+
+        // Tests interactifs
+        System.out.print("\nVoulez-vous lancer les tests interactifs ? (o/n): ");
+        String reponse = scanner.nextLine().trim().toLowerCase();
+        if (reponse.equals("o") || reponse.equals("oui")) {
+            testerArticlesAvecImages();
+        }
 
         logger.info("Tests termines avec succes!");
     }
 
-    /**
-     * Affiche le banner de demarrage depuis banner.txt
-     */
     private static void afficherBanner() {
         try {
             InputStream inputStream = Main.class.getClassLoader()
@@ -68,252 +80,309 @@ public class Main {
         }
     }
 
-    /**
-     * Test du repository Article (Commit 13)
-     */
-    private static void testerArticleRepository() {
-        System.out.println("=== TEST DU REPOSITORY ARTICLE ===\n");
+    private static void testerServiceImageStorage() {
+        System.out.println("\n=== TESTS UNITAIRES :  SERVICE IMAGE STORAGE ===\n");
 
-        IArticleRepository articleRepo = new NeonArticleRepository();
+        IImageStorageService imageService = new CloudinaryImageStorageService();
 
         try {
-            // ==========================================
-            // Test 1: CREATE - Burger
-            // ==========================================
-            System.out.println("Test 1: Creation de burgers.. .");
-            Burger burger1 = new Burger("BRG001", "Burger Classic", "burgers/classic",
-                    "Delicieux burger avec steak hache, salade, tomate", 5000);
+            System.out.println("Test 1: Configuration.. .");
+            Map<String, Object> config = CloudinaryConfig.getConfigInfo();
+            System.out.println("  Cloud:  " + config.get("cloud_name"));
+            System.out.println("  ✓ Configuration OK");
 
-            Burger burger2 = new Burger("BRG002", "Burger Cheese", "burgers/cheese",
-                    "Burger avec fromage cheddar fondant", 5500);
+            System.out.println("\nTest 2: Dossiers.. .");
+            System.out.println("  Burgers: " + CloudinaryFolders.getBurgers());
+            System.out.println("  ✓ Dossiers OK");
 
-            burger1 = (Burger) articleRepo.save(burger1);
-            burger2 = (Burger) articleRepo.save(burger2);
+            System.out.println("\nTest 3: Generation URL...");
+            String testId = CloudinaryFolders.getBurgers() + "/test";
+            String url = imageService.getImageUrl(testId);
+            System.out.println("  URL:  " + url);
+            System.out.println("  ✓ URL OK");
 
-            System.out.println("  ✓ Burger 1: " + burger1);
-            System.out.println("  ✓ Burger 2: " + burger2);
+            System.out.println("\nTest 4: Validation format...");
+            CloudinaryImageStorageService service = (CloudinaryImageStorageService) imageService;
+            assert service.estFormatImageValide("test.jpg");
+            assert service.estFormatImageValide("test.png");
+            assert ! service.estFormatImageValide("test.txt");
+            System.out.println("  ✓ Validation OK");
 
-            // ==========================================
-            // Test 2: CREATE - Complement
-            // ==========================================
-            System.out.println("\nTest 2: Creation de complements...");
-            Complement boisson1 = new Complement("CMP001", "Coca-Cola", "complements/coca",
-                    TypeComplement.BOISSON, 1000);
-
-            Complement boisson2 = new Complement("CMP002", "Sprite", "complements/sprite",
-                    TypeComplement.BOISSON, 1000);
-
-            Complement frites = new Complement("CMP003", "Frites", "complements/frites",
-                    TypeComplement.FRITES, 1500);
-
-            boisson1 = (Complement) articleRepo.save(boisson1);
-            boisson2 = (Complement) articleRepo.save(boisson2);
-            frites = (Complement) articleRepo.save(frites);
-
-            System.out.println("  ✓ Boisson 1: " + boisson1);
-            System.out.println("  ✓ Boisson 2: " + boisson2);
-            System.out.println("  ✓ Frites: " + frites);
-
-            // ==========================================
-            // Test 3: CREATE - Menu
-            // ==========================================
-            System.out.println("\nTest 3: Creation de menus.. .");
-            Menu menu1 = new Menu("MNU001", "Menu Deluxe", "menus/deluxe",
-                    "Menu complet avec burger, frites et boisson");
-
-            Menu menu2 = new Menu("MNU002", "Menu Classic", "menus/classic",
-                    "Menu economique avec burger et boisson");
-
-            menu1 = (Menu) articleRepo.save(menu1);
-            menu2 = (Menu) articleRepo.save(menu2);
-
-            System.out.println("  ✓ Menu 1: " + menu1);
-            System.out.println("  ✓ Menu 2: " + menu2);
-
-            // ==========================================
-            // Test 4: COUNT
-            // ==========================================
-            System.out.println("\nTest 4: Comptage des articles.. .");
-            long countTotal = articleRepo.count();
-            long countBurgers = articleRepo.countByCategorie(CategorieArticle.BURGER);
-            long countMenus = articleRepo.countByCategorie(CategorieArticle.MENU);
-            long countComplements = articleRepo.countByCategorie(CategorieArticle.COMPLEMENT);
-
-            System.out.println("  Total:  " + countTotal);
-            System.out.println("  Burgers: " + countBurgers);
-            System.out.println("  Menus: " + countMenus);
-            System.out.println("  Complements: " + countComplements);
-
-            // ==========================================
-            // Test 5: FIND BY ID
-            // ==========================================
-            System.out.println("\nTest 5: Recherche par ID...");
-            Optional<Article> foundBurger = articleRepo.findById(burger1.getId());
-            if (foundBurger.isPresent()) {
-                System.out.println("  ✓ Burger trouve: " + foundBurger.get().getLibelle());
-                System.out.println("    Type reel: " + foundBurger.get().getClass().getSimpleName());
-                if (foundBurger.get() instanceof Burger) {
-                    Burger b = (Burger) foundBurger.get();
-                    System.out.println("    Prix: " + b.getPrix() + " FCFA");
-                    System.out.println("    Description: " + b.getDescription());
-                }
-            }
-
-            // ==========================================
-            // Test 6: FIND BY CODE
-            // ==========================================
-            System.out.println("\nTest 6: Recherche par code...");
-            Optional<Article> foundByCode = articleRepo.findByCode("CMP001");
-            if (foundByCode.isPresent()) {
-                System.out.println("  ✓ Article trouve: " + foundByCode.get().getLibelle());
-                System.out.println("    Type reel: " + foundByCode.get().getClass().getSimpleName());
-                if (foundByCode.get() instanceof Complement) {
-                    Complement c = (Complement) foundByCode.get();
-                    System.out.println("    Type:  " + c.getType());
-                    System.out.println("    Prix: " + c.getPrix() + " FCFA");
-                }
-            }
-
-            // ==========================================
-            // Test 7: FIND ALL
-            // ==========================================
-            System.out.println("\nTest 7: Liste de tous les articles...");
-            List<Article> allArticles = articleRepo.findAll();
-            System.out.println("  Nombre d'articles: " + allArticles.size());
-            allArticles.forEach(a -> System.out.println("    - " + a.getLibelle() +
-                    " (" + a.getCategorie() + ") - Code: " + a.getCode()));
-
-            // ==========================================
-            // Test 8: FIND BY CATEGORIE
-            // ==========================================
-            System.out.println("\nTest 8: Articles par categorie...");
-
-            System.out.println("  Burgers:");
-            List<Article> burgers = articleRepo.findByCategorie(CategorieArticle.BURGER);
-            burgers.forEach(a -> {
-                Burger b = (Burger) a;
-                System.out.println("    - " + b.getLibelle() + " - " + b.getPrix() + " FCFA");
-            });
-
-            System.out.println("\n  Complements:");
-            List<Article> complements = articleRepo.findByCategorie(CategorieArticle.COMPLEMENT);
-            complements.forEach(a -> {
-                Complement c = (Complement) a;
-                System.out.println("    - " + c.getLibelle() + " (" + c.getType() + ") - " + c.getPrix() + " FCFA");
-            });
-
-            System.out.println("\n  Menus:");
-            List<Article> menus = articleRepo.findByCategorie(CategorieArticle.MENU);
-            menus.forEach(a -> {
-                Menu m = (Menu) a;
-                System.out.println("    - " + m.getLibelle() + " - " + m.getDescription());
-            });
-
-            // ==========================================
-            // Test 9: UPDATE
-            // ==========================================
-            System.out.println("\nTest 9: Mise a jour d'articles...");
-
-            // Modifier un burger
-            burger1.setPrix(5200);
-            burger1.modifierLibelle("Burger Classic Premium");
-            burger1 = (Burger) articleRepo.save(burger1);
-            System.out.println("  ✓ Burger mis a jour: " + burger1.getLibelle() + " - " + burger1.getPrix() + " FCFA");
-
-            // Modifier un complement
-            frites.setPrix(1800);
-            frites = (Complement) articleRepo.save(frites);
-            System.out.println("  ✓ Complement mis a jour: " + frites.getLibelle() + " - " + frites.getPrix() + " FCFA");
-
-            // ==========================================
-            // Test 10:  ARCHIVAGE
-            // ==========================================
-            System.out.println("\nTest 10: Archivage d'articles...");
-            burger2.archiver();
-            burger2 = (Burger) articleRepo.save(burger2);
-            System.out.println("  ✓ Burger archive: " + burger2.getLibelle());
-            System.out.println("    Disponible: " + burger2.estDisponible());
-
-            // ==========================================
-            // Test 11: FIND BY EST_ARCHIVER
-            // ==========================================
-            System.out.println("\nTest 11: Articles par statut d'archivage...");
-            List<Article> articlesActifs = articleRepo.findByEstArchiver(false);
-            List<Article> articlesArchives = articleRepo.findByEstArchiver(true);
-
-            System.out.println("  Actifs:  " + articlesActifs.size());
-            articlesActifs.forEach(a -> System.out.println("    - " + a.getLibelle()));
-
-            System.out.println("\n  Archives: " + articlesArchives.size());
-            articlesArchives.forEach(a -> System.out.println("    - " + a.getLibelle()));
-
-            // ==========================================
-            // Test 12: FIND AVAILABLE BY CATEGORIE
-            // ==========================================
-            System.out.println("\nTest 12: Burgers disponibles.. .");
-            List<Article> burgersDisponibles = articleRepo.findAvailableByCategorie(CategorieArticle.BURGER);
-            System.out.println("  Nombre de burgers disponibles: " + burgersDisponibles.size());
-            burgersDisponibles.forEach(a -> System.out.println("    - " + a.getLibelle()));
-
-            // ==========================================
-            // Test 13: EXISTS BY CODE
-            // ==========================================
-            System.out.println("\nTest 13: Verification d'existence...");
-            boolean exists = articleRepo.existsByCode("BRG001");
-            System.out.println("  'BRG001' existe ?  " + (exists ? "Oui" : "Non"));
-
-            boolean notExists = articleRepo.existsByCode("BRG999");
-            System.out.println("  'BRG999' existe ? " + (notExists ?  "Oui" : "Non"));
-
-            // ==========================================
-            // Test 14: DUPLICATE CODE
-            // ==========================================
-            System.out.println("\nTest 14: Test de duplication de code...");
-            try {
-                Burger burgerDuplicate = new Burger("BRG001", "Test", "test", "desc", 3000);
-                articleRepo.save(burgerDuplicate);
-                System.out.println("  ✗ ERREUR: La duplication aurait du etre detectee!");
-            } catch (DuplicateCodeArticleException e) {
-                System.out.println("  ✓ Duplication detectee: " + e.getMessage());
-            }
-
-            // ==========================================
-            // Test 15: POLYMORPHISME
-            // ==========================================
-            System.out.println("\nTest 15: Test du polymorphisme...");
-            Optional<Article> article = articleRepo.findById(burger1.getId());
-            if (article.isPresent()) {
-                Article a = article.get();
-                System.out.println("  Article recupere: " + a.getLibelle());
-                System.out.println("  Type Java: " + a.getClass().getSimpleName());
-                System.out.println("  Categorie DB: " + a.getCategorie());
-                System.out.println("  Est Burger ?  " + (a instanceof Burger));
-                System.out.println("  Est Menu ? " + (a instanceof Menu));
-                System.out.println("  Est Complement ? " + (a instanceof Complement));
-
-                if (a instanceof Burger) {
-                    System.out.println("  Prix (via cast Burger): " + ((Burger) a).getPrix() + " FCFA");
-                }
-            }
-
-            // ==========================================
-            // Test 16: DELETE
-            // ==========================================
-            System.out.println("\nTest 16: Suppression d'articles...");
-            articleRepo.delete(menu2.getId());
-            System.out.println("  ✓ Menu supprime: " + menu2.getLibelle());
-
-            long finalCount = articleRepo.count();
-            System.out.println("  Nombre d'articles restants: " + finalCount);
-
-            System.out.println("\n===============================================");
-            System.out.println("TOUS LES TESTS DU REPOSITORY ARTICLE SONT REUSSIS !");
-            System.out.println("===============================================");
+            System.out.println("\n✓ TOUS LES TESTS REUSSIS\n");
 
         } catch (Exception e) {
-            System.err.println("\n✗ ERREUR:  " + e.getMessage());
-            logger.error("Erreur lors des tests", e);
-            e.printStackTrace();
+            System.err.println("✗ ERREUR:  " + e.getMessage());
+            logger.error("Erreur tests", e);
         }
+    }
+
+    private static void testerArticlesAvecImages() {
+        System.out.println("\n=== TESTS INTERACTIFS ===\n");
+
+        IArticleRepository articleRepo = new NeonArticleRepository();
+        IImageStorageService imageService = new CloudinaryImageStorageService();
+
+        while (true) {
+            System.out.println("\n=== MENU ===");
+            System.out.println("1.Creer burger");
+            System.out.println("2.Creer complement");
+            System.out.println("3.Creer menu");
+            System.out.println("4.Lister articles");
+            System.out.println("5.Rechercher article");
+            System.out.println("6.Modifier article");
+            System.out.println("7.Supprimer article");
+            System.out.println("8.Lister images");
+            System.out.println("0.Quitter");
+            System.out.print("\nChoix: ");
+
+            String choix = scanner.nextLine().trim();
+
+            switch (choix) {
+                case "1":  creerBurger(articleRepo, imageService); break;
+                case "2": creerComplement(articleRepo, imageService); break;
+                case "3":  creerMenu(articleRepo, imageService); break;
+                case "4": listerArticles(articleRepo); break;
+                case "5":  rechercherArticle(articleRepo); break;
+                case "6": modifierArticle(articleRepo, imageService); break;
+                case "7": supprimerArticle(articleRepo, imageService); break;
+                case "8": listerImages(imageService); break;
+                case "0": return;
+                default: System.out.println("Choix invalide!");
+            }
+        }
+    }
+
+    private static void creerBurger(IArticleRepository repo, IImageStorageService imageService) {
+        System.out.println("\n=== CREER BURGER ===");
+
+        try {
+            System.out.print("Code:  ");
+            String code = scanner.nextLine().trim();
+
+            System.out.print("Libelle: ");
+            String libelle = scanner.nextLine().trim();
+
+            System.out.print("Description: ");
+            String description = scanner.nextLine().trim();
+
+            System.out.print("Prix: ");
+            int prix = Integer.parseInt(scanner.nextLine().trim());
+
+            System.out.print("Chemin image (ENTER pour sauter): ");
+            String chemin = scanner.nextLine().trim();
+
+            String publicId = null;
+            if (!chemin.isEmpty()) {
+                try {
+                    ImageInfo img = imageService.uploadImage(chemin, CloudinaryFolders.getBurgers());
+                    publicId = img.getPublicId();
+                    System.out.println("  ✓ Image uploadee");
+                } catch (Exception e) {
+                    System.out.println("  ✗ " + e.getMessage());
+                }
+            }
+
+            Burger burger = new Burger(code, libelle, publicId, description, prix);
+            repo.save(burger);
+            System.out.println("\n✓ BURGER CREE!");
+
+        } catch (Exception e) {
+            System.out.println("✗ ERREUR: " + e.getMessage());
+        }
+    }
+
+    private static void creerComplement(IArticleRepository repo, IImageStorageService imageService) {
+        System.out.println("\n=== CREER COMPLEMENT ===");
+
+        try {
+            System.out.print("Code: ");
+            String code = scanner.nextLine().trim();
+
+            System.out.print("Libelle: ");
+            String libelle = scanner.nextLine().trim();
+
+            System.out.print("Type (1=Boisson, 2=Frites): ");
+            TypeComplement type = scanner.nextLine().trim().equals("1") ?
+                    TypeComplement.BOISSON : TypeComplement.FRITES;
+
+            System.out.print("Prix: ");
+            int prix = Integer.parseInt(scanner.nextLine().trim());
+
+            System.out.print("Chemin image (ENTER pour sauter): ");
+            String chemin = scanner.nextLine().trim();
+
+            String publicId = null;
+            if (!chemin.isEmpty()) {
+                try {
+                    ImageInfo img = imageService.uploadImage(chemin, CloudinaryFolders.getComplements());
+                    publicId = img.getPublicId();
+                    System.out.println("  ✓ Image uploadee");
+                } catch (Exception e) {
+                    System.out.println("  ✗ " + e.getMessage());
+                }
+            }
+
+            Complement complement = new Complement(code, libelle, publicId, type, prix);
+            repo.save(complement);
+            System.out.println("\n✓ COMPLEMENT CREE!");
+
+        } catch (Exception e) {
+            System.out.println("✗ ERREUR: " + e.getMessage());
+        }
+    }
+
+    private static void creerMenu(IArticleRepository repo, IImageStorageService imageService) {
+        System.out.println("\n=== CREER MENU ===");
+
+        try {
+            System.out.print("Code: ");
+            String code = scanner.nextLine().trim();
+
+            System.out.print("Libelle: ");
+            String libelle = scanner.nextLine().trim();
+
+            System.out.print("Description: ");
+            String description = scanner.nextLine().trim();
+
+            System.out.print("Chemin image (ENTER pour sauter): ");
+            String chemin = scanner.nextLine().trim();
+
+            String publicId = null;
+            if (!chemin.isEmpty()) {
+                try {
+                    ImageInfo img = imageService.uploadImage(chemin, CloudinaryFolders.getMenus());
+                    publicId = img.getPublicId();
+                    System.out.println("  ✓ Image uploadee");
+                } catch (Exception e) {
+                    System.out.println("  ✗ " + e.getMessage());
+                }
+            }
+
+            Menu menu = new Menu(code, libelle, publicId, description);
+            repo.save(menu);
+            System.out.println("\n✓ MENU CREE!");
+
+        } catch (Exception e) {
+            System.out.println("✗ ERREUR: " + e.getMessage());
+        }
+    }
+
+    private static void listerArticles(IArticleRepository repo) {
+        System.out.println("\n=== LISTE ARTICLES ===");
+        List<Article> articles = repo.findAll();
+
+        if (articles.isEmpty()) {
+            System.out.println("Aucun article");
+            return;
+        }
+
+        for (Article a : articles) {
+            System.out.println("\n" + a.getCode() + " - " + a.getLibelle());
+            System.out.println("  Type: " + a.getCategorie());
+            if (a.getImagePublicId() != null) {
+                System.out.println("  Image: " + a.getImagePublicId());
+            }
+        }
+    }
+
+    private static void rechercherArticle(IArticleRepository repo) {
+        System.out.print("\nCode article: ");
+        String code = scanner.nextLine().trim();
+
+        Optional<Article> opt = repo.findByCode(code);
+        if (opt.isPresent()) {
+            Article a = opt.get();
+            System.out.println("\n✓ TROUVE:");
+            System.out.println("  " + a.getLibelle());
+            System.out.println("  " + a.getCategorie());
+            if (a.getImagePublicId() != null) {
+                System.out.println("  Image: " + a.getImagePublicId());
+            }
+        } else {
+            System.out.println("✗ Non trouve");
+        }
+    }
+
+    private static void modifierArticle(IArticleRepository repo, IImageStorageService imageService) {
+        System.out.print("\nCode article: ");
+        String code = scanner.nextLine().trim();
+
+        Optional<Article> opt = repo.findByCode(code);
+        if (!opt.isPresent()) {
+            System.out.println("✗ Non trouve");
+            return;
+        }
+
+        Article article = opt.get();
+        System.out.println("Article:  " + article.getLibelle());
+
+        System.out.print("Nouveau libelle (ENTER pour garder): ");
+        String libelle = scanner.nextLine().trim();
+        if (!libelle.isEmpty()) {
+            article.modifierLibelle(libelle);
+        }
+
+        System.out.print("Changer image?  (o/n): ");
+        if (scanner.nextLine().trim().equalsIgnoreCase("o")) {
+            System.out.print("Chemin:  ");
+            String chemin = scanner.nextLine().trim();
+
+            try {
+                if (article.getImagePublicId() != null) {
+                    imageService.deleteImage(article.getImagePublicId());
+                }
+
+                String folder = CloudinaryFolders.getSubfolderForArticle(article.getCategorie().name());
+                ImageInfo img = imageService.uploadImage(chemin, folder);
+                article.setImagePublicId(img.getPublicId());
+                System.out.println("  ✓ Image changee");
+            } catch (Exception e) {
+                System.out.println("  ✗ " + e.getMessage());
+            }
+        }
+
+        repo.save(article);
+        System.out.println("✓ Modifie");
+    }
+
+    private static void supprimerArticle(IArticleRepository repo, IImageStorageService imageService) {
+        System.out.print("\nCode article: ");
+        String code = scanner.nextLine().trim();
+
+        Optional<Article> opt = repo.findByCode(code);
+        if (!opt.isPresent()) {
+            System.out.println("✗ Non trouve");
+            return;
+        }
+
+        Article article = opt.get();
+        System.out.print("Confirmer suppression de '" + article.getLibelle() + "' ?  (o/n): ");
+
+        if (scanner.nextLine().trim().equalsIgnoreCase("o")) {
+            if (article.getImagePublicId() != null) {
+                imageService.deleteImage(article.getImagePublicId());
+            }
+            repo.delete(article.getId());
+            System.out.println("✓ Supprime");
+        }
+    }
+
+    private static void listerImages(IImageStorageService imageService) {
+        System.out.println("\n1.Burgers");
+        System.out.println("2.Menus");
+        System.out.println("3.Complements");
+        System.out.print("Choix: ");
+
+        String folder;
+        switch (scanner.nextLine().trim()) {
+            case "1":  folder = CloudinaryFolders.getBurgers(); break;
+            case "2": folder = CloudinaryFolders.getMenus(); break;
+            case "3": folder = CloudinaryFolders.getComplements(); break;
+            default: folder = CloudinaryFolders.getArticlesBase();
+        }
+
+        List<ImageInfo> images = imageService.listImages(folder);
+        System.out.println("\n" + images.size() + " image(s):");
+        images.forEach(img -> System.out.println("  - " + img.getPublicId()));
     }
 }
