@@ -7,3 +7,8 @@
 # OS
 .DS_Store
 Thumbs.db
+
+# Dossier des autres branches
+.modelisation/
+.java-console/
+.csharp-client/
