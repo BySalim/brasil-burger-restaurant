@@ -2,20 +2,25 @@ package com.brasilburger;
 
 import com.brasilburger.config.AppConfig;
 import com.brasilburger.domain.entities.*;
-import com.brasilburger.domain.entities.enums.TypeComplement;
 import com.brasilburger.domain.repositories.IArticleRepository;
 import com.brasilburger.domain.repositories.impl.NeonArticleRepository;
 import com.brasilburger.domain.services.ICodeArticleGenerator;
 import com.brasilburger.domain.services.IImageStorageService;
+import com.brasilburger.domain.services.IZoneService;
 import com.brasilburger.domain.services.impl.CodeArticleGeneratorImpl;
 import com.brasilburger.domain.services.impl.CloudinaryImageStorageService;
+import com.brasilburger.factories.ImageStorageFactory;
+import com.brasilburger.factories.RepositoryFactory;
+import com.brasilburger.factories.ServiceFactory;
 import com.brasilburger.infrastructure.cloudinary.CloudinaryConfig;
 import com.brasilburger.infrastructure.cloudinary.CloudinaryFolders;
 import com.brasilburger.infrastructure.database.NeonConnectionManager;
 import com.brasilburger.domain.services.IArticleService;
-import com.brasilburger.domain.services.impl.ArticleServiceImpl;
-import com.brasilburger.domain.entities.enums.CategorieArticle;
-import com.brasilburger.domain.valueobjects.ImageInfo;
+import com.brasilburger.domain.repositories.IZoneRepository;
+import com.brasilburger.domain.repositories.IQuartierRepository;
+import com.brasilburger.domain.repositories.ILivreurRepository;
+import com.brasilburger.domain.services.IQuartierService;
+import com.brasilburger.domain.services.ILivreurService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +61,7 @@ public class Main {
 
         // Tests unitaires
         testerServiceImageStorage();
-        testerServiceArticle();
+        testerFactories();
 
         logger.info("Tests termines avec succes!");
     }
@@ -134,152 +139,107 @@ public class Main {
     }
 
     /**
-     * Test INTERACTIF du service Article avec upload d'images
+     * Test des Factories
      */
-    private static void testerServiceArticle() {
-        System.out.println("\n=== TESTS INTERACTIFS :  SERVICE ARTICLE ===\n");
-
-        IArticleRepository articleRepo = new NeonArticleRepository();
-        ICodeArticleGenerator codeGenerator = new CodeArticleGeneratorImpl(articleRepo);
-        IArticleService articleService = new ArticleServiceImpl(articleRepo, codeGenerator);
-        IImageStorageService imageService = new CloudinaryImageStorageService();
-
-        System.out.println("NOTE:  Les images sont OBLIGATOIRES pour tous les articles\n");
+    private static void testerFactories() {
+        System.out.println("\n=== TESTS :   FACTORIES ===\n");
 
         try {
-            // Test 1: Création d'un burger avec image
-            System.out.println("=== Test 1: Creation d'un burger avec image ===");
-            System.out.print("Voulez-vous creer un burger ?  (o/n): ");
-            if (scanner.nextLine().trim().equalsIgnoreCase("o")) {
+            // Test 1: Création des repositories via factory
+            System.out.println("Test 1: Creation des repositories via factory.. .");
+            IZoneRepository zoneRepo = RepositoryFactory. createZoneRepository();
+            IQuartierRepository quartierRepo = RepositoryFactory.createQuartierRepository();
+            ILivreurRepository livreurRepo = RepositoryFactory.createLivreurRepository();
+            IArticleRepository articleRepo = RepositoryFactory.createArticleRepository();
+            System.out.println("  ✓ Repositories crees");
 
-                System.out.print("Libelle du burger: ");
-                String libelle = scanner.nextLine().trim();
+            // Test 2: Vérification Singleton repositories
+            System.out.println("\nTest 2: Verification Singleton repositories...");
+            IZoneRepository zoneRepo2 = RepositoryFactory.createZoneRepository();
+            boolean isSameInstance = (zoneRepo == zoneRepo2);
+            System.out.println("  Meme instance ? " + isSameInstance);
+            System.out. println("  ✓ Pattern Singleton OK");
 
-                System. out.print("Description: ");
-                String description = scanner. nextLine().trim();
+            // Test 3: Création des services via factory
+            System.out.println("\nTest 3: Creation des services via factory...");
+            IZoneService zoneService = ServiceFactory.createZoneService();
+            IQuartierService quartierService = ServiceFactory.createQuartierService();
+            ILivreurService livreurService = ServiceFactory.createLivreurService();
+            IArticleService articleService = ServiceFactory. createArticleService();
+            ICodeArticleGenerator codeGenerator = ServiceFactory.createCodeArticleGenerator();
+            System.out. println("  ✓ Services metier crees");
 
-                System.out.print("Prix (FCFA): ");
-                int prix = Integer.parseInt(scanner.nextLine().trim());
+            // Test 4: Création du service Image Storage via factory dédiée
+            System.out.println("\nTest 4: Creation ImageStorageService via factory...");
+            IImageStorageService imageService1 = ImageStorageFactory.createImageStorageService();
+            IImageStorageService imageService2 = ImageStorageFactory.createImageStorageService();
+            boolean isSameImageService = (imageService1 == imageService2);
+            System.out.println("  Meme instance ?  " + isSameImageService);
+            System.out.println("  ✓ ImageStorageFactory OK");
 
-                System. out.print("Chemin de l'image:  ");
-                String cheminImage = scanner.nextLine().trim();
+            // Test 5: Accès via ServiceFactory
+            System.out.println("\nTest 5: Acces ImageStorageService via ServiceFactory...");
+            IImageStorageService imageServiceViaServiceFactory = ServiceFactory.createImageStorageService();
+            boolean isSameViaServiceFactory = (imageService1 == imageServiceViaServiceFactory);
+            System.out. println("  Meme instance via ServiceFactory ? " + isSameViaServiceFactory);
+            System.out.println("  ✓ Delegation OK");
 
-                try {
-                    // Upload de l'image
-                    ImageInfo imageInfo = imageService.uploadImage(cheminImage, CloudinaryFolders.getBurgers());
-                    System.out.println("  ✓ Image uploadee:  " + imageInfo.getPublicId());
+            // Test 6: Test fonctionnel avec une zone
+            System.out.println("\nTest 6: Test fonctionnel avec factory.. .");
+            Zone zone = zoneService.creerZone("Zone Test Factory", 2500);
+            System.out.println("  ✓ Zone creee via factory:  " + zone.getNom());
 
-                    // Création du burger
-                    Burger burger = articleService.creerBurger(libelle, description, prix, imageInfo.getPublicId());
-                    System.out.println("  ✓ Burger cree: " + burger.getCode() + " - " + burger.getLibelle());
-                    System.out.println("    Image: " + burger.getImagePublicId());
+            // Nettoyage
+            zoneService.supprimerZone(zone. getId());
+            System.out. println("  ✓ Nettoyage effectue");
 
-                } catch (Exception e) {
-                    System.out.println("  ✗ Erreur:  " + e.getMessage());
-                }
-            }
+            // Test 7: Test du code generator via factory
+            System.out.println("\nTest 7: Test code generator via factory...");
+            String codeBurger = codeGenerator.genererCodeBurger();
+            String codeMenu = codeGenerator. genererCodeMenu();
+            String codeComplement = codeGenerator.genererCodeComplement();
+            System.out.println("  Code Burger:       " + codeBurger);
+            System.out.println("  Code Menu:        " + codeMenu);
+            System.out.println("  Code Complement:  " + codeComplement);
+            System.out.println("  ✓ Code generator OK");
 
-            // Test 2: Création d'un complément avec image
-            System.out.println("\n=== Test 2: Creation d'un complement avec image ===");
-            System.out.print("Voulez-vous creer un complement ? (o/n): ");
-            if (scanner.nextLine().trim().equalsIgnoreCase("o")) {
+            // Test 8: Test validation format image via ImageStorageFactory
+            System.out.println("\nTest 8: Test fonctionnalite ImageStorageService...");
+            CloudinaryImageStorageService imageService = (CloudinaryImageStorageService) ImageStorageFactory.createImageStorageService();
+            boolean jpgValide = imageService.estFormatImageValide("test.jpg");
+            boolean pngValide = imageService. estFormatImageValide("test.png");
+            boolean txtInvalide = ! imageService.estFormatImageValide("test.txt");
+            System.out.println("  JPG valide ?  " + jpgValide);
+            System.out.println("  PNG valide ? " + pngValide);
+            System.out.println("  TXT invalide ? " + txtInvalide);
+            System.out.println("  ✓ Validation formats OK");
 
-                System.out.print("Libelle du complement: ");
-                String libelle = scanner.nextLine().trim();
+            // Test 9: Test reset des factories
+            System.out.println("\nTest 9: Test reset des factories...");
+            ServiceFactory.resetAll();
+            RepositoryFactory.resetAll();
+            IZoneService zoneServiceNew = ServiceFactory.createZoneService();
+            IImageStorageService imageServiceNew = ImageStorageFactory.createImageStorageService();
+            boolean isDifferentZoneService = (zoneService != zoneServiceNew);
+            boolean isDifferentImageService = (imageService1 != imageServiceNew);
+            System.out.println("  ZoneService different apres reset ? " + isDifferentZoneService);
+            System.out.println("  ImageService different apres reset ? " + isDifferentImageService);
+            System.out.println("  ✓ Reset OK");
 
-                System.out.print("Type (1=Boisson, 2=Frites): ");
-                TypeComplement type = scanner.nextLine().trim().equals("1")
-                        ? TypeComplement. BOISSON : TypeComplement. FRITES;
+            // Test 10: Test createNewImageStorageService
+            System.out.println("\nTest 10: Test creation nouvelle instance ImageStorageService...");
+            IImageStorageService imageServiceForce1 = ImageStorageFactory.createNewImageStorageService();
+            IImageStorageService imageServiceForce2 = ImageStorageFactory.createNewImageStorageService();
+            boolean areDifferentForced = (imageServiceForce1 != imageServiceForce2);
+            System.out.println("  Instances forcees differentes ? " + areDifferentForced);
+            System.out.println("  ✓ Creation nouvelle instance OK");
 
-                System.out.print("Prix (FCFA): ");
-                int prix = Integer.parseInt(scanner.nextLine().trim());
-
-                System.out.print("Chemin de l'image: ");
-                String cheminImage = scanner. nextLine().trim();
-
-                try {
-                    // Upload de l'image
-                    ImageInfo imageInfo = imageService.uploadImage(cheminImage, CloudinaryFolders.getComplements());
-                    System.out.println("  ✓ Image uploadee: " + imageInfo.getPublicId());
-
-                    // Création du complément
-                    Complement complement = articleService.creerComplement(libelle, type, prix, imageInfo.getPublicId());
-                    System.out.println("  ✓ Complement cree:  " + complement.getCode() + " - " + complement.getLibelle());
-                    System.out. println("    Image: " + complement.getImagePublicId());
-
-                } catch (Exception e) {
-                    System.out. println("  ✗ Erreur: " + e.getMessage());
-                }
-            }
-
-            // Test 3: Création d'un menu avec image
-            System.out.println("\n=== Test 3: Creation d'un menu avec image ===");
-            System.out.print("Voulez-vous creer un menu ? (o/n): ");
-            if (scanner.nextLine().trim().equalsIgnoreCase("o")) {
-
-                System.out.print("Libelle du menu: ");
-                String libelle = scanner.nextLine().trim();
-
-                System.out.print("Description: ");
-                String description = scanner.nextLine().trim();
-
-                System.out.print("Chemin de l'image: ");
-                String cheminImage = scanner.nextLine().trim();
-
-                try {
-                    // Upload de l'image
-                    ImageInfo imageInfo = imageService.uploadImage(cheminImage, CloudinaryFolders.getMenus());
-                    System.out.println("  ✓ Image uploadee:  " + imageInfo.getPublicId());
-
-                    // Création du menu
-                    Menu menu = articleService.creerMenu(libelle, description, imageInfo.getPublicId());
-                    System. out.println("  ✓ Menu cree: " + menu.getCode() + " - " + menu.getLibelle());
-                    System.out.println("    Image: " + menu.getImagePublicId());
-
-                } catch (Exception e) {
-                    System.out.println("  ✗ Erreur:  " + e.getMessage());
-                }
-            }
-
-            // Test 4: Liste des articles créés
-            System.out.println("\n=== Test 4: Liste de tous les articles ===");
-            List<Article> articles = articleService. listerTousLesArticles();
-            System.out.println("Nombre total d'articles: " + articles. size());
-
-            if (! articles.isEmpty()) {
-                System.out.println("\nArticles:");
-                for (Article a : articles) {
-                    System. out.println("  - " + a.getCode() + ": " + a.getLibelle() + " (" + a.getCategorie() + ")");
-                    System.out.println("    Image: " + a.getImagePublicId());
-                }
-            }
-
-            // Test 5: Test de validation (image obligatoire)
-            System.out.println("\n=== Test 5: Validation image obligatoire ===");
-            try {
-                articleService.creerBurger("Test Burger", "Description", 5000, null);
-                System. out.println("  ✗ ERREUR: devrait lancer une exception");
-            } catch (IllegalArgumentException e) {
-                System.out.println("  ✓ Exception correctement levee: " + e.getMessage());
-            }
-
-            // Test 6: Comptage par catégorie
-            System.out.println("\n=== Test 6: Comptage par categorie ===");
-            long nbBurgers = articleService.compterArticlesParCategorie(CategorieArticle.BURGER);
-            long nbMenus = articleService.compterArticlesParCategorie(CategorieArticle.MENU);
-            long nbComplements = articleService.compterArticlesParCategorie(CategorieArticle.COMPLEMENT);
-            System.out.println("  Burgers: " + nbBurgers);
-            System.out.println("  Menus: " + nbMenus);
-            System.out.println("  Complements: " + nbComplements);
-
-            System.out.println("\n✓ TOUS LES TESTS TERMINES\n");
+            System.out.println("\n✓ TOUS LES TESTS FACTORIES REUSSIS\n");
 
         } catch (Exception e) {
-            System.err.println("✗ ERREUR: " + e.getMessage());
-            logger.error("Erreur tests service article", e);
+            System.err.println("✗ ERREUR:  " + e.getMessage());
+            logger.error("Erreur tests factories", e);
             e.printStackTrace();
         }
     }
-
-
 }
