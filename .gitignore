@@ -7,3 +7,9 @@
 # OS
 .DS_Store
 Thumbs.db
+
+# dossier des branch
+.modelisation/
+.java-console/
+.csharp-client/
+.symfony-gestionnaire/
