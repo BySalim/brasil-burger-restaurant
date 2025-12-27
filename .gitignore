@@ -9,6 +9,6 @@
 Thumbs.db
 
 # Dossier des autres branches
-.modelisation/
-.java-console/
-.csharp-client/
+/modelisation/
+/java-console/
+/csharp-client/
