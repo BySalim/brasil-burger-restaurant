@@ -8,22 +8,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================
--- SUPPRESSION SÉCURISÉE (Optionnel - décommenter si besoin)
--- ============================================
-/*
-DROP TABLE IF EXISTS article_quantifier CASCADE;
-DROP TABLE IF EXISTS paiement CASCADE;
-DROP TABLE IF EXISTS commande CASCADE;
-DROP TABLE IF EXISTS livraison CASCADE;
-DROP TABLE IF EXISTS panier CASCADE;
-DROP TABLE IF EXISTS article CASCADE;
-DROP TABLE IF EXISTS quartier CASCADE;
-DROP TABLE IF EXISTS livreur CASCADE;
-DROP TABLE IF EXISTS zone CASCADE;
-DROP TABLE IF EXISTS utilisateur CASCADE;
-*/
-
--- ============================================
 -- TABLE:  ZONE
 -- ============================================
 CREATE TABLE IF NOT EXISTS zone (
@@ -100,6 +84,40 @@ CREATE TABLE IF NOT EXISTS article (
 );
 
 -- ============================================
+-- TABLE: INFO_LIVRAISON
+-- ============================================
+CREATE TABLE IF NOT EXISTS info_livraison (
+    id SERIAL PRIMARY KEY,
+    id_zone INTEGER NOT NULL,
+    id_quartier INTEGER NOT NULL,
+    note_livraison TEXT,
+    prix_livraison INTEGER NOT NULL,
+    
+    -- Clés étrangères
+    CONSTRAINT fk_info_livraison_zone 
+        FOREIGN KEY (id_zone) 
+        REFERENCES zone(id) ON DELETE CASCADE,
+    CONSTRAINT fk_info_livraison_quartier 
+        FOREIGN KEY (id_quartier) 
+        REFERENCES quartier(id) ON DELETE CASCADE
+);
+
+-- ============================================
+-- TABLE: GROUPE_LIVRAISON
+-- ============================================
+CREATE TABLE IF NOT EXISTS groupe_livraison (
+    id SERIAL PRIMARY KEY,
+    id_livreur INTEGER NOT NULL,
+    statut VARCHAR(20) NOT NULL DEFAULT 'EN_COURS' 
+        CHECK (statut IN ('EN_COURS', 'TERMINER')),
+    
+    -- Clé étrangère
+    CONSTRAINT fk_groupe_livraison_livreur 
+        FOREIGN KEY (id_livreur) 
+        REFERENCES livreur(id) ON DELETE CASCADE
+);
+
+-- ============================================
 -- TABLE: LIVRAISON
 -- ============================================
 CREATE TABLE IF NOT EXISTS livraison (
@@ -108,16 +126,12 @@ CREATE TABLE IF NOT EXISTS livraison (
         CHECK (statut IN ('EN_COURS', 'TERMINER')),
     date_debut DATE NOT NULL DEFAULT CURRENT_DATE,
     date_fin DATE,
-    id_zone_livraison INTEGER NOT NULL,
-    id_livreur INTEGER NOT NULL,
+    id_groupe_livraison INTEGER NOT NULL,
     
-    -- Clés étrangères
-    CONSTRAINT fk_livraison_zone 
-        FOREIGN KEY (id_zone_livraison) 
-        REFERENCES zone(id) ON DELETE CASCADE,
-    CONSTRAINT fk_livraison_livreur 
-        FOREIGN KEY (id_livreur) 
-        REFERENCES livreur(id) ON DELETE CASCADE
+    -- Clé étrangère
+    CONSTRAINT fk_livraison_groupe 
+        FOREIGN KEY (id_groupe_livraison) 
+        REFERENCES groupe_livraison(id) ON DELETE CASCADE
 );
 
 -- ============================================
@@ -127,8 +141,6 @@ CREATE TABLE IF NOT EXISTS panier (
     id SERIAL PRIMARY KEY,
     montant_total INTEGER NOT NULL DEFAULT 0,
     categorie_panier VARCHAR(20) NOT NULL CHECK (categorie_panier IN ('BURGER', 'MENU')),
-    id_commande INTEGER
-    -- FK vers commande ajoutée après création de la table commande (dépendance circulaire)
 );
 
 -- ============================================
@@ -145,40 +157,24 @@ CREATE TABLE IF NOT EXISTS commande (
     type_recuperation VARCHAR(20) NOT NULL 
         CHECK (type_recuperation IN ('SUR_PLACE', 'EMPORTER', 'LIVRER')),
     id_panier INTEGER,
-    tel_client VARCHAR(20) NOT NULL, -- Téléphone du client
-    id_zone_livraison INTEGER,
+    id_client INTEGER NOT NULL,
+    id_info_livraison INTEGER UNIQUE NOT NULL,
     id_livraison INTEGER,
     
     -- Clés étrangères
     CONSTRAINT fk_commande_panier 
         FOREIGN KEY (id_panier) 
         REFERENCES panier(id) ON DELETE SET NULL,
-    CONSTRAINT fk_commande_utilisateur_telephone 
-        FOREIGN KEY (tel_client) 
-        REFERENCES utilisateur(telephone) ON DELETE CASCADE,
-    CONSTRAINT fk_commande_zone 
-        FOREIGN KEY (id_zone_livraison) 
-        REFERENCES zone(id) ON DELETE SET NULL,
+    CONSTRAINT fk_commande_client 
+        FOREIGN KEY (id_client) 
+        REFERENCES utilisateur(id) ON DELETE CASCADE,
+    CONSTRAINT fk_commande_info_livraison 
+        FOREIGN KEY (id_info_livraison) 
+        REFERENCES info_livraison(id) ON DELETE CASCADE,
     CONSTRAINT fk_commande_livraison 
         FOREIGN KEY (id_livraison) 
         REFERENCES livraison(id) ON DELETE SET NULL
 );
-
--- ============================================
--- AJOUT FK PANIER -> COMMANDE (dépendance circulaire)
--- ============================================
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint 
-        WHERE conname = 'fk_panier_commande'
-    ) THEN
-        ALTER TABLE panier
-        ADD CONSTRAINT fk_panier_commande 
-        FOREIGN KEY (id_commande) 
-        REFERENCES commande(id) ON DELETE CASCADE;
-    END IF;
-END $$;
 
 -- ============================================
 -- TABLE: PAIEMENT
@@ -187,8 +183,9 @@ CREATE TABLE IF NOT EXISTS paiement (
     id SERIAL PRIMARY KEY,
     date_paie DATE NOT NULL DEFAULT CURRENT_DATE,
     montant_paie INTEGER NOT NULL,
-    mode_paie VARCHAR(20) NOT NULL CHECK (mode_paie IN ('WAVE', 'OM', 'FAKE')),
+    mode_paie VARCHAR(20) NOT NULL CHECK (mode_paie IN ('WAVE', 'OM')),
     reference_paiement_externe VARCHAR(100) UNIQUE,
+    test BOOLEAN NOT NULL DEFAULT FALSE,
     id_client INTEGER,
     id_commande INTEGER UNIQUE NOT NULL,
     
