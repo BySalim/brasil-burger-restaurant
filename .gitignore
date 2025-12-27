@@ -9,6 +9,6 @@
 Thumbs.db
 
 # ignorer les autres dossiers branch
-.java-console/
-.csharp-client/
-.symfony-gestionnaire/
+/java-console/
+/csharp-client/
+/symfony-gestionnaire/
