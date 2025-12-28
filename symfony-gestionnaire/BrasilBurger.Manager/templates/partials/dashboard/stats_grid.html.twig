@@ -1,0 +1,19 @@
+{#
+Statistics Grid
+
+@param array stats - Array of statistics
+    Each stat should have: title, value, icon, iconBg, valueUnit (optional)
+#}
+{% set statistics = stats|default([]) %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+    {% for stat in statistics %}
+        {% include 'components/stat_card.html.twig' with {
+            title: stat.title,
+            value: stat.value,
+            icon: stat.icon,
+            iconBg: stat.iconBg,
+            valueUnit: stat.valueUnit|default('')
+        } %}
+    {% endfor %}
+</div>

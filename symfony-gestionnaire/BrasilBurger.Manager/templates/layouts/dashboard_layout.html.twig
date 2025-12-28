@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block body_class %}flex overflow-hidden h-screen{% endblock %}
+
+{% block tailwind_config %}
+    colors: {
+    "primary": "#f97316",
+    "background-light": "#f3f4f6",
+    "background-dark": "#0f172a",
+    "surface-dark": "#1e293b",
+    "border-dark": "#334155",
+    "text-muted-dark": "#94a3b8",
+    },
+{% endblock %}
+
+{% block body %}
+    {# Sidebar - Fixed height, no scroll #}
+    <aside class="w-64 lg:w-72 bg-white dark:bg-surface-dark border-r border-gray-200 dark:border-border-dark flex flex-col flex-shrink-0 z-20 shadow-lg h-screen">
+        {% block sidebar %}
+            {% include 'partials/dashboard/sidebar.html.twig' %}
+        {% endblock %}
+    </aside>
+
+    {# Main Content - Scrollable #}
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        {# Header - Fixed at top #}
+        <header class="flex-shrink-0 bg-background-light dark:bg-background-dark px-8 py-6 flex justify-between items-center border-b border-gray-200 dark:border-border-dark shadow-sm">
+            {% block header %}
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{% block page_title %}Titre de la page{% endblock %}</h2>
+                    <p class="text-sm text-gray-500 dark:text-text-muted-dark">{% block page_subtitle %}Sous-titre{% endblock %}</p>
+                </div>
+                <div class="hidden md:flex items-center gap-4">
+                    {% block header_actions %}{% endblock %}
+                </div>
+            {% endblock %}
+        </header>
+
+        {# Page Content - Scrollable area #}
+        <div class="flex-1 overflow-y-auto p-8">
+            {% block content %}{% endblock %}
+
+            {# Footer #}
+            <div class="mt-8 text-center opacity-60">
+                <p class="text-xs text-gray-500 dark:text-text-muted-dark">© {{ 'now'|date('Y') }} Brazil Burger - Interface de Gestion</p>
+            </div>
+        </div>
+    </main>
+{% endblock %}

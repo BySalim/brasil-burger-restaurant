@@ -11,6 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
+    {# Flatpickr CSS for Date Picker #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+
     {# Tailwind CSS CDN - TODO: Replace with Asset Mapper or Webpack Encore in production #}
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
@@ -18,6 +22,7 @@
             darkMode: "class",
             theme: {
                 extend: {
+                    {% block tailwind_config %}
                     colors: {
                         "primary": "#2563eb",
                         "primary-hover": "#1d4ed8",
@@ -26,6 +31,7 @@
                         "background-dark": "#020617",
                         "card-dark": "#1e293b",
                     },
+                    {% endblock %}
                     fontFamily: {
                         "display": ["Work Sans", "sans-serif"]
                     },
@@ -37,10 +43,64 @@
         }
     </script>
 
-    {% block stylesheets %}{% endblock %}
+    {% block stylesheets %}
+        <style>
+            /* Custom Flatpickr Dark Mode Styles */
+            .dark .flatpickr-calendar {
+                background: #1e293b;
+                border-color: #334155;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            }
+            .dark .flatpickr-months {
+                background: #1e293b;
+            }
+            .dark .flatpickr-current-month .flatpickr-monthDropdown-months,
+            .dark .numInputWrapper input {
+                background: #0f172a;
+                color: #fff;
+                border-color: #334155;
+            }
+            .dark .flatpickr-day {
+                color: #94a3b8;
+            }
+            .dark .flatpickr-day:hover {
+                background: #334155;
+                color: #fff;
+            }
+            .dark .flatpickr-day.selected {
+                background: #f97316 !important;
+                border-color: #f97316 !important;
+                color: #fff;
+            }
+            .dark .flatpickr-day.today {
+                border-color: #f97316;
+            }
+            .dark .flatpickr-months .flatpickr-month,
+            .dark .flatpickr-current-month .flatpickr-monthDropdown-months,
+            .dark .flatpickr-weekdays,
+            .dark span.flatpickr-weekday {
+                color: #fff !important;
+            }
+            .dark .flatpickr-months .flatpickr-prev-month,
+            .dark .flatpickr-months .flatpickr-next-month {
+                fill: #fff;
+            }
+            .dark .flatpickr-months .flatpickr-prev-month:hover,
+            .dark .flatpickr-months .flatpickr-next-month:hover {
+                fill: #f97316;
+            }
+        </style>
+    {% endblock %}
 </head>
-<body class="font-display bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
+<body class="font-display bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300 {% block body_class %}{% endblock %}">
 {% block body %}{% endblock %}
+
+{# Alpine.js for interactivity #}
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+{# Flatpickr for Date Picker #}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
 
 {% block javascripts %}{% endblock %}
 </body>

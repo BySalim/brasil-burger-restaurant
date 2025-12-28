@@ -1,0 +1,29 @@
+{#
+Navigation Link Component
+
+@param string href - Link URL (required)
+@param string text - Link text (required)
+@param string icon - Material icon name (required)
+@param bool active - Is link active (default: false)
+#}
+{% set linkHref = href|default('#') %}
+{% set linkText = text|default('Lien') %}
+{% set linkIcon = icon|default('circle') %}
+{% set isActive = active|default(false) %}
+
+{% if isActive %}
+    <a href="{{ linkHref }}" class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary border border-primary/10 rounded-lg font-medium transition-colors">
+        {% include 'components/icon.html.twig' with {
+            name: linkIcon
+        } %}
+        {{ linkText }}
+    </a>
+{% else %}
+    <a href="{{ linkHref }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-text-muted-dark hover:bg-gray-50 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white rounded-lg font-medium transition-colors group">
+        {% include 'components/icon.html.twig' with {
+            name: linkIcon,
+            class: 'text-gray-400 dark:text-slate-500 group-hover:text-primary transition-colors'
+        } %}
+        {{ linkText }}
+    </a>
+{% endif %}

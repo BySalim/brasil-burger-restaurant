@@ -1,0 +1,21 @@
+{#
+Product Image Component with Fallback Icon
+
+@param string imageUrl - Product image URL (optional)
+@param string fallbackIcon - Material icon for fallback (default: lunch_dining)
+@param string size - Size classes (default: h-12 w-12)
+#}
+{% set productImage = imageUrl|default(null) %}
+{% set fallbackIconName = fallbackIcon|default('lunch_dining') %}
+{% set imageSize = size|default('h-12 w-12') %}
+
+{% if productImage %}
+    <div class="{{ imageSize }} rounded-lg bg-gray-200 dark:bg-slate-700 overflow-hidden bg-cover bg-center shrink-0" style="background-image: url('{{ productImage }}');"></div>
+{% else %}
+    <div class="{{ imageSize }} rounded-lg bg-gray-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
+        {% include 'components/icon.html.twig' with {
+            name: fallbackIconName,
+            class: 'text-gray-400'
+        } %}
+    </div>
+{% endif %}

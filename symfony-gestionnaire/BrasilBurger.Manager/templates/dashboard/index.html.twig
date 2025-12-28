@@ -1,0 +1,85 @@
+{% extends 'layouts/dashboard_layout.html.twig' %}
+
+{% block title %}Manager Dashboard - Brazil Burger{% endblock %}
+
+{% block page_title %}Aperçu du jour{% endblock %}
+{% block page_subtitle %}Bienvenue sur votre tableau de bord de gestion.{% endblock %}
+
+{% block header_actions %}
+    {% include 'components/date_picker_button.html.twig' with {
+        date: 'now'|date('Y-m-d'),
+        label: 'Date du jour'
+    } %}
+{% endblock %}
+
+{% block content %}
+    {# Statistics Grid #}
+    {% set dailyStats = [
+        {
+            title: 'Commandes en cours',
+            value: '12',
+            icon: 'cooking',
+            iconBg: 'bg-orange-50 dark:bg-orange-900/10 text-primary'
+        },
+        {
+            title: 'Commandes Validées',
+            value: '85',
+            icon: 'verified',
+            iconBg: 'bg-green-50 dark:bg-green-900/10 text-green-600 dark:text-green-500'
+        },
+        {
+            title: 'Recettes Journalières',
+            value: '450 000',
+            icon: 'payments',
+            iconBg: 'bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-500',
+            valueUnit: 'FCFA'
+        },
+        {
+            title: 'Commandes Annulées',
+            value: '3',
+            icon: 'cancel_presentation',
+            iconBg: 'bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-500'
+        }
+    ] %}
+
+    {% include 'partials/dashboard/stats_grid.html.twig' with {
+        stats: dailyStats
+    } %}
+
+    {# Top Products Table #}
+    {% set topProducts = [
+        {
+            name: 'Brazil Burger Spécial',
+            category: 'MENU',
+            categoryColor: 'blue',
+            price: '4 500',
+            sales: 42,
+            total: '189 000',
+            imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'
+        },
+        {
+            name: 'Cheese & Bacon',
+            category: 'Burger',
+            categoryColor: 'yellow',
+            price: '3 500',
+            sales: 28,
+            total: '98 000',
+            fallbackIcon: 'lunch_dining'
+        },
+        {
+            name: 'Chicken Spicy',
+            category: 'Burger',
+            categoryColor: 'yellow',
+            price: '3 000',
+            sales: 15,
+            total: '45 000',
+            fallbackIcon: 'fastfood'
+        }
+    ] %}
+
+    {% include 'partials/dashboard/top_products_table.html.twig' with {
+        products: topProducts,
+        title: 'Burgers ou menu les plus vendus de la journée',
+        subtitle: 'Performance des ventes de la journée'
+    } %}
+{% endblock %}

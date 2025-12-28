@@ -1,0 +1,114 @@
+{#
+Date Picker Button Component with Calendar
+
+@param string date - Selected date (default: today)
+@param string label - Label text (default: Date du jour)
+@param string inputName - Name for hidden input (default: selected_date)
+#}
+{% set selectedDate = date|default('now'|date('Y-m-d')) %}
+{% set dateLabel = label|default('Date du jour') %}
+{% set inputName = inputName|default('selected_date') %}
+{% set uniqueId = 'datepicker_' ~ random() %}
+
+<div class="relative"
+     x-data="{
+         open: false,
+         selectedDate: '{{ selectedDate }}',
+         formatDate(dateStr) {
+             const date = new Date(dateStr + 'T00:00:00');
+             const options = { day: 'numeric', month: 'long', year: 'numeric' };
+             return date.toLocaleDateString('fr-FR', options);
+         }
+     }"
+     @click.away="open = false">
+
+    <button
+        type="button"
+        @click="open = !open"
+        class="flex items-center gap-3 pl-3 pr-4 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg shadow-sm hover:border-primary/30 hover:shadow-md transition-all group"
+    >
+        <div class="h-9 w-9 rounded-md bg-primary/10 flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+            {% include 'components/icon.html.twig' with {
+                name: 'calendar_month',
+                size: 'text-[20px]'
+            } %}
+        </div>
+        <div class="flex flex-col items-start text-left">
+            <span class="text-[10px] uppercase font-bold text-gray-400 dark:text-slate-500 tracking-wider leading-none mb-0.5">{{ dateLabel }}</span>
+            <span class="text-sm font-bold text-gray-900 dark:text-white leading-none" x-text="formatDate(selectedDate)"></span>
+        </div>
+        {% include 'components/icon.html.twig' with {
+            name: 'arrow_drop_down',
+            class: 'text-gray-400 dark:text-slate-500 group-hover:text-primary ml-2 transition-colors'
+        } %}
+    </button>
+
+    {# Calendar Dropdown #}
+    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 scale-95"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-95"
+        class="absolute right-0 mt-2 w-80 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg shadow-xl z-50"
+        style="display: none;"
+    >
+        <input type="hidden" name="{{ inputName }}" x-model="selectedDate">
+        <div class="p-4">
+            <div id="{{ uniqueId }}"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const uniqueId = '{{ uniqueId }}';
+
+        // Attendre que Alpine.js soit chargé
+        document.addEventListener('alpine:init', () => {
+            // Le component Alpine est déjà défini inline dans x-data
+        });
+
+        // Initialiser Flatpickr quand le DOM est prêt
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFlatpickr);
+        } else {
+            initFlatpickr();
+        }
+
+        function initFlatpickr() {
+            const element = document.getElementById(uniqueId);
+            if (!element) {
+                console.warn('Element not found:', uniqueId);
+                return;
+            }
+
+            // Attendre que Flatpickr soit chargé
+            const checkFlatpickr = setInterval(() => {
+                if (typeof flatpickr !== 'undefined') {
+                    clearInterval(checkFlatpickr);
+
+                    flatpickr('#' + uniqueId, {
+                        inline: true,
+                        locale: 'fr',
+                        defaultDate: '{{ selectedDate }}',
+                        dateFormat: 'Y-m-d',
+                        onChange: function(selectedDates, dateStr) {
+                            // Trouver le component Alpine parent
+                            const container = element.closest('[x-data]');
+                            if (container && container._x_dataStack) {
+                                container._x_dataStack[0].selectedDate = dateStr;
+                                container._x_dataStack[0].open = false;
+                            }
+                        }
+                    });
+                }
+            }, 50);
+
+            // Timeout de sécurité
+            setTimeout(() => clearInterval(checkFlatpickr), 5000);
+        }
+    })();
+</script>

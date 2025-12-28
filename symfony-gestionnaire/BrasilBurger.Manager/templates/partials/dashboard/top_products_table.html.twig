@@ -1,0 +1,70 @@
+{#
+Top Products Table
+
+@param array products - Array of top products
+    Each product: name, category, categoryColor, price, sales, total, imageUrl, fallbackIcon
+@param string title - Table title
+@param string subtitle - Table subtitle
+#}
+{% set productsList = products|default([]) %}
+{% set tableTitle = title|default('Burgers ou menu les plus vendus') %}
+{% set tableSubtitle = subtitle|default('Performance des ventes') %}
+
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm">
+    {# Header #}
+    <div class="px-6 py-5 border-b border-gray-100 dark:border-border-dark">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ tableTitle }}</h3>
+        <p class="text-sm text-gray-500 dark:text-text-muted-dark">{{ tableSubtitle }}</p>
+    </div>
+
+    {# Table #}
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+            <tr class="bg-gray-50/50 dark:bg-slate-900/30 text-xs uppercase tracking-wider text-gray-500 dark:text-text-muted-dark font-semibold border-b border-gray-100 dark:border-border-dark">
+                <th class="px-6 py-4">Article</th>
+                <th class="px-6 py-4">Catégorie</th>
+                <th class="px-6 py-4 text-right">Prix</th>
+                <th class="px-6 py-4 text-center">Ventes</th>
+                <th class="px-6 py-4 text-right">Total</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-border-dark text-sm">
+            {% for product in productsList %}
+                <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-4">
+                            {% include 'components/product_image.html.twig' with {
+                                imageUrl: product.imageUrl|default(null),
+                                fallbackIcon: product.fallbackIcon|default('lunch_dining')
+                            } %}
+                            <div>
+                                <p class="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">{{ product.name }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% include 'components/badge.html.twig' with {
+                            text: product.category,
+                            color: product.categoryColor|default('blue')
+                        } %}
+                    </td>
+                    <td class="px-6 py-4 text-right font-medium text-gray-600 dark:text-text-muted-dark">{{ product.price }} FCFA</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="font-bold text-gray-900 dark:text-white">{{ product.sales }}</span>
+                    </td>
+                    <td class="px-6 py-4 text-right font-bold text-primary">{{ product.total }} FCFA</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Footer #}
+    <div class="px-6 py-4 border-t border-gray-100 dark:border-border-dark bg-gray-50/50 dark:bg-slate-900/30 flex justify-center">
+        {% include 'components/button_text.html.twig' with {
+            text: 'Afficher plus de résultats',
+            href: '#'
+        } %}
+    </div>
+</div>

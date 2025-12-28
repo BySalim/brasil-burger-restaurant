@@ -1,0 +1,33 @@
+{#
+Text Button Component (no background)
+
+@param string text - Button text (required)
+@param string href - Link URL (optional, makes it an <a> tag)
+@param string class - Additional CSS classes
+@param string icon - Optional icon name
+@param string size - Size variant: xs, sm, md (default: xs)
+#}
+{% set btnText = text|default('Bouton') %}
+{% set btnHref = href|default(null) %}
+{% set btnClass = class|default('') %}
+{% set btnIcon = icon|default(null) %}
+{% set btnSize = size|default('xs') %}
+
+{% set sizeClasses = {
+    'xs': 'text-xs',
+    'sm': 'text-sm',
+    'md': 'text-base'
+} %}
+
+{% set element = btnHref ? 'a' : 'button' %}
+{% set extraAttrs = btnHref ? 'href="' ~ btnHref ~ '"' : 'type="button"' %}
+
+<{{ element }} {{ extraAttrs|raw }} class="font-medium text-gray-500 dark:text-text-muted-dark hover:text-primary transition-colors inline-flex items-center gap-2 {{ sizeClasses[btnSize] }} {{ btnClass }}">
+{% if btnIcon %}
+    {% include 'components/icon.html.twig' with {
+        name: btnIcon,
+        size: 'text-[16px]'
+    } %}
+{% endif %}
+    {{ btnText }}
+</{{ element }}>
