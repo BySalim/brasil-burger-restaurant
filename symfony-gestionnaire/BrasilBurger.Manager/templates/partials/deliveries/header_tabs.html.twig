@@ -1,0 +1,29 @@
+{#
+Deliveries Header Tabs
+
+@param string activeTab - Active tab: orders, deliveries, deliverers (default: orders)
+@param int ordersCount - Count for orders tab badge
+#}
+{% set currentTab = activeTab|default('orders') %}
+{% set ordersCount = ordersCount|default(0) %}
+
+<div class="px-8 flex items-center gap-8 border-t border-gray-200 dark:border-border-dark bg-white/50 dark:bg-surface-dark/50">
+    {% include 'components/tab_button.html.twig' with {
+        text: 'Commandes terminées à livrer',
+        active: currentTab == 'orders',
+        badge: ordersCount > 0 ? ordersCount : null,
+        href: path('app_default')
+    } %}
+
+    {% include 'components/tab_button.html.twig' with {
+        text: 'Livraisons',
+        active: currentTab == 'deliveries',
+        href: path('app_default')
+    } %}
+
+    {% include 'components/tab_button.html.twig' with {
+        text: 'Livreurs',
+        active: currentTab == 'deliverers',
+        href: path('app_default')
+    } %}
+</div>

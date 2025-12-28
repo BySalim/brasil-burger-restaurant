@@ -1,0 +1,19 @@
+{#
+Tab Button Component
+
+@param string text - Tab text (required)
+@param bool active - Is tab active (default: false)
+@param int badge - Badge count (optional)
+@param string href - Link URL (default: #)
+#}
+{% set tabText = text|default('Tab') %}
+{% set isActive = active|default(false) %}
+{% set badgeCount = badge|default(null) %}
+{% set tabHref = href|default('#') %}
+
+<a href="{{ tabHref }}" class="relative py-4 text-sm {% if isActive %}font-bold text-primary border-b-2 border-primary{% else %}font-medium text-gray-500 dark:text-text-muted-dark hover:text-gray-900 dark:hover:text-white{% endif %} transition-colors flex items-center gap-2">
+    {{ tabText }}
+    {% if badgeCount %}
+        <span class="flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-primary rounded-full -mt-2">{{ badgeCount }}</span>
+    {% endif %}
+</a>

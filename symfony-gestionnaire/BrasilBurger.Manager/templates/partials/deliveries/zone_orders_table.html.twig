@@ -1,0 +1,54 @@
+{#
+Zone Orders Table with Assignment
+
+@param array orders - Array of orders to deliver
+@param string zoneId - Zone ID
+@param array deliverers - Available deliverers
+#}
+{% import 'macros/table_macros.html.twig' as table %}
+{% set ordersList = orders|default([]) %}
+{% set zoneId = zoneId|default('') %}
+{% set deliverersList = deliverers|default([]) %}
+
+<div class="border-t border-gray-100 dark:border-border-dark">
+    {# Action Bar #}
+    <div class="p-4 flex items-center justify-between bg-gray-50/50 dark:bg-slate-900/20">
+        <div class="text-sm text-gray-500 dark:text-text-muted-dark italic">
+            Sélectionnez les commandes pour les assigner
+        </div>
+
+        {% include 'components/deliverer_dropdown.html.twig' with {
+            deliverers: deliverersList,
+            zoneId: zoneId
+        } %}
+    </div>
+
+    {# Orders Table #}
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+            <tr class="bg-gray-50 dark:bg-slate-800/50 text-xs uppercase tracking-wider text-gray-500 dark:text-text-muted-dark font-semibold border-y border-gray-100 dark:border-border-dark">
+                <th class="px-6 py-3 w-28">
+                    <div class="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            class="w-4 h-4 text-primary bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 rounded focus:ring-primary focus:ring-offset-0 transition-colors cursor-pointer"
+                            onchange="toggleAllOrders(this, '{{ zoneId }}')"
+                        >
+                        <span class="normal-case font-normal text-gray-400 dark:text-slate-500" id="selected-count-{{ zoneId }}">(0)</span>
+                    </div>
+                </th>
+                <th class="px-6 py-3">CODE COMMANDE</th>
+                <th class="px-6 py-3">QUARTIER</th>
+                <th class="px-6 py-3">CLIENT</th>
+                <th class="px-6 py-3 w-16"></th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-border-dark text-sm">
+            {% for order in ordersList %}
+                {{ table.delivery_order_row(order, zoneId) }}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

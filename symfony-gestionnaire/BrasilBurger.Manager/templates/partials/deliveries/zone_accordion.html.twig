@@ -1,0 +1,54 @@
+{#
+Zone Accordion Component
+
+@param object zone - Zone object {id, name, ordersCount, orders, isExpanded}
+@param array deliverers - Available deliverers list
+#}
+{% set zoneData = zone|default({}) %}
+{% set zoneId = zoneData.id|default('zone_' ~ random()) %}
+{% set zoneName = zoneData.name|default('Zone') %}
+{% set ordersCount = zoneData.ordersCount|default(0) %}
+{% set ordersList = zoneData.orders|default([]) %}
+{% set isExpanded = zoneData.isExpanded|default(false) %}
+{% set deliverersList = deliverers|default([]) %}
+
+<div
+    class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm transition-all duration-200 {% if isExpanded %}overflow-visible relative z-10{% endif %}"
+    x-data="{ expanded: {{ isExpanded ? 'true' : 'false' }} }"
+>
+    {# Header #}
+    <button
+        type="button"
+        @click="expanded = !expanded"
+        class="w-full flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+    >
+        <div class="flex items-center gap-4">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ zoneName }}</h3>
+            {% include 'components/zone_count_badge.html.twig' with {
+                count: ordersCount
+            } %}
+        </div>
+
+        <span class="text-gray-400 dark:text-slate-500 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined" x-show="expanded">expand_less</span>
+            <span class="material-symbols-outlined" x-show="!expanded">expand_more</span>
+        </span>
+    </button>
+
+    {# Content #}
+    <div x-show="expanded" x-collapse>
+        {% if ordersCount > 0 %}
+            {% include 'partials/deliveries/zone_orders_table.html.twig' with {
+                orders: ordersList,
+                zoneId: zoneId,
+                deliverers: deliverersList
+            } %}
+        {% else %}
+            <div class="border-t border-gray-100 dark:border-border-dark bg-gray-50/30 dark:bg-slate-900/10">
+                {% include 'components/empty_state.html.twig' with {
+                    text: 'Aucune commande à livrer dans cette zone'
+                } %}
+            </div>
+        {% endif %}
+    </div>
+</div>

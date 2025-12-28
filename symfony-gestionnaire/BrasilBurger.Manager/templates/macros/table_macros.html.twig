@@ -2,7 +2,9 @@
 Table Macros - Reusable table row components
 #}
 
-{# Order Row Macro (EXISTANT - INCHANGÉ) #}
+{# ========================================
+   MACRO 1: Order Row (pour la liste des commandes)
+   ======================================== #}
 {% macro order_row(order) %}
     <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
         {# Date #}
@@ -60,7 +62,10 @@ Table Macros - Reusable table row components
     </tr>
 {% endmacro %}
 
-{# Order Item Row Macro (NOUVEAU) #}
+
+{# ========================================
+   MACRO 2: Order Item Row (pour les articles dans les détails de commande)
+   ======================================== #}
 {% macro order_item_row(item) %}
     <tr>
         {# Article with Image #}
@@ -86,5 +91,59 @@ Table Macros - Reusable table row components
 
         {# Total #}
         <td class="px-6 py-4 text-right font-bold text-gray-900 dark:text-white">{{ item.total|default('0') }} FCFA</td>
+    </tr>
+{% endmacro %}
+
+
+{# ========================================
+   MACRO 3: Delivery Order Row (pour les commandes à livrer par zone)
+   ======================================== #}
+{% macro delivery_order_row(order, zoneId) %}
+    <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
+        {# Checkbox #}
+        <td class="px-6 py-4">
+            <input
+                type="checkbox"
+                name="selected_orders[]"
+                value="{{ order.id|default('') }}"
+                class="order-checkbox w-4 h-4 text-primary bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 rounded focus:ring-primary focus:ring-offset-0 transition-colors cursor-pointer"
+                data-zone="{{ zoneId }}"
+                onchange="updateSelectedCount('{{ zoneId }}')"
+            >
+        </td>
+
+        {# Order Code #}
+        <td class="px-6 py-4">
+            <span class="font-mono font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">
+                {{ order.code|default('#CMD-0000') }}
+            </span>
+        </td>
+
+        {# Neighborhood #}
+        <td class="px-6 py-4">
+            <span class="text-gray-700 dark:text-gray-300">{{ order.neighborhood|default('--') }}</span>
+        </td>
+
+        {# Client Info #}
+        <td class="px-6 py-4">
+            <div class="flex flex-col">
+                <span class="font-medium text-gray-900 dark:text-white">{{ order.clientName|default('Client') }}</span>
+                <span class="text-xs text-gray-500">{{ order.clientPhone|default('--') }}</span>
+            </div>
+        </td>
+
+        {# View Details Button #}
+        <td class="px-6 py-4 text-right">
+            <a
+                href="{{ path('app_default', {id: order.id|default(0)}) }}"
+                class="p-2 text-gray-400 hover:text-primary hover:bg-orange-50 dark:hover:bg-orange-900/10 rounded-full transition-all inline-flex"
+                title="Voir les détails"
+            >
+                {% include 'components/icon.html.twig' with {
+                    name: 'arrow_forward',
+                    size: 'text-[20px]'
+                } %}
+            </a>
+        </td>
     </tr>
 {% endmacro %}
