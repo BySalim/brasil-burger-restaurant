@@ -1,0 +1,19 @@
+{#
+Date Input Component
+
+@param string name - Input name (default: date)
+@param string value - Input value
+@param string class - Additional classes
+#}
+{% set dateName = name|default('date') %}
+{% set dateValue = value|default('') %}
+{% set dateClass = class|default('') %}
+
+<div class="relative shrink-0 {{ dateClass }}">
+    <input
+        type="date"
+        name="{{ dateName }}"
+        value="{{ dateValue }}"
+        class="w-full px-3 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-600 dark:text-gray-300 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer dark:[color-scheme:dark]"
+    >
+</div>

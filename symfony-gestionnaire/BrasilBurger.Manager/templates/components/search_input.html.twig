@@ -1,0 +1,23 @@
+{#
+Search Input Component
+
+@param string placeholder - Placeholder text
+@param string name - Input name (default: search)
+@param string value - Input value
+@param string class - Additional classes
+#}
+{% set searchPlaceholder = placeholder|default('Rechercher...') %}
+{% set searchName = name|default('search') %}
+{% set searchValue = value|default('') %}
+{% set searchClass = class|default('') %}
+
+<div class="relative flex-1 min-w-[200px] {{ searchClass }}">
+    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 text-[20px]">search</span>
+    <input
+        type="text"
+        name="{{ searchName }}"
+        value="{{ searchValue }}"
+        placeholder="{{ searchPlaceholder }}"
+        class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500"
+    >
+</div>

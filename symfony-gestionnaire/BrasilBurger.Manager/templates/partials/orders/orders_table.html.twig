@@ -1,0 +1,44 @@
+{#
+Orders Table
+
+@param array orders - Array of orders
+#}
+{% import 'macros/table_macros.html.twig' as table %}
+{% set ordersList = orders|default([]) %}
+
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+            <tr class="bg-gray-50/50 dark:bg-slate-900/30 text-xs uppercase tracking-wider text-gray-500 dark:text-text-muted-dark font-semibold border-b border-gray-100 dark:border-border-dark">
+                <th class="px-3 py-3 whitespace-nowrap">Date</th>
+                <th class="px-3 py-3 whitespace-nowrap">Code</th>
+                <th class="px-3 py-3 whitespace-nowrap">Type</th>
+                <th class="px-3 py-3 whitespace-nowrap text-right">Montant</th>
+                <th class="px-3 py-3 whitespace-nowrap">Client</th>
+                <th class="px-3 py-3 whitespace-nowrap text-center">Statut</th>
+                <th class="px-3 py-3 whitespace-nowrap text-right">Action</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-border-dark text-sm">
+            {% for order in ordersList %}
+                {{ table.order_row(order) }}
+            {% else %}
+                <tr>
+                    <td colspan="7" class="px-6 py-12 text-center">
+                        <div class="flex flex-col items-center justify-center text-gray-400 dark:text-slate-500">
+                            {% include 'components/icon.html.twig' with {
+                                name: 'inbox',
+                                size: 'text-5xl',
+                                class: 'mb-3'
+                            } %}
+                            <p class="text-sm font-medium">Aucune commande trouvée</p>
+                            <p class="text-xs mt-1">Essayez de modifier vos filtres</p>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

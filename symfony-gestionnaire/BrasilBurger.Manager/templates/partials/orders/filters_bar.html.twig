@@ -1,0 +1,66 @@
+{#
+Orders Filters Bar
+
+@param array filters - Current filter values
+#}
+{% set currentFilters = filters|default({}) %}
+
+<div class="mb-6">
+    <form method="get" action="{{ path('app_orders') }}" class="flex flex-wrap items-center gap-3 w-full">
+        {# Search Input #}
+        {% include 'components/search_input.html.twig' with {
+            placeholder: 'Rechercher par code...',
+            name: 'search',
+            value: currentFilters.search|default('')
+        } %}
+
+        {# Date Filter #}
+        {% include 'components/date_input.html.twig' with {
+            name: 'date',
+            value: currentFilters.date|default('')
+        } %}
+
+        {# Type Filter #}
+        {% include 'components/select_input.html.twig' with {
+            name: 'type',
+            label: 'Type',
+            selected: currentFilters.type|default('all'),
+            options: [
+                {value: 'all', label: 'Tout'},
+                {value: 'burger', label: 'Burger simple'},
+                {value: 'menu', label: 'Menu'}
+            ]
+        } %}
+
+        {# Status Filter #}
+        {% include 'components/select_input.html.twig' with {
+            name: 'status',
+            label: 'Statut',
+            selected: currentFilters.status|default('all'),
+            options: [
+                {value: 'all', label: 'Tout'},
+                {value: 'pending', label: 'En attente'},
+                {value: 'processing', label: 'En cours'},
+                {value: 'completed', label: 'Terminé'},
+                {value: 'cancelled', label: 'Annulé'}
+            ],
+            showIcon: true
+        } %}
+
+        {# Divider #}
+        <div class="w-px h-8 bg-gray-200 dark:bg-border-dark mx-1 shrink-0"></div>
+
+        {# Items Per Page #}
+        {% include 'components/select_input.html.twig' with {
+            name: 'per_page',
+            label: 'Afficher',
+            selected: currentFilters.per_page|default('8'),
+            options: [
+                {value: '8', label: '8'},
+                {value: '20', label: '20'},
+                {value: '50', label: '50'}
+            ],
+            showIcon: false
+        } %}
+    </form>
+</div>

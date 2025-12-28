@@ -1,0 +1,32 @@
+{#
+Select Input Component
+
+@param array options - Array of options [{value: '', label: ''}]
+@param string name - Select name (required)
+@param string selected - Selected value
+@param string label - Optional label prefix in first option
+@param bool showIcon - Show dropdown icon (default: true)
+@param string class - Additional classes
+#}
+{% set selectOptions = options|default([]) %}
+{% set selectName = name|default('select') %}
+{% set selectedValue = selected|default('') %}
+{% set selectLabel = label|default('') %}
+{% set showDropdownIcon = showIcon is defined ? showIcon : true %}
+{% set selectClass = class|default('') %}
+
+<div class="relative shrink-0 {{ selectClass }}">
+    <select
+        name="{{ selectName }}"
+        class="w-full {% if showDropdownIcon %}pl-3 pr-8{% else %}px-3{% endif %} py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-600 dark:text-gray-300 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer {% if showDropdownIcon %}appearance-none{% endif %}"
+    >
+        {% for option in selectOptions %}
+            <option value="{{ option.value }}" {% if option.value == selectedValue %}selected{% endif %}>
+                {% if loop.first and selectLabel %}{{ selectLabel }}: {% endif %}{{ option.label }}
+            </option>
+        {% endfor %}
+    </select>
+    {% if showDropdownIcon %}
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none text-[20px]">expand_more</span>
+    {% endif %}
+</div>

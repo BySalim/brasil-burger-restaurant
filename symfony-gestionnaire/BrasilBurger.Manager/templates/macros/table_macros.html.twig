@@ -1,0 +1,61 @@
+{#
+Table Macros - Reusable table row components
+#}
+
+{# Order Row Macro #}
+{% macro order_row(order) %}
+    <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
+        {# Date #}
+        <td class="px-3 py-3 whitespace-nowrap text-gray-600 dark:text-gray-300">
+            {{ order.date }}
+            <span class="text-xs text-gray-400 block">{{ order.time }}</span>
+        </td>
+
+        {# Code #}
+        <td class="px-3 py-3 whitespace-nowrap">
+            <span class="font-mono font-medium text-gray-900 dark:text-white">{{ order.code }}</span>
+        </td>
+
+        {# Type Badge #}
+        <td class="px-3 py-3 whitespace-nowrap">
+            {% include 'components/badge.html.twig' with {
+                text: order.type,
+                color: order.typeColor|default('blue')
+            } %}
+        </td>
+
+        {# Amount #}
+        <td class="px-3 py-3 whitespace-nowrap text-right font-bold text-gray-900 dark:text-white">
+            {{ order.amount }} FCFA
+        </td>
+
+        {# Client Info #}
+        <td class="px-3 py-3 whitespace-nowrap">
+            <div class="flex flex-col">
+                <span class="font-medium text-gray-900 dark:text-white">{{ order.clientName }}</span>
+                <span class="text-xs text-gray-500">{{ order.clientPhone }}</span>
+            </div>
+        </td>
+
+        {# Status Badge #}
+        <td class="px-3 py-3 whitespace-nowrap text-center">
+            {% include 'components/status_badge.html.twig' with {
+                status: order.status
+            } %}
+        </td>
+
+        {# Actions #}
+        <td class="px-3 py-3 whitespace-nowrap text-right">
+            <div class="flex items-center justify-end gap-2">
+                {% include 'components/icon_button.html.twig' with {
+                    icon: 'edit_note',
+                    title: 'Changer statut'
+                } %}
+                {% include 'components/icon_button.html.twig' with {
+                    icon: 'arrow_forward',
+                    title: 'Voir détails'
+                } %}
+            </div>
+        </td>
+    </tr>
+{% endmacro %}

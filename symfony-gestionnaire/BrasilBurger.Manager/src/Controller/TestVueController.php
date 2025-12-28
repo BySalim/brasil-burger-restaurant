@@ -29,7 +29,7 @@ final class TestVueController extends AbstractController
     #[Route('/test/orders', name: 'app_orders')]
     public function commandes(): Response
     {
-        return $this->render('dashboard/index.html.twig', [
+        return $this->render('orders/index.html.twig', [
             "error" => false,
             "last_username" => null
         ]);

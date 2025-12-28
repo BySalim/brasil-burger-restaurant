@@ -1,0 +1,72 @@
+{#
+Pagination Component
+
+@param int currentPage - Current page number
+@param int totalPages - Total number of pages
+@param int totalItems - Total number of items
+@param int itemsPerPage - Items per page
+@param int displayedItems - Number of items currently displayed
+#}
+{% set current = currentPage|default(1) %}
+{% set total = totalPages|default(1) %}
+{% set totalCount = totalItems|default(0) %}
+{% set perPage = itemsPerPage|default(10) %}
+{% set displayed = displayedItems|default(perPage) %}
+
+{% set startItem = ((current - 1) * perPage) + 1 %}
+{% set endItem = startItem + displayed - 1 %}
+
+<div class="px-6 py-4 border-t border-gray-100 dark:border-border-dark flex items-center justify-between">
+    <p class="text-sm text-gray-500 dark:text-text-muted-dark">
+        Affichage de
+        <span class="font-bold text-gray-900 dark:text-white">{{ startItem }}</span>
+        à
+        <span class="font-bold text-gray-900 dark:text-white">{{ endItem }}</span>
+        sur
+        <span class="font-bold text-gray-900 dark:text-white">{{ totalCount }}</span>
+        commandes
+    </p>
+
+    <nav class="flex items-center gap-4">
+        {# Previous Button #}
+        <button
+            type="button"
+            {% if current <= 1 %}disabled{% endif %}
+            class="h-10 w-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-border-dark text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+            {% include 'components/icon.html.twig' with {
+                name: 'chevron_left',
+                size: 'text-[20px]'
+            } %}
+        </button>
+
+        {# Page Selector #}
+        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+            <span class="font-medium">Page</span>
+            <div class="relative">
+                <select
+                    name="page"
+                    class="appearance-none pl-3 pr-8 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-white font-bold focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all cursor-pointer"
+                >
+                    {% for page in 1..total %}
+                        <option value="{{ page }}" {% if page == current %}selected{% endif %}>{{ page }}</option>
+                    {% endfor %}
+                </select>
+                <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[18px]">expand_more</span>
+            </div>
+            <span class="font-medium">sur {{ total }}</span>
+        </div>
+
+        {# Next Button #}
+        <button
+            type="button"
+            {% if current >= total %}disabled{% endif %}
+            class="h-10 w-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-border-dark text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+            {% include 'components/icon.html.twig' with {
+                name: 'chevron_right',
+                size: 'text-[20px]'
+            } %}
+        </button>
+    </nav>
+</div>

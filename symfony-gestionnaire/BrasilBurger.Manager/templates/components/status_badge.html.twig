@@ -1,0 +1,45 @@
+{#
+Status Badge Component
+
+@param string status - Status key: pending, processing, completed, cancelled
+@param string text - Display text (optional, auto from status if not provided)
+@param bool rounded - Use rounded-full (default: true)
+@param string size - Size variant: sm, md (default: sm)
+#}
+{% set statusKey = status|default('pending') %}
+{% set badgeText = text|default('') %}
+{% set isRounded = rounded is defined ? rounded : true %}
+{% set badgeSize = size|default('sm') %}
+
+{% set statusConfig = {
+    'pending': {
+        'text': 'En attente',
+        'class': 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600'
+    },
+    'processing': {
+        'text': 'En cours',
+        'class': 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800'
+    },
+    'completed': {
+        'text': 'Terminé',
+        'class': 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
+    },
+    'cancelled': {
+        'text': 'Annulé',
+        'class': 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800'
+    }
+} %}
+
+{% set config = statusConfig[statusKey]|default(statusConfig['pending']) %}
+{% set displayText = badgeText ?: config.text %}
+
+{% set sizeClasses = {
+    'sm': 'px-3 py-1 text-xs',
+    'md': 'px-4 py-1.5 text-sm'
+} %}
+
+{% set roundedClass = isRounded ? 'rounded-full' : 'rounded' %}
+
+<span class="inline-flex items-center gap-1.5 font-medium border {{ config.class }} {{ sizeClasses[badgeSize] }} {{ roundedClass }}">
+    {{ displayText }}
+</span>
