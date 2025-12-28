@@ -8,8 +8,10 @@ services:
       dockerfilePath: ./Dockerfile
       envVars:
           - key: APP_ENV
+            scope: run
             value: prod
           - key: APP_SECRET
+            scope: run
             generateValue: true
           - key: DATABASE_URL
             scope: run
