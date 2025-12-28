@@ -1,0 +1,33 @@
+{#
+Auth Brand Panel - Left side panel for authentication pages
+
+@param string backgroundImage - Background image URL (optional)
+#}
+{% set bgImage = backgroundImage|default('https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4') %}
+
+<div class="relative bg-sidebar-dark flex flex-col items-center justify-center p-8 overflow-hidden min-h-[300px] md:min-h-full">
+    {# Background Image Overlay #}
+    <div class="absolute inset-0 z-0 opacity-40 mix-blend-overlay bg-cover bg-center" style="background-image: url('{{ bgImage }}');"></div>
+
+    {# Gradient Overlay #}
+    <div class="absolute inset-0 z-0 bg-gradient-to-t from-sidebar-dark via-transparent to-transparent opacity-90"></div>
+
+    {# Brand Logo #}
+    <div class="relative z-10">
+        {% include 'components/brand_logo.html.twig' with {
+            showBadge: true,
+            size: 'md'
+        } %}
+    </div>
+
+    {# Security Badge #}
+    <div class="relative z-10 mt-12 hidden md:block">
+        <div class="flex items-center gap-3 text-slate-400 text-sm bg-slate-800/50 px-4 py-2 rounded-lg backdrop-blur-sm border border-slate-700/50">
+            {% include 'components/icon.html.twig' with {
+                name: 'verified_user',
+                size: 'text-sm'
+            } %}
+            <span>Accès sécurisé Manager</span>
+        </div>
+    </div>
+</div>

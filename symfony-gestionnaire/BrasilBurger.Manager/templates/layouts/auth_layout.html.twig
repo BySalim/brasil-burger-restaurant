@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="flex flex-col items-center justify-center p-4 min-h-screen">
+        <div class="w-full max-w-5xl flex flex-col md:flex-row bg-white dark:bg-card-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-slate-700">
+            {# Left Panel - Brand #}
+            <div class="w-full md:w-5/12">
+                {% include 'partials/auth/brand_panel.html.twig' %}
+            </div>
+
+            {# Right Panel - Content #}
+            <div class="w-full md:w-7/12 p-8 md:p-12 lg:p-16 flex flex-col justify-center bg-white dark:bg-card-dark">
+                <div class="max-w-md mx-auto w-full">
+                    {% block auth_content %}{% endblock %}
+
+                    {# Footer Copyright #}
+                    <div class="mt-8 pt-6 border-t border-gray-100 dark:border-slate-700/50">
+                        {% include 'partials/footer_copyright.html.twig' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

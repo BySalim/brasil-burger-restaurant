@@ -1,0 +1,12 @@
+{#
+Material Symbols Icon Component
+
+@param string name - Icon name (required)
+@param string size - Text size class (default: text-xl)
+@param string class - Additional CSS classes
+#}
+{% set iconName = name|default('question_mark') %}
+{% set iconSize = size|default('text-xl') %}
+{% set iconClass = class|default('') %}
+
+<span class="material-symbols-outlined {{ iconSize }} {{ iconClass }}">{{ iconName }}</span>

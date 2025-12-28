@@ -1,0 +1,28 @@
+{#
+Primary Button Component
+
+@param string text - Button text (required)
+@param string type - Button type: button, submit, reset (default: button)
+@param string class - Additional CSS classes
+@param string icon - Optional icon name
+@param bool fullWidth - Full width button (default: false)
+#}
+{% set btnText = text|default('Button') %}
+{% set btnType = type|default('button') %}
+{% set btnClass = class|default('') %}
+{% set btnIcon = icon|default(null) %}
+{% set fullWidth = fullWidth is defined ? fullWidth : false %}
+
+<button
+    type="{{ btnType }}"
+    class="flex cursor-pointer items-center justify-center rounded-lg h-11 bg-primary hover:bg-primary-hover text-white text-sm font-semibold tracking-wide shadow-lg shadow-blue-500/20 transition-all transform active:scale-[0.98] {{ fullWidth ? 'w-full' : '' }} {{ btnClass }}"
+>
+    {% if btnIcon %}
+        {% include 'components/icon.html.twig' with {
+            name: btnIcon,
+            size: 'text-[20px]',
+            class: 'mr-2'
+        } %}
+    {% endif %}
+    {{ btnText }}
+</button>

@@ -1,0 +1,33 @@
+{#
+Brand Logo Component
+
+@param bool showBadge - Show "Administration" badge (default: true)
+@param string size - Size variant: 'sm', 'md', 'lg' (default: 'md')
+#}
+{% set showBadge = showBadge is defined ? showBadge : true %}
+{% set size = size|default('md') %}
+
+{% set iconSizes = {
+    'sm': 'w-12 h-12 text-3xl',
+    'md': 'w-16 h-16 text-4xl',
+    'lg': 'w-20 h-20 text-5xl'
+} %}
+
+{% set titleSizes = {
+    'sm': 'text-xl',
+    'md': 'text-3xl',
+    'lg': 'text-4xl'
+} %}
+
+<div class="text-center">
+    <div class="{{ iconSizes[size] }} bg-primary rounded-xl flex items-center justify-center mx-auto mb-6 shadow-glow transform rotate-3">
+        {% include 'components/icon.html.twig' with {
+            name: 'storefront',
+            class: 'text-white'
+        } %}
+    </div>
+    <h1 class="{{ titleSizes[size] }} font-bold text-white tracking-tight mb-2">Brazil Burger</h1>
+    {% if showBadge %}
+        <p class="text-blue-200 text-xs font-semibold tracking-[0.2em] uppercase">Administration</p>
+    {% endif %}
+</div>
