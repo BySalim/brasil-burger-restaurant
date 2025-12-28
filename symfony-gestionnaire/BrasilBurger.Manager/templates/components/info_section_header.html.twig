@@ -1,0 +1,17 @@
+{#
+Info Section Header Component
+
+@param string title - Section title (required)
+@param string icon - Material icon name (required)
+#}
+{% set sectionTitle = title|default('Section') %}
+{% set sectionIcon = icon|default('info') %}
+
+<h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-border-dark">
+    {% include 'components/icon.html.twig' with {
+        name: sectionIcon,
+        size: 'text-lg',
+        class: 'text-primary'
+    } %}
+    {{ sectionTitle }}
+</h4>

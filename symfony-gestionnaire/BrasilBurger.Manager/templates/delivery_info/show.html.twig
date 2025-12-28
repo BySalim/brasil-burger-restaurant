@@ -1,0 +1,78 @@
+{% extends 'layouts/dashboard_layout.html.twig' %}
+
+{% block title %}Infos de livraison {{ deliveryInfo.id|default('#0') }} - Brazil Burger{% endblock %}
+
+{% block page_title %}Infos de livraison{% endblock %}
+{% block page_subtitle %}Consultez les détails logistiques complets de cette livraison.{% endblock %}
+
+{% block header_actions %}
+    <button type="button" onclick="history.back()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
+        {% include 'components/icon.html.twig' with {
+            name: 'arrow_back',
+            size: 'text-[20px]'
+        } %}
+        Retour
+    </button>
+{% endblock %}
+
+{% block content %}
+    <div class="max-w-4xl mx-auto w-full">
+        {# Main Card #}
+        <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm overflow-hidden">
+            {# Header #}
+            {% include 'partials/delivery_info/delivery_header.html.twig' with {
+                id: deliveryInfo.id|default('#15')
+            } %}
+
+            {# Content Grid #}
+            <div class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                {# Left Column: Order & Price #}
+                {% include 'partials/delivery_info/order_price_section.html.twig' with {
+                    orderCode: deliveryInfo.orderCode|default('#CMD-8924'),
+                    orderId: deliveryInfo.orderId|default(''),
+                    deliveryPrice: deliveryInfo.price|default('1 000 F CFA')
+                } %}
+
+                {# Right Column: Client #}
+                {% include 'partials/delivery_info/client_section.html.twig' with {
+                    client: deliveryInfo.client|default(sampleClient)
+                } %}
+
+                {# Full Width: Location & Note #}
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                    {# Location #}
+                    {% include 'partials/delivery_info/location_section.html.twig' with {
+                        location: deliveryInfo.location|default(sampleLocation)
+                    } %}
+
+                    {# Delivery Note #}
+                    {% include 'partials/delivery_info/delivery_note_section.html.twig' with {
+                        note: deliveryInfo.note|default(sampleNote)
+                    } %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Footer #}
+    <div class="mt-8">
+        {% include 'partials/footer_copyright.html.twig' with {
+            year: 2024,
+            company: 'Brazil Burger - Interface Manager'
+        } %}
+    </div>
+{% endblock %}
+
+{# Sample Data for Development #}
+{% set sampleClient = {
+    name: 'Amadou Diallo',
+    phone: '+221 77 123 45 67'
+} %}
+
+{% set sampleLocation = {
+    zone: 'Plateau',
+    neighborhood: 'Avenue Ponty',
+    address: 'Immeuble ABC, 2ème étage'
+} %}
+
+{% set sampleNote = 'Attention, la sonnette ne fonctionne pas. Merci d\'appeler le client une fois arrivé devant l\'immeuble. Livraison à remettre en main propre uniquement.' %}

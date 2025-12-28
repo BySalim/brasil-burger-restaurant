@@ -1,0 +1,26 @@
+{#
+Delivery Note Section
+
+@param string note - Delivery note/instructions
+#}
+{% set deliveryNote = note|default('') %}
+
+<div class="space-y-6">
+    {% include 'components/info_section_header.html.twig' with {
+        title: 'Note de livraison',
+        icon: 'description'
+    } %}
+
+    {% if deliveryNote %}
+        {% include 'components/alert_box.html.twig' with {
+            type: 'warning',
+            text: deliveryNote
+        } %}
+    {% else %}
+        {% include 'components/empty_state.html.twig' with {
+            text: 'Aucune note de livraison',
+            icon: 'description',
+            subtext: 'Le client n\'a pas ajouté d\'instructions spéciales'
+        } %}
+    {% endif %}
+</div>
