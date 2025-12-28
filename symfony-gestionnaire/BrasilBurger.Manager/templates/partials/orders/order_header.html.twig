@@ -1,0 +1,43 @@
+{#
+Order Header - Main order information
+
+@param object order - Order object with code, date, time, type, status
+#}
+{% set orderData = order|default({}) %}
+
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm p-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        {# Order Information Grid #}
+        <div class="grid grid-cols-2 md:flex md:items-center gap-x-12 gap-y-4 text-sm">
+            {# Code #}
+            <div>
+                <p class="text-gray-500 dark:text-text-muted-dark mb-1">Code commande</p>
+                <p class="font-mono font-bold text-gray-900 dark:text-white text-lg">{{ orderData.code|default('#CMD-0000') }}</p>
+            </div>
+
+            {# Date #}
+            <div>
+                <p class="text-gray-500 dark:text-text-muted-dark mb-1">Date de la commande</p>
+                <p class="font-medium text-gray-900 dark:text-white">{{ orderData.date|default('--') }} - {{ orderData.time|default('--') }}</p>
+            </div>
+
+            {# Type Badge #}
+            <div>
+                <p class="text-gray-500 dark:text-text-muted-dark mb-1">Type</p>
+                {% include 'components/badge.html.twig' with {
+                    text: orderData.type|default('Burger'),
+                    color: orderData.typeColor|default('blue'),
+                    size: 'sm'
+                } %}
+            </div>
+        </div>
+
+        {# Status Select #}
+        <form method="post" action="{{ path('app_default', {id: orderData.id|default(0)}) }}">
+            {% include 'components/order_status_select.html.twig' with {
+                currentStatus: orderData.status|default('pending'),
+                orderId: orderData.id|default('')
+            } %}
+        </form>
+    </div>
+</div>

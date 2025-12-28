@@ -1,0 +1,55 @@
+{#
+Order Items Table
+
+@param array items - Array of order items
+@param string totalAmount - Total amount with currency
+#}
+{% import 'macros/table_macros.html.twig' as table %}
+{% set orderItems = items|default([]) %}
+{% set total = totalAmount|default('0 FCFA') %}
+
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm overflow-hidden">
+    {# Header #}
+    <div class="px-6 py-4 border-b border-gray-100 dark:border-border-dark flex justify-between items-center">
+        <h3 class="font-bold text-gray-900 dark:text-white">Articles achetés</h3>
+        <span class="text-xs font-medium px-2 py-1 rounded bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300">
+            {{ orderItems|length }} article{{ orderItems|length > 1 ? 's' : '' }}
+        </span>
+    </div>
+
+    {# Table #}
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+            <tr class="bg-gray-50/50 dark:bg-slate-900/30 text-xs uppercase tracking-wider text-gray-500 dark:text-text-muted-dark font-semibold border-b border-gray-100 dark:border-border-dark">
+                <th class="px-6 py-4">Article</th>
+                <th class="px-6 py-4">Catégorie</th>
+                <th class="px-6 py-4 text-right">Prix Unit.</th>
+                <th class="px-6 py-4 text-center">Qté</th>
+                <th class="px-6 py-4 text-right">Total</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-border-dark text-sm">
+            {% for item in orderItems %}
+                {{ table.order_item_row(item) }}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-400 dark:text-slate-500">
+                        Aucun article
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot class="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-border-dark">
+            <tr>
+                <td colspan="5" class="px-6 py-4 text-right">
+                    <div class="flex justify-end items-center gap-4 text-sm font-medium text-gray-900 dark:text-white">
+                        <span>Total:</span>
+                        <span class="text-lg font-bold">{{ total }}</span>
+                    </div>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+{#
+Payment Method Badge Component
+
+@param string method - Payment method: wave, orange_money, cash (default: wave)
+@param string imageUrl - Custom logo URL (optional)
+#}
+{% set paymentMethod = method|default('wave') %}
+{% set customImage = imageUrl|default(null) %}
+
+{% set methodConfig = {
+    'wave': {
+        'text': 'WAVE',
+        'image': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDE17dQoRkOKafZh_qYFc_6hfbfdiptv-Z6x4OEwHyxXW5yiK6CzegZOWSj7bJ6wG6Om6bwR62HhWCwbCtk8yMa1EazXWjo4YsAyjbSLXdaKTBCEheLc_wFSfFnyqwVZlb7_s7ac1_PXbscxZYeepOxZ_T0nig3v-PrVbXrUe4pTJ9BHvJHMpZfTLhb36zhpAmCiGGQKbsd4WUBh8CKpBLfD21CWIJgmLIIHL-i_VEMBD_i2JintPHrnNSYGjCOj5XvPG7b4es41Z4',
+        'class': 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800'
+    },
+    'orange_money': {
+        'text': 'ORANGE MONEY',
+        'image': null,
+        'class': 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800'
+    },
+    'cash': {
+        'text': 'ESPÈCES',
+        'image': null,
+        'class': 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
+    }
+} %}
+
+{% set config = methodConfig[paymentMethod]|default(methodConfig['wave']) %}
+{% set displayImage = customImage ?: config.image %}
+
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-bold {{ config.class }} border uppercase">
+    {% if displayImage %}
+        <img src="{{ displayImage }}" alt="{{ config.text }}" class="h-2.5 w-auto opacity-80">
+    {% endif %}
+    {{ config.text }}
+</span>

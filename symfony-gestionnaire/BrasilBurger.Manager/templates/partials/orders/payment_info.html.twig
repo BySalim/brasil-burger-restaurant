@@ -1,0 +1,56 @@
+{#
+Payment Information Card
+
+@param string amount - Payment amount with currency
+@param string method - Payment method (wave, orange_money, cash)
+@param string date - Payment date
+@param string time - Payment time
+@param string reference - Payment reference
+@param string methodImage - Custom logo URL (optional)
+#}
+{% set paymentAmount = amount|default('0 FCFA') %}
+{% set paymentMethod = method|default('wave') %}
+{% set paymentDate = date|default('--') %}
+{% set paymentTime = time|default('--') %}
+{% set paymentRef = reference|default('--') %}
+{% set methodImage = methodImage|default(null) %}
+
+{% embed 'components/info_card.html.twig' with {
+    title: 'Infos de paiement',
+    icon: 'payments',
+    titleSize: 'text-sm',
+    class: 'p-4'
+} %}
+    {% block card_content %}
+        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-gray-100 dark:border-border-dark flex flex-col gap-3">
+            {# Amount and Method #}
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">Montant</p>
+                    <p class="text-xl font-bold text-primary">{{ paymentAmount }}</p>
+                </div>
+                <div class="text-right">
+                    {% include 'components/payment_method_badge.html.twig' with {
+                        method: paymentMethod,
+                        imageUrl: methodImage
+                    } %}
+                </div>
+            </div>
+
+            {# Divider #}
+            <div class="h-px bg-gray-200 dark:bg-slate-700 w-full"></div>
+
+            {# Date and Reference #}
+            <div class="flex justify-between items-center text-xs">
+                <div>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase mb-0.5">Date</p>
+                    <p class="font-medium text-gray-700 dark:text-gray-300">{{ paymentDate }} - {{ paymentTime }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase mb-0.5">Réf.</p>
+                    <p class="font-mono font-medium text-gray-700 dark:text-gray-300">{{ paymentRef }}</p>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+{% endembed %}

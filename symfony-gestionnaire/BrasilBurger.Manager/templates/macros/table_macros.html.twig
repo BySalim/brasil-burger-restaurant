@@ -2,7 +2,7 @@
 Table Macros - Reusable table row components
 #}
 
-{# Order Row Macro #}
+{# Order Row Macro (EXISTANT - INCHANGÉ) #}
 {% macro order_row(order) %}
     <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
         {# Date #}
@@ -57,5 +57,34 @@ Table Macros - Reusable table row components
                 } %}
             </div>
         </td>
+    </tr>
+{% endmacro %}
+
+{# Order Item Row Macro (NOUVEAU) #}
+{% macro order_item_row(item) %}
+    <tr>
+        {# Article with Image #}
+        <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+                {% include 'components/product_image.html.twig' with {
+                    imageUrl: item.image|default(null),
+                    fallbackIcon: 'lunch_dining',
+                    size: 'h-12 w-12'
+                } %}
+                <span class="font-medium text-gray-900 dark:text-white">{{ item.name|default('Article') }}</span>
+            </div>
+        </td>
+
+        {# Category #}
+        <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ item.category|default('--') }}</td>
+
+        {# Unit Price #}
+        <td class="px-6 py-4 text-right text-gray-600 dark:text-gray-300">{{ item.unitPrice|default('0') }} FCFA</td>
+
+        {# Quantity #}
+        <td class="px-6 py-4 text-center font-medium text-gray-900 dark:text-white">{{ item.quantity|default(1) }}</td>
+
+        {# Total #}
+        <td class="px-6 py-4 text-right font-bold text-gray-900 dark:text-white">{{ item.total|default('0') }} FCFA</td>
     </tr>
 {% endmacro %}

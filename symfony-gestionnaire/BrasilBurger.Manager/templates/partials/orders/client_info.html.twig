@@ -1,0 +1,26 @@
+{#
+Client Information Card
+
+@param object client - Client object with name and phone
+#}
+{% set clientData = client|default({}) %}
+
+{% embed 'components/info_card.html.twig' with {
+    title: 'Client',
+    icon: 'person'
+} %}
+    {% block card_content %}
+        <div class="flex items-start gap-4">
+            <div>
+                <p class="font-bold text-gray-900 dark:text-white text-lg">{{ clientData.name|default('Client inconnu') }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1.5">
+                    {% include 'components/icon.html.twig' with {
+                        name: 'call',
+                        size: 'text-[16px]'
+                    } %}
+                    {{ clientData.phone|default('--') }}
+                </p>
+            </div>
+        </div>
+    {% endblock %}
+{% endembed %}

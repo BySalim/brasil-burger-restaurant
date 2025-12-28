@@ -1,0 +1,27 @@
+{#
+Order Summary - Delivery price and total amount
+
+@param string deliveryPrice - Delivery price with currency
+@param string totalAmount - Total order amount with currency
+#}
+{% set deliveryPrice = deliveryPrice|default('0 FCFA') %}
+{% set totalAmount = totalAmount|default('0 FCFA') %}
+
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm p-6">
+    <div class="flex flex-col gap-3 max-w-sm">
+        {# Delivery Price #}
+        <div class="flex justify-between items-center text-sm">
+            <span class="text-gray-600 dark:text-gray-400">Prix de la livraison:</span>
+            <span class="font-bold text-gray-900 dark:text-white">{{ deliveryPrice }}</span>
+        </div>
+
+        {# Divider #}
+        <div class="h-px bg-gray-100 dark:bg-border-dark w-full"></div>
+
+        {# Total Amount #}
+        <div class="flex justify-between items-center">
+            <span class="text-base font-bold text-gray-900 dark:text-white uppercase tracking-wide">Montant commande:</span>
+            <span class="text-xl font-extrabold text-primary whitespace-nowrap">{{ totalAmount }}</span>
+        </div>
+    </div>
+</div>
