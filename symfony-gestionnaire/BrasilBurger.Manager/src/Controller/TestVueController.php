@@ -39,8 +39,8 @@ final class TestVueController extends AbstractController
         return $this->render('orders/show.html.twig', []);
     }
 
-    #[Route('/test/deliveries', name: 'app_deliveries')]
-    public function showDelivredCommandes(): Response
+    #[Route('/test/deliveries', name: 'app_orders_to_delivered')]
+    public function showOrdersToDelivered(): Response
     {
         return $this->render('deliveries/orders.html.twig', []);
     }
@@ -49,6 +49,12 @@ final class TestVueController extends AbstractController
     public function showDelivredInfos(): Response
     {
         return $this->render('delivery_info/show.html.twig', []);
+    }
+
+    #[Route('/test/deliveries/list', name: 'app_deliveries')]
+    public function deliveries(): Response
+    {
+        return $this->render('deliveries/list.html.twig', []);
     }
 
 

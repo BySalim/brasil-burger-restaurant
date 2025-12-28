@@ -1,0 +1,32 @@
+{#
+Bulk Action Button Component
+
+@param string text - Button text (required)
+@param string icon - Material icon name (required)
+@param bool disabled - Is disabled (default: true)
+@param int count - Selected items count (optional)
+@param string onclick - JS onclick handler
+#}
+{% set btnText = text|default('Action') %}
+{% set btnIcon = icon|default('check_circle') %}
+{% set isDisabled = disabled is defined ? disabled : true %}
+{% set selectedCount = count|default(0) %}
+{% set btnOnclick = onclick|default('') %}
+
+<button
+    type="button"
+    {% if isDisabled %}disabled{% endif %}
+    {% if btnOnclick and not isDisabled %}onclick="{{ btnOnclick }}"{% endif %}
+    class="flex items-center gap-2 px-5 py-2 rounded-lg font-bold text-sm transition-all shadow-sm {{ isDisabled ? 'bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg' }}"
+>
+    {% include 'components/icon.html.twig' with {
+        name: btnIcon,
+        size: 'text-[20px]'
+    } %}
+    {{ btnText }}
+    {% if selectedCount > 0 %}
+        <span class="ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs font-bold">
+            {{ selectedCount }}
+        </span>
+    {% endif %}
+</button>

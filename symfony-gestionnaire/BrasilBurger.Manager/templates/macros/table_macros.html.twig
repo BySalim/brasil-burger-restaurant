@@ -147,3 +147,93 @@ Table Macros - Reusable table row components
         </td>
     </tr>
 {% endmacro %}
+
+{# ========================================
+   MACRO 4: Delivery Tracking Row (pour le tableau de suivi des livraisons)
+   ======================================== #}
+{% macro delivery_tracking_row(delivery) %}
+    {% set isCompleted = delivery.status == 'completed' %}
+
+    <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
+        {# Checkbox #}
+        <td class="pl-4 pr-2 py-4">
+            <div class="flex items-center justify-center">
+                <input
+                    type="checkbox"
+                    name="selected_deliveries[]"
+                    value="{{ delivery.id }}"
+                    class="delivery-checkbox w-4 h-4 text-primary bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 rounded focus:ring-primary focus:ring-offset-0 transition-colors cursor-pointer {{ isCompleted ? 'text-gray-300 bg-gray-100 dark:bg-slate-900 border-gray-300 dark:border-slate-700 cursor-not-allowed opacity-50' : '' }}"
+                    {% if isCompleted %}disabled{% endif %}
+                    onchange="updateBulkActionButton()"
+                >
+            </div>
+        </td>
+
+        {# Date #}
+        <td class="px-4 py-4 whitespace-nowrap">
+            <div class="flex flex-col">
+                <span class="text-gray-900 dark:text-white font-medium">{{ delivery.date|default('--') }}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">{{ delivery.time|default('--') }}</span>
+            </div>
+        </td>
+
+        {# Code #}
+        <td class="px-4 py-4 whitespace-nowrap">
+            <span class="font-mono font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">
+                {{ delivery.code|default('#LIV-0000') }}
+            </span>
+        </td>
+
+        {# Zone #}
+        <td class="px-4 py-4 text-gray-900 dark:text-white font-medium whitespace-nowrap">
+            {{ delivery.zone|default('--') }}
+        </td>
+
+        {# Deliverer Info #}
+        <td class="px-4 py-4 whitespace-nowrap">
+            <div class="flex flex-col">
+                <span class="text-gray-900 dark:text-white font-medium">{{ delivery.delivererName|default('--') }}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.delivererCode|default('--') }}</span>
+            </div>
+        </td>
+
+        {# Client Info #}
+        <td class="px-4 py-4 whitespace-nowrap">
+            <div class="flex flex-col">
+                <span class="font-medium text-gray-900 dark:text-white">{{ delivery.clientName|default('--') }}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.clientPhone|default('--') }}</span>
+            </div>
+        </td>
+
+        {# Status Badge #}
+        <td class="px-4 py-4 whitespace-nowrap">
+            {% include 'components/delivery_status_badge.html.twig' with {
+                status: delivery.status|default('en_cours')
+            } %}
+        </td>
+
+        {# Action Button (Complete) #}
+        <td class="px-4 py-4 text-center whitespace-nowrap">
+            {% include 'components/action_button.html.twig' with {
+                icon: 'check',
+                color: 'success',
+                disabled: isCompleted,
+                title: isCompleted ? 'Livraison terminée' : 'Terminer la livraison',
+                onclick: isCompleted ? '' : 'completeDelivery(' ~ delivery.id ~ ')'
+            } %}
+        </td>
+
+        {# Details Button #}
+        <td class="px-4 py-4 text-center whitespace-nowrap">
+            <a
+                href="{{ path('app_default', {id: delivery.id}) }}"
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                title="Détails"
+            >
+                {% include 'components/icon.html.twig' with {
+                    name: 'chevron_right'
+                } %}
+            </a>
+        </td>
+    </tr>
+{% endmacro %}

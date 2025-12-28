@@ -1,0 +1,154 @@
+{% extends 'layouts/dashboard_layout.html.twig' %}
+
+{% block title %}Livraisons (Tracking) - Brazil Burger{% endblock %}
+
+{% block page_title %}Suivi des Livraisons{% endblock %}
+{% block page_subtitle %}Suivez l'état des livraisons en cours et l'historique.{% endblock %}
+
+{% block header_actions %}
+    <button type="button" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+        {% include 'components/icon.html.twig' with {
+            name: 'refresh',
+            size: 'text-[20px]'
+        } %}
+        Actualiser
+    </button>
+{% endblock %}
+
+{% block header_extra %}
+    {# Tabs Navigation #}
+    {% include 'partials/deliveries/header_tabs.html.twig' with {
+        activeTab: 'deliveries',
+        ordersCount: ordersCount|default(5)
+    } %}
+{% endblock %}
+
+{% block content %}
+    <div class="space-y-6 max-w-[1600px] w-full mx-auto">
+        {# Filters Bar #}
+        {% include 'partials/deliveries/deliveries_filters_bar.html.twig' with {
+            filters: filters|default({}),
+            zones: zones|default(sampleZones)
+        } %}
+
+        {# Deliveries Table #}
+        {% include 'partials/deliveries/deliveries_table.html.twig' with {
+            deliveries: deliveries|default(sampleDeliveries),
+            currentPage: currentPage|default(1),
+            totalPages: totalPages|default(8),
+            totalItems: totalItems|default(42)
+        } %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/deliveries-checkboxes.js') }}"></script>
+{% endblock %}
+
+{# Sample Data for Development #}
+{% set sampleZones = [
+    {id: 'plateau', name: 'Plateau'},
+    {id: 'almadies', name: 'Almadies'},
+    {id: 'mermoz', name: 'Mermoz'},
+    {id: 'parcelles', name: 'Parcelles'}
+] %}
+
+{% set sampleDeliveries = [
+    {
+        id: 1,
+        date: '24/05/2024',
+        time: '12:30',
+        code: '#LIV-4021',
+        zone: 'Plateau',
+        delivererName: 'Moussa Diop',
+        delivererCode: '#DVR-001',
+        clientName: 'Amadou Diallo',
+        clientPhone: '77 123 45 67',
+        status: 'en_cours'
+    },
+    {
+        id: 2,
+        date: '24/05/2024',
+        time: '11:45',
+        code: '#LIV-3998',
+        zone: 'Almadies',
+        delivererName: 'Omar Sy',
+        delivererCode: '#DVR-004',
+        clientName: 'Fatou Ndiaye',
+        clientPhone: '76 888 99 00',
+        status: 'completed'
+    },
+    {
+        id: 3,
+        date: '24/05/2024',
+        time: '10:15',
+        code: '#LIV-4022',
+        zone: 'Mermoz',
+        delivererName: 'Cheikh Fall',
+        delivererCode: '#DVR-012',
+        clientName: 'Babacar Diop',
+        clientPhone: '70 555 44 33',
+        status: 'en_cours'
+    },
+    {
+        id: 4,
+        date: '23/05/2024',
+        time: '18:45',
+        code: '#LIV-3850',
+        zone: 'Plateau',
+        delivererName: 'Moussa Diop',
+        delivererCode: '#DVR-001',
+        clientName: 'Amina Sow',
+        clientPhone: '77 999 00 11',
+        status: 'completed'
+    },
+    {
+        id: 5,
+        date: '23/05/2024',
+        time: '17:20',
+        code: '#LIV-3842',
+        zone: 'Parcelles',
+        delivererName: 'Ibrahima Konate',
+        delivererCode: '#DVR-007',
+        clientName: 'Sophie Gueye',
+        clientPhone: '77 444 33 22',
+        status: 'completed'
+    },
+    {
+        id: 6,
+        date: '23/05/2024',
+        time: '16:10',
+        code: '#LIV-3835',
+        zone: 'Almadies',
+        delivererName: 'Omar Sy',
+        delivererCode: '#DVR-004',
+        clientName: 'Paul Gomis',
+        clientPhone: '77 212 34 56',
+        status: 'completed'
+    },
+    {
+        id: 7,
+        date: '23/05/2024',
+        time: '15:45',
+        code: '#LIV-3829',
+        zone: 'Mermoz',
+        delivererName: 'Cheikh Fall',
+        delivererCode: '#DVR-012',
+        clientName: 'Awa Diop',
+        clientPhone: '70 987 65 43',
+        status: 'completed'
+    },
+    {
+        id: 8,
+        date: '23/05/2024',
+        time: '14:30',
+        code: '#LIV-3810',
+        zone: 'Plateau',
+        delivererName: 'Moussa Diop',
+        delivererCode: '#DVR-001',
+        clientName: 'Marc Ndiaye',
+        clientPhone: '76 543 21 09',
+        status: 'completed'
+    }
+] %}

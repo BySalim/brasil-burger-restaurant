@@ -1,0 +1,83 @@
+{#
+Deliveries Filters Bar
+
+@param array filters - Current filter values
+@param array zones - Available zones list
+#}
+{% set zonesList = zones|default([]) %}
+{% set currentFilters = filters|default({}) %}
+
+<div class="flex flex-col xl:flex-row gap-4 justify-between items-start xl:items-center">
+    <form method="get" action="{{ path('app_deliveries') }}" class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+        {# Search Input #}
+        <div class="relative w-full sm:w-64">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                {% include 'components/icon.html.twig' with {
+                    name: 'search',
+                    size: 'text-[20px]'
+                } %}
+            </span>
+            <input
+                type="text"
+                name="search"
+                value="{{ currentFilters.search|default('') }}"
+                placeholder="Rechercher par code ou client..."
+                class="w-full pl-10 pr-4 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+            >
+        </div>
+
+        {# Date Filter #}
+        {% include 'components/date_input.html.twig' with {
+            name: 'date',
+            value: currentFilters.date|default('')
+        } %}
+
+        {# Zone Filter #}
+        <div class="relative min-w-[140px]">
+            <select
+                name="zone"
+                class="w-full pl-3 pr-10 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-sm text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
+            >
+
+                <option value="">Zone: Tout</option>
+                {% for zone in zonesList %}
+                    <option value="{{ zone.id }}" {% if currentFilters.zone|default('') == zone.id %}selected{% endif %}>
+                        {{ zone.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {# Status Filter #}
+        {% include 'components/select_input.html.twig' with {
+            name: 'status',
+            label: 'Statut',
+            selected: currentFilters.status|default('all'),
+            options: [
+                {value: 'all', label: 'Tout'},
+                {value: 'en_cours', label: 'En cours'},
+                {value: 'completed', label: 'Terminé'}
+            ],
+            showIcon: false,
+            class: 'min-w-[150px]'
+        } %}
+
+        {# Divider #}
+        <div class="h-8 w-px bg-gray-200 dark:bg-border-dark mx-1 hidden sm:block"></div>
+
+        {# Items Per Page #}
+        {% include 'components/select_input.html.twig' with {
+            name: 'per_page',
+            label: 'Afficher',
+            selected: currentFilters.per_page|default('8'),
+            options: [
+                {value: '8', label: '8'},
+                {value: '10', label: '10'},
+                {value: '20', label: '20'},
+                {value: '50', label: '50'}
+            ],
+            showIcon: true,
+            class: 'min-w-[130px]'
+        } %}
+    </form>
+</div>

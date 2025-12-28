@@ -1,0 +1,26 @@
+{#
+Delivery Status Badge Component
+
+@param string status - Status key: en_cours, completed
+@param string text - Display text (optional, auto from status if not provided)
+#}
+{% set statusKey = status|default('en_cours') %}
+{% set badgeText = text|default('') %}
+
+{% set statusConfig = {
+    'en_cours': {
+        'text': 'En cours',
+        'class': 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800/50'
+    },
+    'completed': {
+        'text': 'Terminé',
+        'class': 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50'
+    }
+} %}
+
+{% set config = statusConfig[statusKey]|default(statusConfig['en_cours']) %}
+{% set displayText = badgeText ?: config.text %}
+
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border {{ config.class }}">
+    {{ displayText }}
+</span>

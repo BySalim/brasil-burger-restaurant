@@ -1,0 +1,35 @@
+{#
+Action Button Component (small icon button for table actions)
+
+@param string icon - Material icon name (required)
+@param string color - Color variant: success, danger, secondary (default: success)
+@param bool disabled - Is disabled (default: false)
+@param string title - Tooltip title
+@param string onclick - JS onclick handler
+#}
+{% set btnIcon = icon|default('check') %}
+{% set btnColor = color|default('success') %}
+{% set isDisabled = disabled|default(false) %}
+{% set btnTitle = title|default('') %}
+{% set btnOnclick = onclick|default('') %}
+
+{% set colorClasses = {
+    'success': 'bg-green-600 text-white hover:bg-green-700 shadow-md hover:shadow-lg',
+    'danger': 'bg-red-600 text-white hover:bg-red-700 shadow-md hover:shadow-lg',
+    'secondary': 'bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500'
+} %}
+
+{% set disabledClasses = 'bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-300 dark:text-slate-600 cursor-not-allowed' %}
+
+<button
+    type="button"
+    {% if isDisabled %}disabled{% endif %}
+    {% if btnTitle %}title="{{ btnTitle }}"{% endif %}
+    {% if btnOnclick and not isDisabled %}onclick="{{ btnOnclick }}"{% endif %}
+    class="inline-flex items-center justify-center w-8 h-8 rounded-lg transition-colors {{ isDisabled ? disabledClasses : colorClasses[btnColor] }}"
+>
+    {% include 'components/icon.html.twig' with {
+        name: btnIcon,
+        size: 'text-[20px]'
+    } %}
+</button>

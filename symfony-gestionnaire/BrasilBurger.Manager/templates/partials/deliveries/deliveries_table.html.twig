@@ -1,0 +1,59 @@
+{#
+Deliveries Table with Checkboxes
+
+@param array deliveries - Array of deliveries
+#}
+{% import 'macros/table_macros.html.twig' as table %}
+{% set deliveriesList = deliveries|default([]) %}
+
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm overflow-hidden flex flex-col">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+            <tr class="bg-gray-50 dark:bg-slate-800/50 text-xs uppercase tracking-wider text-gray-500 dark:text-text-muted-dark font-semibold border-b border-gray-200 dark:border-border-dark">
+                <th class="pl-4 pr-2 py-4 w-px">
+                    <div class="flex items-center justify-center">
+                        <input
+                            type="checkbox"
+                            id="selectAll"
+                            onchange="toggleAllDeliveries(this)"
+                            class="w-4 h-4 text-primary bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 rounded focus:ring-primary focus:ring-offset-0 transition-colors cursor-pointer"
+                        >
+                    </div>
+                </th>
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Date</th>
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Code</th>
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Zone</th>
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Livreur</th>
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Client</th>
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Statut</th>
+                <th class="px-4 py-4 text-center w-[80px]">Action</th>
+                <th class="px-4 py-4 w-[60px]"></th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-border-dark text-sm">
+            {% for delivery in deliveriesList %}
+                {{ table.delivery_tracking_row(delivery) }}
+            {% else %}
+                <tr>
+                    <td colspan="9" class="px-6 py-12 text-center">
+                        {% include 'components/empty_state.html.twig' with {
+                            text: 'Aucune livraison trouvée',
+                            icon: 'local_shipping',
+                            subtext: 'Essayez de modifier vos filtres'
+                        } %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Footer with Bulk Actions & Pagination #}
+    {% include 'partials/deliveries/bulk_actions_bar.html.twig' with {
+        currentPage: currentPage|default(1),
+        totalPages: totalPages|default(8),
+        totalItems: totalItems|default(42),
+        displayedItems: deliveriesList|length
+    } %}
+</div>
