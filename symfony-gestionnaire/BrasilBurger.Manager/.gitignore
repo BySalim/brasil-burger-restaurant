@@ -18,3 +18,13 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> Node modules ###
+/node_modules/
+npm-debug.log
+yarn-error.log
+###< Node modules ###
+
+###> Docker ###
+.env.docker
+###< Docker ###

@@ -1,0 +1,24 @@
+services:
+    - type: web
+      name: todo-symfony
+      env: docker
+      plan: free
+      region: frankfurt
+      branch: main
+      dockerfilePath: ./Dockerfile
+      envVars:
+          - key: APP_ENV
+            value: prod
+          - key: APP_SECRET
+            generateValue: true
+          - key: DATABASE_URL
+            scope: run
+            value: ${DATABASE_URL}
+          - key: CLOUDINARY_CLOUD_NAME
+            scope: run
+            value: ${CLOUDINARY_CLOUD_NAME}
+      buildCommand: |
+          php bin/console cache:clear
+          php bin/console doctrine:migrations:migrate --no-interaction
+      healthCheckPath: /tasks
+
