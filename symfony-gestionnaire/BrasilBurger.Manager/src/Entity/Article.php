@@ -12,9 +12,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'categorie', type: 'string', length: 20, enumType: CategorieArticle::class)]
 #[ORM\DiscriminatorMap([
-    'Burger' => Burger::class,
-    'Menu' => Menu::class,
-    'Complement' => Complement::class
+    'BURGER' => Burger::class,
+    'MENU' => Menu::class,
+    'COMPLEMENT' => Complement::class
 ])]
 abstract class Article
 {
@@ -85,4 +85,6 @@ abstract class Article
     }
 
     abstract public function getCategorie(): CategorieArticle;
+
+    abstract public function getPrix(): ?int;
 }

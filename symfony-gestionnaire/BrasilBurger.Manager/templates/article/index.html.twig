@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Nos Articles</h1>
+
+    <section class="articles-list">
+        {% for article in articles %}
+            <article class="article-card">
+                <img
+                    src="{{ article.imageUrl }}"
+                    alt="{{ article.libelle }}"
+                    loading="lazy"
+                    class="article-image"
+                >
+
+                <h3>{{ article.libelle }}</h3>
+                <p class="code">Code: {{ article.code }}</p>
+
+                {% if article.description %}
+                    <p class="description">{{ article.description }}</p>
+                {% endif %}
+
+                {% if article.prix %}
+                    <p class="prix">Prix: {{ (article.prix / 100)|number_format(2, ',', ' ') }} FCFA</p>
+                {% endif %}
+
+                <span class="badge badge-{{ article.categorie|lower }}">{{ article.categorie }}</span>
+            </article>
+        {% endfor %}
+    </section>
+
+{% endblock %}

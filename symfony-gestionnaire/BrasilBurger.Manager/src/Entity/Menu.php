@@ -29,4 +29,9 @@ class Menu extends Article
         $this->description = $description;
         return $this;
     }
+
+    public function getPrix(): ?int
+    {
+        return 0; # En attente d'implémentation des articles quantifiers
+    }
 }

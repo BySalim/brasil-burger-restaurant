@@ -4,6 +4,6 @@ namespace App\Enum;
 
 enum TypeComplement: string
 {
-    case BOISSON = 'Boisson';
-    case FRITES = 'Frites';
+    case BOISSON = 'BOISSON';
+    case FRITES = 'FRITES';
 }
