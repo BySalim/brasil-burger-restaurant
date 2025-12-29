@@ -7,6 +7,8 @@ use App\Enum\ModePaiement;
 use App\Enum\ModeRecuperation;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\Table(name: 'utilisateur')]
@@ -16,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
     'CLIENT' => Client::class,
     'GESTIONNAIRE' => Gestionnaire::class
 ])]
-abstract class Utilisateur
+abstract class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -44,6 +46,27 @@ abstract class Utilisateur
 
     #[ORM\Column(name: 'mode_recuperation_defaut', length: 20, nullable: true, enumType: ModeRecuperation::class)]
     protected ?ModeRecuperation $modeRecuperationDefaut = null;
+
+    // Méthodes requises par UserInterface
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->login;
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_' . $this->getRole()->value];
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+
+    // Méthode requise par PasswordAuthenticatedUserInterface
+    public function getPassword(): string
+    {
+        return $this->motDePasse;
+    }
 
     public function getId(): ?int
     {

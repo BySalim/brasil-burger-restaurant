@@ -41,7 +41,8 @@
         } %}
 
         {# CSRF Token #}
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+        {% set csrf = csrf_token('authenticate') %}
+        <input type="hidden" name="_csrf_token" value="{{ csrf }}">
 
         {# Submit Button #}
         <div class="mt-4">

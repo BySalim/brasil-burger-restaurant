@@ -15,12 +15,6 @@ final class TestVueController extends AbstractController
         return $this->render('test_vue/index.html.twig', []);
     }
 
-    #[Route('/test/login', name: 'app_login')]
-    public function login(): Response
-    {
-        return $this->render('security/login.html.twig', []);
-    }
-
     #[Route('/test/dashboard', name: 'app_dashboard')]
     public function dashboard(): Response
     {

@@ -1,0 +1,23 @@
+{# templates/bundles/TwigBundle/Exception/error404.html.twig #}
+
+{# Étendez votre layout principal pour garder le menu et le footer #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Page introuvable - Brazil Burger{% endblock %}
+
+{% block body %}
+    <div class="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <h1 class="text-6xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
+        <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-6">
+            Oups ! Cette page semble avoir disparu.
+        </h2>
+        <p class="text-gray-500 mb-8 max-w-md">
+            Le lien que vous avez suivi est peut-être incorrect ou la page a été supprimée.
+        </p>
+
+        {# Bouton de retour (réutilisez vos composants si possible) #}
+        <a href="{{ path('app_home') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+            Retour à l'accueil
+        </a>
+    </div>
+{% endblock %}
