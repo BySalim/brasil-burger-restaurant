@@ -1,0 +1,30 @@
+{# templates/components/logo.html.twig #}
+
+{#
+Composant Logo Générique
+@param string src   - Le chemin du logo (ex: site_logo_main). Par défaut: site_logo_icon
+@param string size  - La taille : 'xs', 'sm', 'md', 'lg', 'xl' ou une classe custom (ex: 'h-[50px]')
+@param string alt   - Texte alternatif. Par défaut: site_name
+@param string class - Classes CSS supplémentaires
+#}
+
+{% set sourcePath = src|default(site_logo_icon_main) %}
+{% set altText = alt|default(site_name) %}
+{% set sizeParam = size|default('md') %}
+{% set customClass = class|default('') %}
+
+{# Dictionnaire des tailles pour standardiser #}
+{% set sizes = {
+    'xs': 'h-8',
+    'sm': 'h-12',
+    'md': 'h-16',
+    'lg': 'h-24',
+    'xl': 'h-32'
+    } %}
+
+    {% set heightClass = sizes[sizeParam] is defined ? sizes[sizeParam] : sizeParam %}
+
+    <img src="{{ asset(sourcePath) }}"
+     alt="{{ altText }}"
+     class="{{ heightClass }} w-auto object-contain {{ customClass }}"
+     loading="lazy">

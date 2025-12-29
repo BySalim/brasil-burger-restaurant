@@ -1,33 +1,24 @@
-{#
-Brand Logo Component
+{# templates/components/brand_logo.html.twig #}
 
-@param bool showBadge - Show "Administration" badge (default: true)
-@param string size - Size variant: 'sm', 'md', 'lg' (default: 'md')
-#}
 {% set showBadge = showBadge is defined ? showBadge : true %}
 {% set size = size|default('md') %}
 
-{% set iconSizes = {
-    'sm': 'w-12 h-12 text-3xl',
-    'md': 'w-16 h-16 text-4xl',
-    'lg': 'w-20 h-20 text-5xl'
-} %}
-
-{% set titleSizes = {
-    'sm': 'text-xl',
-    'md': 'text-3xl',
-    'lg': 'text-4xl'
-} %}
-
 <div class="text-center">
-    <div class="{{ iconSizes[size] }} bg-primary rounded-xl flex items-center justify-center mx-auto mb-6 shadow-glow transform rotate-3">
-        {% include 'components/icon.html.twig' with {
-            name: 'storefront',
-            class: 'text-white'
-        } %}
-    </div>
-    <h1 class="{{ titleSizes[size] }} font-bold text-white tracking-tight mb-2">{{ site_name }}</h1>
+
+    {# On appelle notre nouveau composant générique #}
+    {% include 'components/logo.html.twig' with {
+        src: site_logo_icon_main,
+        size: size == 'sm' ? 'sm' : 'lg',
+        class: 'mx-auto mb-4 hover:scale-105 transition-transform duration-300'
+    } %}
+
+    <h1 class="font-bold text-white tracking-tight mb-2 {{ size == 'sm' ? 'text-xl' : 'text-3xl' }}">
+        {{ site_name }}
+    </h1>
+
     {% if showBadge %}
-        <p class="text-blue-200 text-xs font-semibold tracking-[0.2em] uppercase">Administration</p>
+        <p class="text-blue-200 text-xs font-semibold tracking-[0.2em] uppercase">
+            Administration
+        </p>
     {% endif %}
 </div>
