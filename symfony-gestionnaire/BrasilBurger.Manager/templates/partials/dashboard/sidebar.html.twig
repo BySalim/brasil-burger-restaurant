@@ -8,21 +8,35 @@ Dashboard Sidebar
 {% set currentRoute = app.request.attributes.get('_route') %}
 
 {# Header #}
-<div class="h-24 flex flex-col justify-center px-8 border-b border-gray-100 dark:border-border-dark">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{{ site_name }}</h1>
-    <div class="flex items-center gap-2 mt-1">
-        <span class="h-[1px] w-4 bg-primary"></span>
-        <p class="text-primary font-bold text-[10px] tracking-[0.15em] uppercase">Espace Manager</p>
+<div class="h-24 flex items-center px-6 border-b border-gray-100 dark:border-border-dark gap-4">
+    <div class="shrink-0">
+        {% include 'components/logo.html.twig' with {
+            src: site_logo_icon_main,
+            size: 'md',
+            class: 'hover:scale-105 transition-transform duration-300'
+        } %}
     </div>
-</div>
 
+    <div class="flex flex-col justify-center">
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
+            {{ site_name }}
+        </h1>
+        <div class="flex items-center gap-2 mt-1">
+            <span class="h-[1px] w-3 bg-primary"></span>
+            <p class="text-primary font-bold text-[10px] tracking-[0.15em] uppercase">
+                Espace Manager
+            </p>
+        </div>
+    </div>
+
+</div>
 {# Navigation #}
 <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
     {% include 'components/nav_link.html.twig' with {
         href: path('app_dashboard'),
         text: 'Tableau de bord',
         icon: 'dashboard',
-        active: currentRoute == 'app_dashboard'
+        active: currentRoute == 'app_home'
     } %}
 
     {% include 'components/nav_link.html.twig' with {

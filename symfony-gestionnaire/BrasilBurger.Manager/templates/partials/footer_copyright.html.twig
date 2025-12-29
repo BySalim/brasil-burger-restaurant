@@ -2,10 +2,10 @@
 Footer Copyright Component
 
 @param string year - Copyright year (default: current year)
-@param string company - Company name (default: {{ site_name }})
+@param string company - Company name (default: site_name)
 #}
 {% set copyrightYear = year|default('now'|date('Y')) %}
-{% set companyName = company|default('{{ site_name }}') %}
+{% set companyName = company|default(site_name) %}
 
 <div class="text-center">
     <p class="text-xs text-gray-400 dark:text-slate-500">
