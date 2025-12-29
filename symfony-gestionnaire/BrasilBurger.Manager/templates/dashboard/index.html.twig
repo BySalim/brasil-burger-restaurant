@@ -1,6 +1,6 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
-{% block title %}Manager Dashboard - Brazil Burger{% endblock %}
+{% block title %}Manager Dashboard - {{ site_name }}{% endblock %}
 
 {% block page_title %}Aperçu du jour{% endblock %}
 {% block page_subtitle %}Bienvenue sur votre tableau de bord de gestion.{% endblock %}
@@ -49,7 +49,7 @@
     {# Top Products Table #}
     {% set topProducts = [
         {
-            name: 'Brazil Burger Spécial',
+            name: '{{ site_name }} Spécial',
             category: 'MENU',
             categoryColor: 'blue',
             price: '4 500',

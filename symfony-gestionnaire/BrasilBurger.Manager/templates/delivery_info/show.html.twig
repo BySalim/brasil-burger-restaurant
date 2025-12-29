@@ -1,6 +1,6 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
-{% block title %}Infos de livraison {{ deliveryInfo.id|default('#0') }} - Brazil Burger{% endblock %}
+{% block title %}Infos de livraison {{ deliveryInfo.id|default('#0') }} - {{ site_name }}{% endblock %}
 
 {% block page_title %}Infos de livraison{% endblock %}
 {% block page_subtitle %}Consultez les détails logistiques complets de cette livraison.{% endblock %}
@@ -58,7 +58,7 @@
     <div class="mt-8">
         {% include 'partials/footer_copyright.html.twig' with {
             year: 2024,
-            company: 'Brazil Burger - Interface Manager'
+            company: '{{ site_name }} - Interface Manager'
         } %}
     </div>
 {% endblock %}

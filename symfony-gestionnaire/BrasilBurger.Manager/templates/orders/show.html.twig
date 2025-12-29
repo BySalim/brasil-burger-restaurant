@@ -1,6 +1,6 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
-{% block title %}Détails de la Commande {{ order.code|default('#CMD-0000') }} - Brazil Burger{% endblock %}
+{% block title %}Détails de la Commande {{ order.code|default('#CMD-0000') }} - {{ site_name }}{% endblock %}
 
 {% block page_title %}
     Détails de la Commande
@@ -69,7 +69,7 @@
     <div class="mt-8 mb-8">
         {% include 'partials/footer_copyright.html.twig' with {
             year: 2024,
-            company: 'Brazil Burger - Interface de Gestion'
+            company: '{{ site_name }} - Interface de Gestion'
         } %}
     </div>
 {% endblock %}

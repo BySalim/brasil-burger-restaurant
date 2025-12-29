@@ -1,4 +1,5 @@
 parameters:
+    app.site_name: 'Brasil Burger'
     cloudinary.cloud_name: '%env(CLOUDINARY_CLOUD_NAME)%'
     cloudinary.base_url: 'https://res.cloudinary.com'
 
