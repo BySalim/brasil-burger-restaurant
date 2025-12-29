@@ -6,6 +6,8 @@ use App\Enum\CategorieArticle;
 use App\Repository\ArticleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[ORM\Table(name: 'article')]
@@ -31,6 +33,22 @@ abstract class Article
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $imagePublicId = null;
+
+    #[ORM\OneToMany(targetEntity: ArticleQuantifier::class, mappedBy: 'article')]
+    private Collection $articleQuantifiers;
+
+    public function __construct()
+    {
+        $this->articleQuantifiers = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection<int, ArticleQuantifier>
+     */
+    public function getArticleQuantifiers(): Collection
+    {
+        return $this->articleQuantifiers;
+    }
 
     #[ORM\Column(options: ['default' => false])]
     private bool $estArchiver = false;

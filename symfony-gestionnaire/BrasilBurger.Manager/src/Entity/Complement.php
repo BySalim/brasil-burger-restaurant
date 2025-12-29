@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class Complement extends Article
 {
-    #[ORM\Column(length: 20, enumType: TypeComplement::class, nullable: true)]
+    #[ORM\Column(length: 20, nullable: true, enumType: TypeComplement::class)]
     private ?TypeComplement $typeComplement = null;
 
     #[ORM\Column(nullable: true)]
