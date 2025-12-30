@@ -2,7 +2,9 @@
 
 namespace App\Enum;
 
-enum ModeRecuperation: string
+use App\Base\DisplayEnumInterface;
+
+enum ModeRecuperation: string implements DisplayEnumInterface
 {
     case SUR_PLACE = 'SUR_PLACE';
     case EMPORTER = 'EMPORTER';

@@ -2,7 +2,9 @@
 
 namespace App\Enum;
 
-enum Role: string
+use App\Base\DisplayEnumInterface;
+
+enum Role: string implements DisplayEnumInterface
 {
     case CLIENT = 'CLIENT';
     case GESTIONNAIRE = 'GESTIONNAIRE';

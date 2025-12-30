@@ -2,7 +2,9 @@
 
 namespace App\Enum;
 
-enum CategorieArticleQuantifier: string
+use App\Base\DisplayEnumInterface;
+
+enum CategorieArticleQuantifier: string  implements DisplayEnumInterface
 {
     case MENU = 'MENU';
     case COMMANDE = 'COMMANDE';
@@ -10,8 +12,8 @@ enum CategorieArticleQuantifier: string
     public function getLabel(): string
     {
         return match($this) {
-            self::BURGER => 'Burger simple',
             self::MENU => 'Menu',
+            self::COMMANDE => 'Commande',
         };
     }
 

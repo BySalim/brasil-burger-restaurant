@@ -2,11 +2,12 @@
 
 namespace App\Enum;
 
+use App\Base\DisplayEnumInterface;
 use App\Entity\Burger;
 use App\Entity\Menu;
 use App\Entity\Complement;
 
-enum CategorieArticle: string
+enum CategorieArticle: string implements DisplayEnumInterface
 {
     case BURGER = 'BURGER';
     case MENU = 'MENU';

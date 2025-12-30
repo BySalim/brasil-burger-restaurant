@@ -2,7 +2,9 @@
 
 namespace App\Enum;
 
-enum ModePaiement: string
+use App\Base\DisplayEnumInterface;
+
+enum ModePaiement: string implements DisplayEnumInterface
 {
     case WAVE = 'WAVE';
     case OM = 'OM';

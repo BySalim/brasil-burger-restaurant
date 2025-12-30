@@ -2,7 +2,9 @@
 
 namespace App\Enum;
 
-enum EtatCommande: string
+use App\Base\DisplayEnumInterface;
+
+enum EtatCommande: string implements DisplayEnumInterface
 {
     case EN_ATTENTE = 'EN_ATTENTE';
     case EN_PREPARATION = 'EN_PREPARATION';

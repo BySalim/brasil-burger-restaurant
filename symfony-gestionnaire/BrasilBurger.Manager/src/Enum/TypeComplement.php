@@ -2,7 +2,9 @@
 
 namespace App\Enum;
 
-enum TypeComplement: string
+use App\Base\DisplayEnumInterface;
+
+enum TypeComplement: string implements DisplayEnumInterface
 {
     case BOISSON = 'BOISSON';
     case FRITES = 'FRITES';

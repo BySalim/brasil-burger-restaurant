@@ -2,7 +2,9 @@
 
 namespace App\Enum;
 
-enum StatutLivraison: string
+use App\Base\DisplayEnumInterface;
+
+enum StatutLivraison: string implements DisplayEnumInterface
 {
     case EN_COURS = 'EN_COURS';
     case TERMINER = 'TERMINER';

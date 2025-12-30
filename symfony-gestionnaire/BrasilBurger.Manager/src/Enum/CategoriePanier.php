@@ -2,7 +2,9 @@
 
 namespace App\Enum;
 
-enum CategoriePanier: string
+use App\Base\DisplayEnumInterface;
+
+enum CategoriePanier: string implements DisplayEnumInterface
 {
     case BURGER = 'BURGER';
     case MENU = 'MENU';
