@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use App\DTO\DailyStatsDTO;
 use App\Enum\CategoriePanier;
 use App\Enum\EtatCommande;
-use App\Mapper\DashboardViewMapper;
-use App\ViewModel\DashboardStatViewModel;
+use App\Factory\DashboardViewFactory;
+use App\Service\RevenueCalcService;
 use App\ViewModel\TopProductViewModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,7 @@ class HomeController extends AbstractController
     private const ADD_ITEMS_TOP_PRODUCTS_DEFAULT = 3;
 
     #[Route('/dashboard', name: 'app_home')]
-    public function index(Request $request, DashboardViewMapper $dashboardMapper): Response
+    public function index(Request $request, DashboardViewFactory $dashboardView, RevenueCalcService $revunueCalc): Response
     {
         $selectedDate = $request->query->get('date', new \DateTime()->format('Y-m-d'));
 
@@ -26,7 +27,12 @@ class HomeController extends AbstractController
         $limit = $request->query->getInt('limit', self::ITEMS_TOP_PRODUCTS_DEFAULT);
 
         // 2. Récupération des données (Ici je simule, plus tard on appellera un Service/Repository)
-        $stats = $this->getDailyStats($selectedDate, $dashboardMapper);
+        $dailyStats = $this->getDailyStats($selectedDate);
+        $stats = $dashboardView
+            ->createStatsView(
+                DailyStatsDTO::indexByEtat($dailyStats),
+                $revunueCalc->calculateTotalRevenue($dailyStats)
+            );
         ['items' => $products, 'total' => $totalProducts] = $this->getTopProducts($selectedDate, $limit);
 
         // 3. Calcul pour le bouton "Afficher plus"
@@ -45,23 +51,18 @@ class HomeController extends AbstractController
     /**
      * Simule la récupération des stats depuis la BDD
      * @param string $date
-     * @param DashboardViewMapper $dashboardMapper
-     * @return \App\ViewModel\DashboardStatViewModel[]
+     * @return DailyStatsDTO[]
      */
-    private function getDailyStats(string $date, DashboardViewMapper $dashboardMapper): array
+    private function getDailyStats(string $date): array
     {
         // TODO: Remplacer par $repository->countOrdersByDate($date)...
+        $data = [];
+        $data[] = new DailyStatsDTO(EtatCommande::EN_ATTENTE, 10, 5000);
+        $data[] = new DailyStatsDTO(EtatCommande::EN_PREPARATION, 12, 10000);
+        $data[] = new DailyStatsDTO(EtatCommande::TERMINER, 15, 8000);
+        $data[] = new DailyStatsDTO(EtatCommande::ANNULER, 5, 6000);
 
-        /** * @var array<value-of<EtatCommande>|'total_revenue', int> $donnes */
-        $donnes = [
-          EtatCommande::EN_ATTENTE->value => 10,
-          EtatCommande::EN_PREPARATION->value => 12,
-          EtatCommande::TERMINER->value => 15,
-          EtatCommande::ANNULER->value => 5,
-          'total_revenue' => 450000,
-        ];
-
-        return $dashboardMapper->createStats($donnes);
+        return $data;
     }
 
     /**
