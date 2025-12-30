@@ -60,7 +60,7 @@ readonly class DashboardViewFactory
             $products[] = new TopProductViewModel(
                 name: $a->getLibelle(),
                 category: $categorie->getLabel(),
-                categoryColor: $categorie->getColor()->value,
+                categoryColor: $categorie->getColor()->getBadgeClasses(),
                 price: $a->getPrix(),
                 sales: $sales,
                 imageUrl: $this->imageStorage->getImageUrl($imgPublicId),

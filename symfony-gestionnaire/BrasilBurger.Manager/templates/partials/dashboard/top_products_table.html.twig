@@ -51,7 +51,7 @@ Top Products Table Partial
                     <td class="px-6 py-4">
                         {% include 'components/badge.html.twig' with {
                             text: product.category,
-                            color: product.categoryColor|default('blue')
+                            color: product.categoryColor
                         } %}
                     </td>
                     <td class="px-6 py-4 text-right font-medium text-gray-600 dark:text-text-muted-dark">{{ product.price|app_number_formated }} {{ app_currency }}</td>
