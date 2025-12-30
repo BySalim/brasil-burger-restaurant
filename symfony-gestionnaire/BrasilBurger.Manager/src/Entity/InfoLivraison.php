@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\InfoLivraisonRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: InfoLivraisonRepository::class)]
@@ -14,35 +15,26 @@ class InfoLivraison
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $prixLivraison = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'infoLivraisons')]
+    #[ORM\JoinColumn(name: 'id_zone', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Zone $zone = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Quartier::class, inversedBy: 'infoLivraisons')]
+    #[ORM\JoinColumn(name: 'id_quartier', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Quartier $quartier = null;
 
-    // Relation inverse vers Commande
-    #[ORM\OneToOne(mappedBy: 'infoLivraison', cascade: ['persist', 'remove'])]
+    #[ORM\Column(name: 'note_livraison', type: Types::TEXT, nullable: true)]
+    private ?string $noteLivraison = null;
+
+    #[ORM\Column(name: 'prix_livraison')]
+    private ?int $prixLivraison = null;
+
+    #[ORM\OneToOne(targetEntity: Commande::class, mappedBy: 'infoLivraison')]
     private ?Commande $commande = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getPrixLivraison(): ?int
-    {
-        return $this->prixLivraison;
-    }
-
-    public function setPrixLivraison(int $prixLivraison): static
-    {
-        $this->prixLivraison = $prixLivraison;
-        return $this;
     }
 
     public function getZone(): ?Zone
@@ -67,6 +59,28 @@ class InfoLivraison
         return $this;
     }
 
+    public function getNoteLivraison(): ?string
+    {
+        return $this->noteLivraison;
+    }
+
+    public function setNoteLivraison(?string $noteLivraison): static
+    {
+        $this->noteLivraison = $noteLivraison;
+        return $this;
+    }
+
+    public function getPrixLivraison(): ?int
+    {
+        return $this->prixLivraison;
+    }
+
+    public function setPrixLivraison(int $prixLivraison): static
+    {
+        $this->prixLivraison = $prixLivraison;
+        return $this;
+    }
+
     public function getCommande(): ?Commande
     {
         return $this->commande;
@@ -85,6 +99,7 @@ class InfoLivraison
         }
 
         $this->commande = $commande;
+
         return $this;
     }
 }

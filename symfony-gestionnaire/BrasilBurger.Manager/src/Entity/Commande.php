@@ -17,36 +17,46 @@ class Commande
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'date_commande', type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $dateCommande = null;
+    #[ORM\Column(name: 'num_cmd', length: 50, unique: true)]
+    private ?string $numCmd = null;
 
-    #[ORM\Column(length: 20, enumType: EtatCommande::class)]
-    private ?EtatCommande $etat = null;
+    #[ORM\Column(name: 'date_debut', type: Types::DATE_MUTABLE, options: ['default' => 'CURRENT_DATE'])]
+    private ?\DateTimeInterface $dateDebut = null;
+
+    #[ORM\Column(name: 'date_fin', type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateFin = null;
+
+    #[ORM\Column]
+    private ?int $montant = null;
+
+    #[ORM\Column(length: 20, enumType: EtatCommande::class, options: ['default' => 'EN_ATTENTE'])]
+    private EtatCommande $etat = EtatCommande::EN_ATTENTE;
 
     #[ORM\Column(name: 'type_recuperation', length: 20, enumType: ModeRecuperation::class)]
     private ?ModeRecuperation $typeRecuperation = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'id_client', nullable: false)]
-    private ?Client $client = null;
-
-    #[ORM\OneToOne(mappedBy: 'commande', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: Panier::class, inversedBy: 'commande')]
+    #[ORM\JoinColumn(name: 'id_panier', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?Panier $panier = null;
 
-    #[ORM\OneToOne(inversedBy: 'commande', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'id_info_livraison', nullable: true)]
+    #[ORM\ManyToOne(targetEntity: Client::class)]
+    #[ORM\JoinColumn(name: 'id_client', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private ?Client $client = null;
+
+    #[ORM\OneToOne(targetEntity: InfoLivraison::class, inversedBy: 'commande')]
+    #[ORM\JoinColumn(name: 'id_info_livraison', referencedColumnName: 'id', unique: true, nullable: false, onDelete: 'CASCADE')]
     private ?InfoLivraison $infoLivraison = null;
 
-    #[ORM\OneToOne(mappedBy: 'commande', cascade: ['persist', 'remove'])]
-    private ?Paiement $paiement = null;
-
-    #[ORM\OneToOne(mappedBy: 'commande', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
+    #[ORM\JoinColumn(name: 'id_livraison', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?Livraison $livraison = null;
+
+    #[ORM\OneToOne(targetEntity: Paiement::class, mappedBy: 'commande', cascade: ['persist', 'remove'])]
+    private ?Paiement $paiement = null;
 
     public function __construct()
     {
-        $this->dateCommande = new \DateTime();
-        $this->etat = EtatCommande::EN_ATTENTE;
+        $this->dateDebut = new \DateTime();
     }
 
     public function getId(): ?int
@@ -54,18 +64,51 @@ class Commande
         return $this->id;
     }
 
-    public function getDateCommande(): ?\DateTimeInterface
+    public function getNumCmd(): ?string
     {
-        return $this->dateCommande;
+        return $this->numCmd;
     }
 
-    public function setDateCommande(\DateTimeInterface $dateCommande): static
+    public function setNumCmd(string $numCmd): static
     {
-        $this->dateCommande = $dateCommande;
+        $this->numCmd = $numCmd;
         return $this;
     }
 
-    public function getEtat(): ?EtatCommande
+    public function getDateDebut(): ?\DateTimeInterface
+    {
+        return $this->dateDebut;
+    }
+
+    public function setDateDebut(\DateTimeInterface $dateDebut): static
+    {
+        $this->dateDebut = $dateDebut;
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTimeInterface
+    {
+        return $this->dateFin;
+    }
+
+    public function setDateFin(?\DateTimeInterface $dateFin): static
+    {
+        $this->dateFin = $dateFin;
+        return $this;
+    }
+
+    public function getMontant(): ?int
+    {
+        return $this->montant;
+    }
+
+    public function setMontant(int $montant): static
+    {
+        $this->montant = $montant;
+        return $this;
+    }
+
+    public function getEtat(): EtatCommande
     {
         return $this->etat;
     }
@@ -87,6 +130,17 @@ class Commande
         return $this;
     }
 
+    public function getPanier(): ?Panier
+    {
+        return $this->panier;
+    }
+
+    public function setPanier(?Panier $panier): static
+    {
+        $this->panier = $panier;
+        return $this;
+    }
+
     public function getClient(): ?Client
     {
         return $this->client;
@@ -98,27 +152,6 @@ class Commande
         return $this;
     }
 
-    public function getPanier(): ?Panier
-    {
-        return $this->panier;
-    }
-
-    public function setPanier(?Panier $panier): static
-    {
-        // unset the owning side of the relation if necessary
-        if ($panier === null && $this->panier !== null) {
-            $this->panier->setCommande(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($panier !== null && $panier->getCommande() !== $this) {
-            $panier->setCommande($this);
-        }
-
-        $this->panier = $panier;
-        return $this;
-    }
-
     public function getInfoLivraison(): ?InfoLivraison
     {
         return $this->infoLivraison;
@@ -127,6 +160,17 @@ class Commande
     public function setInfoLivraison(?InfoLivraison $infoLivraison): static
     {
         $this->infoLivraison = $infoLivraison;
+        return $this;
+    }
+
+    public function getLivraison(): ?Livraison
+    {
+        return $this->livraison;
+    }
+
+    public function setLivraison(?Livraison $livraison): static
+    {
+        $this->livraison = $livraison;
         return $this;
     }
 
@@ -148,22 +192,7 @@ class Commande
         }
 
         $this->paiement = $paiement;
-        return $this;
-    }
 
-    public function getLivraison(): ?Livraison
-    {
-        return $this->livraison;
-    }
-
-    public function setLivraison(Livraison $livraison): static
-    {
-        // set the owning side of the relation if necessary
-        if ($livraison->getCommande() !== $this) {
-            $livraison->setCommande($this);
-        }
-
-        $this->livraison = $livraison;
         return $this;
     }
 }

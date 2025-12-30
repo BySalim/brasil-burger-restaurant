@@ -17,15 +17,17 @@ class Panier
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(name: 'montant_total', options: ['default' => 0])]
+    private int $montantTotal = 0;
+
     #[ORM\Column(name: 'categorie_panier', length: 20, enumType: CategoriePanier::class)]
     private ?CategoriePanier $categoriePanier = null;
 
-    #[ORM\OneToMany(mappedBy: 'panier', targetEntity: ArticleQuantifier::class, orphanRemoval: true)]
-    private Collection $articleQuantifiers;
-
-    #[ORM\OneToOne(inversedBy: 'panier', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'id_commande', nullable: true)]
+    #[ORM\OneToOne(targetEntity: Commande::class, mappedBy: 'panier')]
     private ?Commande $commande = null;
+
+    #[ORM\OneToMany(targetEntity: ArticleQuantifier::class, mappedBy: 'panier', cascade: ['persist', 'remove'])]
+    private Collection $articleQuantifiers;
 
     public function __construct()
     {
@@ -37,6 +39,17 @@ class Panier
         return $this->id;
     }
 
+    public function getMontantTotal(): int
+    {
+        return $this->montantTotal;
+    }
+
+    public function setMontantTotal(int $montantTotal): static
+    {
+        $this->montantTotal = $montantTotal;
+        return $this;
+    }
+
     public function getCategoriePanier(): ?CategoriePanier
     {
         return $this->categoriePanier;
@@ -45,6 +58,28 @@ class Panier
     public function setCategoriePanier(CategoriePanier $categoriePanier): static
     {
         $this->categoriePanier = $categoriePanier;
+        return $this;
+    }
+
+    public function getCommande(): ?Commande
+    {
+        return $this->commande;
+    }
+
+    public function setCommande(?Commande $commande): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($commande === null && $this->commande !== null) {
+            $this->commande->setPanier(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($commande !== null && $commande->getPanier() !== $this) {
+            $commande->setPanier($this);
+        }
+
+        $this->commande = $commande;
+
         return $this;
     }
 
@@ -69,23 +104,11 @@ class Panier
     public function removeArticleQuantifier(ArticleQuantifier $articleQuantifier): static
     {
         if ($this->articleQuantifiers->removeElement($articleQuantifier)) {
-            // set the owning side to null (unless already changed)
             if ($articleQuantifier->getPanier() === $this) {
                 $articleQuantifier->setPanier(null);
             }
         }
 
-        return $this;
-    }
-
-    public function getCommande(): ?Commande
-    {
-        return $this->commande;
-    }
-
-    public function setCommande(?Commande $commande): static
-    {
-        $this->commande = $commande;
         return $this;
     }
 }

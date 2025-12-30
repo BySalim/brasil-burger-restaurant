@@ -19,18 +19,22 @@ class Zone
     #[ORM\Column(length: 100, unique: true)]
     private ?string $nom = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'prix_livraison')]
     private ?int $prixLivraison = null;
 
-    #[ORM\Column(options: ['default' => false])]
+    #[ORM\Column(name: 'est_archiver', options: ['default' => false])]
     private bool $estArchiver = false;
 
-    #[ORM\OneToMany(targetEntity: Quartier::class, mappedBy: 'zone', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Quartier::class, mappedBy: 'zone', cascade: ['persist', 'remove'])]
     private Collection $quartiers;
+
+    #[ORM\OneToMany(targetEntity: InfoLivraison::class, mappedBy: 'zone')]
+    private Collection $infoLivraisons;
 
     public function __construct()
     {
         $this->quartiers = new ArrayCollection();
+        $this->infoLivraisons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -92,9 +96,37 @@ class Zone
     public function removeQuartier(Quartier $quartier): static
     {
         if ($this->quartiers->removeElement($quartier)) {
-            // set the owning side to null (unless already changed)
             if ($quartier->getZone() === $this) {
                 $quartier->setZone(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InfoLivraison>
+     */
+    public function getInfoLivraisons(): Collection
+    {
+        return $this->infoLivraisons;
+    }
+
+    public function addInfoLivraison(InfoLivraison $infoLivraison): static
+    {
+        if (!$this->infoLivraisons->contains($infoLivraison)) {
+            $this->infoLivraisons->add($infoLivraison);
+            $infoLivraison->setZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInfoLivraison(InfoLivraison $infoLivraison): static
+    {
+        if ($this->infoLivraisons->removeElement($infoLivraison)) {
+            if ($infoLivraison->getZone() === $this) {
+                $infoLivraison->setZone(null);
             }
         }
 

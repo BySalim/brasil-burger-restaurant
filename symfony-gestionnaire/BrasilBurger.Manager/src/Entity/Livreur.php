@@ -25,10 +25,13 @@ class Livreur
     #[ORM\Column(length: 20, unique: true)]
     private ?string $telephone = null;
 
-    #[ORM\Column(options: ['default' => true])]
+    #[ORM\Column(name: 'est_archiver', options: ['default' => false])]
+    private bool $estArchiver = false;
+
+    #[ORM\Column(name: 'est_disponible', options: ['default' => true])]
     private bool $estDisponible = true;
 
-    #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: GroupeLivraison::class)]
+    #[ORM\OneToMany(targetEntity: GroupeLivraison::class, mappedBy: 'livreur')]
     private Collection $groupeLivraisons;
 
     public function __construct()
@@ -74,6 +77,17 @@ class Livreur
         return $this;
     }
 
+    public function isEstArchiver(): bool
+    {
+        return $this->estArchiver;
+    }
+
+    public function setEstArchiver(bool $estArchiver): static
+    {
+        $this->estArchiver = $estArchiver;
+        return $this;
+    }
+
     public function isEstDisponible(): bool
     {
         return $this->estDisponible;
@@ -106,7 +120,6 @@ class Livreur
     public function removeGroupeLivraison(GroupeLivraison $groupeLivraison): static
     {
         if ($this->groupeLivraisons->removeElement($groupeLivraison)) {
-            // set the owning side to null (unless already changed)
             if ($groupeLivraison->getLivreur() === $this) {
                 $groupeLivraison->setLivreur(null);
             }

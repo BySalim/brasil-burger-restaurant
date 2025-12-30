@@ -6,7 +6,6 @@ use App\Enum\StatutLivraison;
 use App\Repository\GroupeLivraisonRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GroupeLivraisonRepository::class)]
@@ -18,64 +17,24 @@ class GroupeLivraison
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $dateDebut = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $dateFin = null;
-
-    #[ORM\Column(length: 20, enumType: StatutLivraison::class)]
-    private ?StatutLivraison $statut = null;
-
-    #[ORM\ManyToOne(inversedBy: 'groupeLivraisons')]
-    #[ORM\JoinColumn(nullable: false, name: 'id_livreur')]
+    #[ORM\ManyToOne(targetEntity: Livreur::class, inversedBy: 'groupeLivraisons')]
+    #[ORM\JoinColumn(name: 'id_livreur', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Livreur $livreur = null;
 
-    #[ORM\OneToMany(mappedBy: 'groupeLivraison', targetEntity: Livraison::class)]
+    #[ORM\Column(length: 20, enumType: StatutLivraison::class, options: ['default' => 'EN_COURS'])]
+    private StatutLivraison $statut = StatutLivraison::EN_COURS;
+
+    #[ORM\OneToMany(targetEntity: Livraison::class, mappedBy: 'groupeLivraison', cascade: ['persist', 'remove'])]
     private Collection $livraisons;
 
     public function __construct()
     {
         $this->livraisons = new ArrayCollection();
-        $this->statut = StatutLivraison::EN_COURS;
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getDateDebut(): ?\DateTimeInterface
-    {
-        return $this->dateDebut;
-    }
-
-    public function setDateDebut(\DateTimeInterface $dateDebut): static
-    {
-        $this->dateDebut = $dateDebut;
-        return $this;
-    }
-
-    public function getDateFin(): ?\DateTimeInterface
-    {
-        return $this->dateFin;
-    }
-
-    public function setDateFin(?\DateTimeInterface $dateFin): static
-    {
-        $this->dateFin = $dateFin;
-        return $this;
-    }
-
-    public function getStatut(): ?StatutLivraison
-    {
-        return $this->statut;
-    }
-
-    public function setStatut(StatutLivraison $statut): static
-    {
-        $this->statut = $statut;
-        return $this;
     }
 
     public function getLivreur(): ?Livreur
@@ -86,6 +45,17 @@ class GroupeLivraison
     public function setLivreur(?Livreur $livreur): static
     {
         $this->livreur = $livreur;
+        return $this;
+    }
+
+    public function getStatut(): StatutLivraison
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(StatutLivraison $statut): static
+    {
+        $this->statut = $statut;
         return $this;
     }
 
@@ -110,7 +80,6 @@ class GroupeLivraison
     public function removeLivraison(Livraison $livraison): static
     {
         if ($this->livraisons->removeElement($livraison)) {
-            // set the owning side to null (unless already changed)
             if ($livraison->getGroupeLivraison() === $this) {
                 $livraison->setGroupeLivraison(null);
             }

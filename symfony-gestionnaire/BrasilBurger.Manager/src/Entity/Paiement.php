@@ -16,22 +16,33 @@ class Paiement
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'date_paie', type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(name: 'date_paie', type: Types::DATE_MUTABLE, options: ['default' => 'CURRENT_DATE'])]
     private ?\DateTimeInterface $datePaie = null;
 
-    #[ORM\Column]
-    private ?int $montant = null;
+    #[ORM\Column(name: 'montant_paie')]
+    private ?int $montantPaie = null;
 
     #[ORM\Column(name: 'mode_paie', length: 20, enumType: ModePaiement::class)]
     private ?ModePaiement $modePaie = null;
 
-    #[ORM\OneToOne(inversedBy: 'paiement', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'id_commande', nullable: false)]
+    #[ORM\Column(name: 'reference_paiement_externe', length: 100, unique: true, nullable: true)]
+    private ?string $referencePaiementExterne = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $test = false;
+
+    #[ORM\ManyToOne(targetEntity: Client::class)]
+    #[ORM\JoinColumn(name: 'id_client', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?Client $client = null;
+
+    #[ORM\OneToOne(targetEntity: Commande::class, inversedBy: 'paiement')]
+    #[ORM\JoinColumn(name: 'id_commande', referencedColumnName: 'id', unique: true, nullable: false, onDelete: 'CASCADE')]
     private ?Commande $commande = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'id_client', nullable: false)]
-    private ?Client $client = null;
+    public function __construct()
+    {
+        $this->datePaie = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -49,14 +60,14 @@ class Paiement
         return $this;
     }
 
-    public function getMontant(): ?int
+    public function getMontantPaie(): ?int
     {
-        return $this->montant;
+        return $this->montantPaie;
     }
 
-    public function setMontant(int $montant): static
+    public function setMontantPaie(int $montantPaie): static
     {
-        $this->montant = $montant;
+        $this->montantPaie = $montantPaie;
         return $this;
     }
 
@@ -71,14 +82,25 @@ class Paiement
         return $this;
     }
 
-    public function getCommande(): ?Commande
+    public function getReferencePaiementExterne(): ?string
     {
-        return $this->commande;
+        return $this->referencePaiementExterne;
     }
 
-    public function setCommande(Commande $commande): static
+    public function setReferencePaiementExterne(?string $referencePaiementExterne): static
     {
-        $this->commande = $commande;
+        $this->referencePaiementExterne = $referencePaiementExterne;
+        return $this;
+    }
+
+    public function isTest(): bool
+    {
+        return $this->test;
+    }
+
+    public function setTest(bool $test): static
+    {
+        $this->test = $test;
         return $this;
     }
 
@@ -90,6 +112,17 @@ class Paiement
     public function setClient(?Client $client): static
     {
         $this->client = $client;
+        return $this;
+    }
+
+    public function getCommande(): ?Commande
+    {
+        return $this->commande;
+    }
+
+    public function setCommande(?Commande $commande): static
+    {
+        $this->commande = $commande;
         return $this;
     }
 }
