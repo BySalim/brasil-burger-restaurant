@@ -1,8 +1,8 @@
 <?php
 
-namespace App\DTO;
+namespace App\ViewModel;
 
-class DashboardStatDTO
+class DashboardStatViewModel
 {
     public function __construct(
         public string $title,

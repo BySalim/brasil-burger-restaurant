@@ -2,17 +2,17 @@
 
 namespace App\Mapper;
 
-use App\DTO\DashboardStatDTO;
 use App\Enum\EtatCommande;
+use App\ViewModel\DashboardStatViewModel;
 
-class DashboardMapper
+class DashboardViewMapper
 {
     /**
      * @param array<string, int> $dataBase Données brutes.
      * Structure attendue :
      * + Clés dynamiques : correspond aux valeurs de l'enum EtatCommande (ex: 'EN_ATTENTE' => 10)
      * + Clé spéciale : 'total_revenu' (int) pour la recette
-     * @return DashboardStatDTO[]
+     * @return DashboardStatViewModel[]
      */
     public function createStats(array $dataBase): array
     {
@@ -29,7 +29,7 @@ class DashboardMapper
         foreach ($etatsAffiche as $etat) {
             $valeur = $this->extractValueForState($dataBase, $etat);
 
-            $stats[] = new DashboardStatDTO(
+            $stats[] = new DashboardStatViewModel(
                 title: $etat->getCardTitle(),
                 value: $valeur,
                 icon: $etat->getIcon(),
@@ -37,7 +37,7 @@ class DashboardMapper
             );
         }
 
-        $stats[] = new DashboardStatDTO(
+        $stats[] = new DashboardStatViewModel(
             title: 'Recettes Journalières',
             value: $dataBase['total_revenue'] ?? 0,
             icon: 'paid',

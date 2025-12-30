@@ -1,8 +1,8 @@
 <?php
 
-namespace App\DTO;
+namespace App\ViewModel;
 
-class TopProductDTO
+class TopProductViewModel
 {
     public function __construct(
         public string $name,

@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\DTO\DashboardStatDTO;
-use App\DTO\TopProductDTO;
 use App\Enum\CategoriePanier;
 use App\Enum\EtatCommande;
-use App\Mapper\DashboardMapper;
+use App\Mapper\DashboardViewMapper;
+use App\ViewModel\DashboardStatViewModel;
+use App\ViewModel\TopProductViewModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +18,7 @@ class HomeController extends AbstractController
     private const ADD_ITEMS_TOP_PRODUCTS_DEFAULT = 3;
 
     #[Route('/dashboard', name: 'app_home')]
-    public function index(Request $request, DashboardMapper $dashboardMapper): Response
+    public function index(Request $request, DashboardViewMapper $dashboardMapper): Response
     {
         $selectedDate = $request->query->get('date', new \DateTime()->format('Y-m-d'));
 
@@ -45,10 +45,10 @@ class HomeController extends AbstractController
     /**
      * Simule la récupération des stats depuis la BDD
      * @param string $date
-     * @param DashboardMapper $dashboardMapper
-     * @return DashboardStatDTO[]
+     * @param DashboardViewMapper $dashboardMapper
+     * @return \App\ViewModel\DashboardStatViewModel[]
      */
-    private function getDailyStats(string $date, DashboardMapper $dashboardMapper): array
+    private function getDailyStats(string $date, DashboardViewMapper $dashboardMapper): array
     {
         // TODO: Remplacer par $repository->countOrdersByDate($date)...
 
@@ -67,7 +67,7 @@ class HomeController extends AbstractController
     /**
      * Simule la récupération des produits
      * @return array{
-     *     items: TopProductDTO[],
+     *     items: TopProductViewModel[],
      *     total: int
      * }
      */
@@ -75,13 +75,13 @@ class HomeController extends AbstractController
     {
         // Simulation d'une liste complète en base de données
         $allProducts = [
-            new TopProductDTO('Brasil Spécial', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 4500, 42, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
-            new TopProductDTO('Cheese & Bacon', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 3500, 28, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
-            new TopProductDTO('Double Whopper', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 5000, 15, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
-            new TopProductDTO('Frites Maison', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 1500, 50, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
-            new TopProductDTO('Coca Cola', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 1000, 60, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
-            new TopProductDTO('Wrap Poulet', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 3000, 10, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
-            new TopProductDTO('Glace Vanille', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 2000, 12, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
+            new TopProductViewModel('Brasil Spécial', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 4500, 42, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
+            new TopProductViewModel('Cheese & Bacon', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 3500, 28, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
+            new TopProductViewModel('Double Whopper', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 5000, 15, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
+            new TopProductViewModel('Frites Maison', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 1500, 50, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
+            new TopProductViewModel('Coca Cola', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 1000, 60, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
+            new TopProductViewModel('Wrap Poulet', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 3000, 10, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
+            new TopProductViewModel('Glace Vanille', CategoriePanier::MENU->getLabel(), CategoriePanier::MENU->getColor(), 2000, 12, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6kIvrk5WKi10YXEJMnHXQDtkuGml98HGvR3pjKvD_dPnStKOMaDh08MjEg1oIMn4QWr5Oos13k5KkM4vZ1ruBaQF4mOpxD5zvkSYjaAFOsW4J8E-ZcIW9vLD-DZgtktdWDeWnnz--62zkbX0SH3KPEa7hf9d4Rw97bk__VJMrPGg8k5xXfuAt7rig87fhpXY0usZKYgMpUbgXOIHECe6jbl23_GOMzmvsXtnWFlddrvwOIHzEeVNaPGGzh38g3by3MH81vgh6lx4'),
         ];
 
         $total = count($allProducts);
