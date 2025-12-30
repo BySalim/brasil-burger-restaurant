@@ -24,28 +24,33 @@ Delivery Information Card
         {% if deliveryMode == 'delivery' %}
             <div class="border-t border-gray-100 dark:border-border-dark pt-4">
                 {# Delivery Info Button #}
-                <button type="button" class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-200 dark:border-border-dark text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
-                    <span class="flex items-center gap-2">
+                <button type="button"
+                        class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-200 dark:border-border-dark text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                        <span class="flex items-center gap-2">
+                                {% include 'components/icon.html.twig' with {
+                                    name: 'info',
+                                    class: 'text-gray-400'
+                                } %}
+                            Infos de livraison
+                        </span>
+                    <a href="{{ path('app_delivery_info') }}">
                         {% include 'components/icon.html.twig' with {
-                            name: 'info',
-                            class: 'text-gray-400'
+                            name: 'visibility',
+                            size: 'text-[20px]'
                         } %}
-                        Infos de livraison
-                    </span>
-                    {% include 'components/icon.html.twig' with {
-                        name: 'visibility',
-                        size: 'text-[20px]'
-                    } %}
+                    </a>
                 </button>
 
                 {# Associated Delivery Code #}
                 {% if deliveryCode %}
-                    <div class="mt-4 flex items-center justify-between px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-border-dark hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                    <div
+                        class="mt-4 flex items-center justify-between px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-border-dark hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
                         <div>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Code de livraison associé</p>
                             <p class="font-mono font-bold text-gray-700 dark:text-gray-300">{{ deliveryCode }}</p>
                         </div>
-                        <a href="{{ path('app_default', {id: deliveryId}) }}" class="h-8 w-8 flex items-center justify-center rounded-full bg-white dark:bg-surface-dark text-gray-400 shadow-sm hover:text-gray-600 transition-colors">
+                        <a href="{{ path('app_default', {id: deliveryId}) }}"
+                           class="h-8 w-8 flex items-center justify-center rounded-full bg-white dark:bg-surface-dark text-gray-400 shadow-sm hover:text-gray-600 transition-colors">
                             {% include 'components/icon.html.twig' with {
                                 name: 'visibility',
                                 size: 'text-[20px]'

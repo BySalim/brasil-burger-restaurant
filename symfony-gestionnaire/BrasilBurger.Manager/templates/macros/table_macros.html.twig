@@ -53,10 +53,12 @@ Table Macros - Reusable table row components
                     icon: 'edit_note',
                     title: 'Changer statut'
                 } %}
-                {% include 'components/icon_button.html.twig' with {
-                    icon: 'arrow_forward',
-                    title: 'Voir détails'
-                } %}
+                <a href="{{ path('app_details_order') }}">
+                    {% include 'components/icon_button.html.twig' with {
+                        icon: 'arrow_forward',
+                        title: 'Voir détails'
+                    } %}
+                </a>
             </div>
         </td>
     </tr>

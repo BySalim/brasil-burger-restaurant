@@ -33,7 +33,7 @@ Dashboard Sidebar
 {# Navigation #}
 <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
     {% include 'components/nav_link.html.twig' with {
-        href: path('app_dashboard'),
+        href: path('app_home'),
         text: 'Tableau de bord',
         icon: 'dashboard',
         active: currentRoute == 'app_home'

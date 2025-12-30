@@ -1,0 +1,44 @@
+{#
+Icon Button Component (Square button with icon only)
+
+@param string icon - Material icon name (required)
+@param string title - Tooltip title
+@param string color - Color variant: primary, secondary, danger (default: none)
+@param string size - Size variant: sm, md (default: sm)
+@param string type - Button type (default: button)
+@param string onclick - JS onclick handler
+#}
+{% set btnIcon = icon|default('more_vert') %}
+{% set btnTitle = title|default('') %}
+{% set btnColor = color|default('secondary') %}
+{% set btnSize = size|default('sm') %}
+{% set btnType = type|default('button') %}
+{% set btnOnclick = onclick|default('') %}
+
+{% set colorClasses = {
+    'primary': 'text-primary hover:bg-primary/10',
+    'secondary': 'text-gray-500 hover:text-primary hover:bg-primary/10',
+    'danger': 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
+} %}
+
+{% set sizeClasses = {
+    'sm': 'p-1.5',
+    'md': 'p-2'
+} %}
+
+{% set iconSizes = {
+    'sm': 'text-[20px]',
+    'md': 'text-[24px]'
+} %}
+
+<button
+    type="{{ btnType }}"
+    {% if btnTitle %}title="{{ btnTitle }}"{% endif %}
+    {% if btnOnclick %}onclick="{{ btnOnclick }}"{% endif %}
+    class="{{ colorClasses[btnColor] }} {{ sizeClasses[btnSize] }} rounded-md transition-colors"
+>
+    {% include 'components/icon.html.twig' with {
+        name: btnIcon,
+        size: iconSizes[btnSize]
+    } %}
+</button>
