@@ -20,11 +20,11 @@ enum CategoriePanier: string implements DisplayEnumInterface
         };
     }
 
-    #[\Override] public function getColor(): string
+    #[\Override] public function getColor(): Color
     {
         return match($this) {
-            self::BURGER => 'blue',
-            self::MENU => 'yellow',
+            self::BURGER => Color::BLUE,
+            self::MENU => Color::YELLOW,
         };
     }
 
@@ -36,13 +36,6 @@ enum CategoriePanier: string implements DisplayEnumInterface
         };
     }
 
-    #[\Override] public function getIconBg(): string
-    {
-        return match($this) {
-            self::BURGER => 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-            self::MENU => 'bg-yellow-50 dark:bg-yellow-900/10 text-yellow-600',
-        };
-    }
 
     #[\Override] public function getCardTitle(): string
     {

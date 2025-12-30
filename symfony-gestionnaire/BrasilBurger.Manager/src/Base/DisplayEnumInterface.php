@@ -2,6 +2,8 @@
 
 namespace App\Base;
 
+use App\Enum\Color;
+
 /**
  * Interface pour les enums avec méthodes d'affichage
  *
@@ -19,7 +21,6 @@ interface DisplayEnumInterface
 {
     public function getLabel(): string;
     public function getCardTitle(): string;
-    public function getColor(): string;
+    public function getColor(): Color;
     public function getIcon(): string;
-    public function getIconBg(): string;
 }

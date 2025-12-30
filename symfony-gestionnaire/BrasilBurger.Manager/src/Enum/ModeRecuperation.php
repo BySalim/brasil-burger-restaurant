@@ -21,12 +21,12 @@ enum ModeRecuperation: string implements DisplayEnumInterface
         };
     }
 
-    #[\Override] public function getColor(): string
+    #[\Override] public function getColor(): Color
     {
         return match($this) {
-            self::SUR_PLACE => 'purple',
-            self::EMPORTER => 'blue',
-            self::LIVRER => 'orange',
+            self::SUR_PLACE => Color::PURPLE,
+            self::EMPORTER => Color::BLUE,
+            self::LIVRER => Color::ORANGE,
         };
     }
 
@@ -36,15 +36,6 @@ enum ModeRecuperation: string implements DisplayEnumInterface
             self::SUR_PLACE => 'restaurant',
             self::EMPORTER => 'shopping_bag',
             self::LIVRER => 'two_wheeler',
-        };
-    }
-
-    #[\Override] public function getIconBg(): string
-    {
-        return match($this) {
-            self::SUR_PLACE => 'bg-purple-50 dark:bg-purple-900/10 text-purple-600',
-            self::EMPORTER => 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-            self::LIVRER => 'bg-orange-50 dark:bg-orange-900/10 text-orange-600',
         };
     }
 

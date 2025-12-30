@@ -19,11 +19,11 @@ enum Role: string implements DisplayEnumInterface
         };
     }
 
-    #[\Override] public function getColor(): string
+    #[\Override] public function getColor(): Color
     {
         return match($this) {
-            self:: CLIENT => 'blue',
-            self::GESTIONNAIRE => 'purple',
+            self:: CLIENT => Color::BLUE,
+            self::GESTIONNAIRE => Color::PURPLE,
         };
     }
 
@@ -32,14 +32,6 @@ enum Role: string implements DisplayEnumInterface
         return match($this) {
             self::CLIENT => 'person',
             self::GESTIONNAIRE => 'admin_panel_settings',
-        };
-    }
-
-    #[\Override] public function getIconBg(): string
-    {
-        return match($this) {
-            self::CLIENT => 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-            self::GESTIONNAIRE => 'bg-purple-50 dark:bg-purple-900/10 text-purple-600',
         };
     }
 

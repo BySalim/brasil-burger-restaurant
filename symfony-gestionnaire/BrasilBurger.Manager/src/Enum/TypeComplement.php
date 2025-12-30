@@ -19,11 +19,11 @@ enum TypeComplement: string implements DisplayEnumInterface
         };
     }
 
-    #[\Override] public function getColor(): string
+    #[\Override] public function getColor(): Color
     {
         return match($this) {
-            self::BOISSON => 'cyan',
-            self::FRITES => 'yellow',
+            self::BOISSON => Color::CYAN,
+            self::FRITES => Color::YELLOW,
         };
     }
 
@@ -32,14 +32,6 @@ enum TypeComplement: string implements DisplayEnumInterface
         return match($this) {
             self::BOISSON => 'local_cafe',
             self::FRITES => 'fastfood',
-        };
-    }
-
-    #[\Override] public function getIconBg(): string
-    {
-        return match($this) {
-            self::BOISSON => 'bg-cyan-50 dark: bg-cyan-900/10 text-cyan-600',
-            self::FRITES => 'bg-yellow-50 dark: bg-yellow-900/10 text-yellow-600',
         };
     }
 

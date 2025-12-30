@@ -56,7 +56,7 @@ trait EnumHelperTrait
                     'label' => $case->getLabel(),
                     'color' => $case->getColor(),
                     'icon' => $case->getIcon(),
-                    'iconBg' => $case->getIconBg(),
+                    'iconBg' => $case->getIconClasseBg(),
                     'cardTitle' => $case->getCardTitle(),
                 ];
             },

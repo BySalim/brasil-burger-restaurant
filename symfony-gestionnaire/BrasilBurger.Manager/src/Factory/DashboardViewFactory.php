@@ -29,7 +29,7 @@ readonly class DashboardViewFactory
                 title: $etat->getCardTitle(),
                 value: $value,
                 icon: $etat->getIcon(),
-                iconBg: $etat->getIconBg(),
+                iconBg: $etat->getColor()->getIconClasseBg(),
             );
         }
 
@@ -60,7 +60,7 @@ readonly class DashboardViewFactory
             $products[] = new TopProductViewModel(
                 name: $a->getLibelle(),
                 category: $categorie->getLabel(),
-                categoryColor: $categorie->getColor(),
+                categoryColor: $categorie->getColor()->value,
                 price: $a->getPrix(),
                 sales: $sales,
                 imageUrl: $this->imageStorage->getImageUrl($imgPublicId),

@@ -19,11 +19,11 @@ enum ModePaiement: string implements DisplayEnumInterface
         };
     }
 
-    #[\Override] public function getColor(): string
+    #[\Override] public function getColor(): Color
     {
         return match($this) {
-            self::WAVE => 'blue',
-            self::OM => 'orange',
+            self::WAVE => Color::BLUE,
+            self::OM => Color::ORANGE,
         };
     }
 
@@ -32,14 +32,6 @@ enum ModePaiement: string implements DisplayEnumInterface
         return match($this) {
             self::WAVE => 'account_balance_wallet',
             self::OM => 'phone_android',
-        };
-    }
-
-    #[\Override] public function getIconBg(): string
-    {
-        return match($this) {
-            self::WAVE => 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-            self::OM => 'bg-orange-50 dark:bg-orange-900/10 text-orange-600',
         };
     }
 

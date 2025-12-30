@@ -19,11 +19,11 @@ enum CategorieArticleQuantifier: string implements DisplayEnumInterface
         };
     }
 
-    #[\Override] public function getColor(): string
+    #[\Override] public function getColor(): Color
     {
         return match($this) {
-            self::MENU => 'yellow',
-            self::COMMANDE => 'blue',
+            self::MENU => Color::YELLOW,
+            self::COMMANDE => Color::BLUE,
         };
     }
 
@@ -32,14 +32,6 @@ enum CategorieArticleQuantifier: string implements DisplayEnumInterface
         return match($this) {
             self::MENU => 'restaurant_menu',
             self::COMMANDE => 'shopping_cart',
-        };
-    }
-
-    #[\Override] public function getIconBg(): string
-    {
-        return match($this) {
-            self::MENU => 'bg-yellow-50 dark: bg-yellow-900/10 text-yellow-600',
-            self::COMMANDE => 'bg-blue-50 dark: bg-blue-900/10 text-blue-600',
         };
     }
 

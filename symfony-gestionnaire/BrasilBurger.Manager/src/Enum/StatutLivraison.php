@@ -19,11 +19,11 @@ enum StatutLivraison: string implements DisplayEnumInterface
         };
     }
 
-    #[\Override] public function getColor(): string
+    #[\Override] public function getColor(): Color
     {
         return match($this) {
-            self::EN_COURS => 'blue',
-            self::TERMINER => 'green',
+            self::EN_COURS => Color::BLUE,
+            self::TERMINER => Color::GREEN,
         };
     }
 
@@ -32,14 +32,6 @@ enum StatutLivraison: string implements DisplayEnumInterface
         return match($this) {
             self::EN_COURS => 'local_shipping',
             self::TERMINER => 'check_circle',
-        };
-    }
-
-    #[\Override] public function getIconBg(): string
-    {
-        return match($this) {
-            self::EN_COURS => 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-            self:: TERMINER => 'bg-green-50 dark:bg-green-900/10 text-green-600',
         };
     }
 

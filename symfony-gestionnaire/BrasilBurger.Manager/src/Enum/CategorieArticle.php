@@ -7,6 +7,7 @@ use App\Base\EnumHelperTrait;
 use App\Entity\Burger;
 use App\Entity\Menu;
 use App\Entity\Complement;
+use Override;
 
 enum CategorieArticle: string implements DisplayEnumInterface
 {
@@ -51,12 +52,12 @@ enum CategorieArticle: string implements DisplayEnumInterface
         };
     }
 
-    #[\Override] public function getColor(): string
+    #[\Override] public function getColor(): Color
     {
         return match($this) {
-            self::BURGER => 'blue',
-            self::MENU => 'yellow',
-            self::COMPLEMENT => 'gray',
+            self::BURGER => Color::BLUE,
+            self::MENU => Color::YELLOW,
+            self::COMPLEMENT => Color::GRAY,
         };
     }
 
@@ -66,15 +67,6 @@ enum CategorieArticle: string implements DisplayEnumInterface
             self::BURGER => 'lunch_dining',
             self::MENU => 'restaurant_menu',
             self::COMPLEMENT => 'fastfood',
-        };
-    }
-
-    #[\Override] public function getIconBg(): string
-    {
-        return match($this) {
-            self::BURGER => 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-            self::MENU => 'bg-yellow-50 dark:bg-yellow-900/10 text-yellow-600',
-            self::COMPLEMENT => 'bg-gray-50 dark:bg-gray-900/10 text-gray-600',
         };
     }
 
