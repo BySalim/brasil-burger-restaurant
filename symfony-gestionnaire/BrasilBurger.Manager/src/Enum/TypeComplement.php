@@ -3,9 +3,12 @@
 namespace App\Enum;
 
 use App\Base\DisplayEnumInterface;
+use App\Base\EnumHelperTrait;
 
 enum TypeComplement: string implements DisplayEnumInterface
 {
+    use EnumHelperTrait;
+
     case BOISSON = 'BOISSON';
     case FRITES = 'FRITES';
 

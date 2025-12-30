@@ -3,9 +3,12 @@
 namespace App\Enum;
 
 use App\Base\DisplayEnumInterface;
+use App\Base\EnumHelperTrait;
 
 enum CategorieArticleQuantifier: string  implements DisplayEnumInterface
 {
+    use EnumHelperTrait;
+
     case MENU = 'MENU';
     case COMMANDE = 'COMMANDE';
 

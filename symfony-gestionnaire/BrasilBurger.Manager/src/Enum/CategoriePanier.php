@@ -3,9 +3,12 @@
 namespace App\Enum;
 
 use App\Base\DisplayEnumInterface;
+use App\Base\EnumHelperTrait;
 
 enum CategoriePanier: string implements DisplayEnumInterface
 {
+    use EnumHelperTrait;
+
     case BURGER = 'BURGER';
     case MENU = 'MENU';
 

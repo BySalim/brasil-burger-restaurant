@@ -2,6 +2,19 @@
 
 namespace App\Base;
 
+/**
+ * Interface pour les enums avec méthodes d'affichage
+ *
+ * ⚠️ IMPORTANT : Tous les enums implémentant cette interface DOIVENT
+ * utiliser le trait EnumHelperTrait pour bénéficier des méthodes statiques :
+ *
+ * - getChoices(): array
+ * - getValueLabelPairs(): array
+ * - toArray(): array
+ * - etc
+ *
+ * @see EnumHelperTrait
+ */
 interface DisplayEnumInterface
 {
     public function getLabel(): string;

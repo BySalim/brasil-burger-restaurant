@@ -3,9 +3,12 @@
 namespace App\Enum;
 
 use App\Base\DisplayEnumInterface;
+use App\Base\EnumHelperTrait;
 
 enum ModePaiement: string implements DisplayEnumInterface
 {
+    use EnumHelperTrait;
+
     case WAVE = 'WAVE';
     case OM = 'OM';
 

@@ -3,9 +3,12 @@
 namespace App\Enum;
 
 use App\Base\DisplayEnumInterface;
+use App\Base\EnumHelperTrait;
 
 enum Role: string implements DisplayEnumInterface
 {
+    use EnumHelperTrait;
+
     case CLIENT = 'CLIENT';
     case GESTIONNAIRE = 'GESTIONNAIRE';
 

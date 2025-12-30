@@ -3,9 +3,12 @@
 namespace App\Enum;
 
 use App\Base\DisplayEnumInterface;
+use App\Base\EnumHelperTrait;
 
 enum EtatCommande: string implements DisplayEnumInterface
 {
+    use EnumHelperTrait;
+
     case EN_ATTENTE = 'EN_ATTENTE';
     case EN_PREPARATION = 'EN_PREPARATION';
     case TERMINER = 'TERMINER';

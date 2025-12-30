@@ -3,9 +3,12 @@
 namespace App\Enum;
 
 use App\Base\DisplayEnumInterface;
+use App\Base\EnumHelperTrait;
 
 enum ModeRecuperation: string implements DisplayEnumInterface
 {
+    use EnumHelperTrait;
+
     case SUR_PLACE = 'SUR_PLACE';
     case EMPORTER = 'EMPORTER';
     case LIVRER = 'LIVRER';

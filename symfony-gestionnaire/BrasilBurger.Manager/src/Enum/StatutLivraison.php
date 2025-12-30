@@ -3,9 +3,12 @@
 namespace App\Enum;
 
 use App\Base\DisplayEnumInterface;
+use App\Base\EnumHelperTrait;
 
 enum StatutLivraison: string implements DisplayEnumInterface
 {
+    use EnumHelperTrait;
+
     case EN_COURS = 'EN_COURS';
     case TERMINER = 'TERMINER';
 
