@@ -21,23 +21,22 @@ class Livraison
     #[ORM\Column(length: 20, enumType: StatutLivraison::class, options: ['default' => 'EN_COURS'])]
     private StatutLivraison $statut = StatutLivraison::EN_COURS;
 
-    #[ORM\Column(name: 'date_debut', type: Types::DATE_MUTABLE, options: ['default' => 'CURRENT_DATE'])]
+    #[ORM\Column(name: 'date_debut', type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $dateDebut = null;
 
-    #[ORM\Column(name: 'date_fin', type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(name: 'date_fin', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateFin = null;
 
     #[ORM\ManyToOne(targetEntity: GroupeLivraison::class, inversedBy: 'livraisons')]
     #[ORM\JoinColumn(name: 'id_groupe_livraison', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?GroupeLivraison $groupeLivraison = null;
 
-    #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'livraison')]
-    private Collection $commandes;
+    #[ORM\OneToOne(targetEntity: Commande::class, mappedBy: 'livraison', cascade: ['persist', 'remove'])]
+    private ?Commande $commande = null;
 
     public function __construct()
     {
         $this->dateDebut = new \DateTime();
-        $this->commandes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -89,32 +88,14 @@ class Livraison
         return $this;
     }
 
-    /**
-     * @return Collection<int, Commande>
-     */
-    public function getCommandes(): Collection
+    public function getCommande(): ?Commande
     {
-        return $this->commandes;
+        return $this->commande;
     }
 
-    public function addCommande(Commande $commande): static
+    public function setCommande(?Commande $commande): void
     {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes->add($commande);
-            $commande->setLivraison($this);
-        }
-
-        return $this;
+        $this->commande = $commande;
     }
 
-    public function removeCommande(Commande $commande): static
-    {
-        if ($this->commandes->removeElement($commande)) {
-            if ($commande->getLivraison() === $this) {
-                $commande->setLivraison(null);
-            }
-        }
-
-        return $this;
-    }
 }

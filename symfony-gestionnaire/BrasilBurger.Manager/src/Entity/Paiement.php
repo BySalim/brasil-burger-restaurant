@@ -16,7 +16,7 @@ class Paiement
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'date_paie', type: Types::DATE_MUTABLE, options: ['default' => 'CURRENT_DATE'])]
+    #[ORM\Column(name: 'date_paie', type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $datePaie = null;
 
     #[ORM\Column(name: 'montant_paie')]

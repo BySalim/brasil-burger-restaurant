@@ -20,10 +20,10 @@ class Commande
     #[ORM\Column(name: 'num_cmd', length: 50, unique: true)]
     private ?string $numCmd = null;
 
-    #[ORM\Column(name: 'date_debut', type: Types::DATE_MUTABLE, options: ['default' => 'CURRENT_DATE'])]
+    #[ORM\Column(name: 'date_debut', type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $dateDebut = null;
 
-    #[ORM\Column(name: 'date_fin', type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(name: 'date_fin', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateFin = null;
 
     #[ORM\Column]
@@ -47,7 +47,7 @@ class Commande
     #[ORM\JoinColumn(name: 'id_info_livraison', referencedColumnName: 'id', unique: true, nullable: false, onDelete: 'CASCADE')]
     private ?InfoLivraison $infoLivraison = null;
 
-    #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
+    #[ORM\OneToOne(targetEntity: Livraison::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'id_livraison', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?Livraison $livraison = null;
 
