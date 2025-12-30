@@ -1,19 +1,93 @@
 {#
-Badge Component
+Badge Component (Pro Version)
 
-@param string text - Badge text (required)
-@param string color - Color variant: blue, indigo, purple, pink, red, orange, yellow, green, teal, cyan, gray, slate (default: blue)
-@param string size - Size variant: sm, md (default: sm)
+@param string text - Badge text (optional)
+@param string colorClasses - Color classes (direct CSS)
+@param string size - Size variant: xs, sm, md, lg (default: sm)
+@param string shape - Shape variant: rounded, pill, square (default: rounded)
+@param string|null icon - Material icon name (optional)
+@param string|null iconPosition - Icon position:  left, right (default: left)
+@param string|null iconBg - Icon background classes (optional, for complex badges)
+@param bool outline - Outline style instead of filled (default: false)
+@param bool uppercase - Uppercase text (default: true)
+@param string|null customClass - Additional custom classes
+
 #}
-{% set badgeText = text|default('Badge') %}
-{% set badgeColorClasse = color|default('bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800') %}
-{% set badgeSize = size|default('sm') %}
 
+{% set badgeText = text|default(null) %}
+{% set badgeColorClasses = color|default('bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800') %}
+{% set badgeSize = size|default('sm') %}
+{% set badgeShape = shape|default('rounded') %}
+{% set badgeIcon = icon|default(null) %}
+{% set badgeIconPosition = iconPosition|default('left') %}
+{% set badgeIconBg = iconBg|default(null) %}
+{% set badgeOutline = outline|default(false) %}
+{% set badgeUppercase = uppercase is defined ?  uppercase : false %}
+{% set badgeCustomClass = customClass|default('') %}
+
+{# Size variants #}
 {% set sizeClasses = {
-    'sm': 'px-2 py-0.5 text-[10px]',
-    'md': 'px-3 py-1 text-xs'
+    'xs': 'px-1.5 py-0.5 text-[9px] gap-1',
+    'sm': 'px-2 py-0.5 text-[10px] gap-1',
+    'md': 'px-3 py-1 text-xs gap-1.5',
+    'lg': 'px-4 py-1.5 text-sm gap-2'
 } %}
 
-<span class="inline-flex items-center rounded font-bold border uppercase tracking-wide {{ badgeColorClasse }} {{ sizeClasses[badgeSize] }}">
-    {{ badgeText }}
+{# Icon sizes per badge size #}
+{% set iconSizes = {
+    'xs':  'text-[10px]',
+    'sm':  'text-[12px]',
+    'md': 'text-[14px]',
+    'lg': 'text-[16px]'
+} %}
+
+{# Shape variants #}
+{% set shapeClasses = {
+    'rounded': 'rounded',
+    'pill': 'rounded-full',
+    'square':  'rounded-none'
+} %}
+
+{# Outline style adjustments #}
+{% set outlineClass = badgeOutline ? 'bg-transparent border-2' : 'border' %}
+
+<span class="inline-flex items-center font-bold tracking-wide {{ sizeClasses[badgeSize] }} {{ shapeClasses[badgeShape] }} {{ outlineClass }} {{ badgeColorClasses }} {{ badgeUppercase ? 'uppercase' : '' }} {{ badgeCustomClass }}">
+    {# Icon with optional background (left position) #}
+    {% if badgeIcon and badgeIconPosition == 'left' %}
+        {% if badgeIconBg %}
+            {# Complex badge with icon background #}
+            <span class="inline-flex items-center justify-center rounded-full {{ badgeIconBg }} {{ badgeSize == 'xs' ? 'h-3 w-3' : (badgeSize == 'sm' ? 'h-3.5 w-3.5' : (badgeSize == 'md' ? 'h-4 w-4' : 'h-5 w-5')) }}">
+                {% include 'components/icon.html. twig' with {
+                    name: badgeIcon,
+                    size: iconSizes[badgeSize]
+                } %}
+            </span>
+        {% else %}
+            {# Simple icon #}
+            {% include 'components/icon.html.twig' with {
+                name: badgeIcon,
+                size: iconSizes[badgeSize]
+            } %}
+        {% endif %}
+    {% endif %}
+
+    {# Badge text #}
+    <span>{{ badgeText }}</span>
+
+    {# Icon (right position) #}
+    {% if badgeIcon and badgeIconPosition == 'right' %}
+        {% if badgeIconBg %}
+            <span class="inline-flex items-center justify-center rounded-full {{ badgeIconBg }} {{ badgeSize == 'xs' ?  'h-3 w-3' : (badgeSize == 'sm' ?  'h-3.5 w-3.5' : (badgeSize == 'md' ? 'h-4 w-4' : 'h-5 w-5')) }}">
+                {% include 'components/icon.html.twig' with {
+                    name: badgeIcon,
+                    size: iconSizes[badgeSize]
+                } %}
+            </span>
+        {% else %}
+            {% include 'components/icon.html.twig' with {
+                name: badgeIcon,
+                size: iconSizes[badgeSize]
+            } %}
+        {% endif %}
+    {% endif %}
 </span>

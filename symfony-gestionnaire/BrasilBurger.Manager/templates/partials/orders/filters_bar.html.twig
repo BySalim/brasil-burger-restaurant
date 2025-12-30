@@ -1,66 +1,90 @@
 {#
-Orders Filters Bar
+Orders Filters Bar with Symfony Form
 
-@param array filters - Current filter values
+@param FormView form - Symfony form object
 #}
-{% set currentFilters = filters|default({}) %}
 
 <div class="mb-6">
-    <form method="get" action="{{ path('app_orders') }}" class="flex flex-wrap items-center gap-3 w-full">
-        {# Search Input #}
-        {% include 'components/search_input.html.twig' with {
-            placeholder: 'Rechercher par code...',
-            name: 'search',
-            value: currentFilters.search|default('')
-        } %}
+    {{ form_start(form, {
+        'action': path('app_orders'),
+        'attr': {'class': 'flex flex-wrap items-center gap-3 w-full', 'id': 'filterForm'}
+    }) }}
 
-        {# Date Filter #}
-        {% include 'components/date_input.html.twig' with {
-            name: 'date',
-            value: currentFilters.date|default('')
-        } %}
+    {# 1. Search Input #}
+    <div class="relative flex-1 min-w-[200px]">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 text-[20px]">search</span>
+        {{ form_widget(form. search, {
+            'attr':  {
+                'class': 'w-full pl-10 pr-4 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 text-sm placeholder: text-gray-400 dark:placeholder:text-slate-500'
+            }
+        }) }}
+    </div>
 
-        {# Type Filter #}
-        {% include 'components/select_input.html.twig' with {
-            name: 'type',
-            label: 'Type',
-            selected: currentFilters.type|default('all'),
-            options: [
-                {value: 'all', label: 'Tout'},
-                {value: 'burger', label: 'Burger simple'},
-                {value: 'menu', label: 'Menu'}
-            ]
-        } %}
+    {# 2. Date Input #}
+    <div class="relative shrink-0">
+        {{ form_widget(form.date, {
+            'attr': {
+                'class':  'w-full px-3 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-600 dark:text-gray-300 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer dark:[color-scheme:dark]'
+            }
+        }) }}
+    </div>
 
-        {# Status Filter #}
-        {% include 'components/select_input.html.twig' with {
-            name: 'status',
-            label: 'Statut',
-            selected: currentFilters.status|default('all'),
-            options: [
-                {value: 'all', label: 'Tout'},
-                {value: 'pending', label: 'En attente'},
-                {value: 'processing', label: 'En cours'},
-                {value: 'completed', label: 'Terminé'},
-                {value: 'cancelled', label: 'Annulé'}
-            ],
-            showIcon: true
-        } %}
+    {# 3. Type Select (CategoriePanier) #}
+    <div class="relative shrink-0">
+        {{ form_widget(form.type, {
+            'attr': {
+                'class': 'w-full pl-3 pr-8 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-600 dark:text-gray-300 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer appearance-none',
+                'onchange': 'this.form. submit()'
+            }
+        }) }}
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none text-[20px]">expand_more</span>
+    </div>
 
-        {# Divider #}
-        <div class="w-px h-8 bg-gray-200 dark:bg-border-dark mx-1 shrink-0"></div>
+    {# 4. Status Select (EtatCommande) #}
+    <div class="relative shrink-0">
+        {{ form_widget(form. status, {
+            'attr':  {
+                'class': 'w-full pl-3 pr-8 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-600 dark:text-gray-300 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer appearance-none',
+                'onchange': 'this.form.submit()'
+            }
+        }) }}
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none text-[20px]">expand_more</span>
+    </div>
 
-        {# Items Per Page #}
-        {% include 'components/select_input.html.twig' with {
-            name: 'per_page',
-            label: 'Afficher',
-            selected: currentFilters.per_page|default('8'),
-            options: [
-                {value: '8', label: '8'},
-                {value: '20', label: '20'},
-                {value: '50', label: '50'}
-            ],
-            showIcon: false
-        } %}
-    </form>
+    {# Divider #}
+    <div class="w-px h-8 bg-gray-200 dark:bg-border-dark mx-1 shrink-0"></div>
+
+    {# 5. Items Per Page #}
+    <div class="relative shrink-0">
+        {{ form_widget(form. per_page, {
+            'attr': {
+                'class': 'w-full px-5 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-600 dark:text-gray-300 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer appearance-none',
+                'onchange': 'this.form.submit()'
+            }
+        }) }}
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none text-[20px]">expand_more</span>
+    </div>
+
+    {# Submit caché (pour JS désactivé) #}
+    <noscript>
+        <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold">
+            Filtrer
+        </button>
+    </noscript>
+
+    {{ form_end(form) }}
 </div>
+
+<script>
+    // Auto-submit sur Enter dans la recherche
+    document.querySelector('#filterForm input[name="search"]')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            this.form.submit();
+        }
+    });
+
+    // Auto-submit sur changement de date
+    document.querySelector('#filterForm input[type="date"]')?.addEventListener('change', function() {
+        this.form.submit();
+    });
+</script>

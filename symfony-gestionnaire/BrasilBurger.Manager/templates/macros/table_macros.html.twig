@@ -15,19 +15,20 @@ Table Macros - Reusable table row components
 
         {# Code #}
         <td class="px-3 py-3 whitespace-nowrap">
-            <span class="font-mono font-medium text-gray-900 dark:text-white">{{ order.code }}</span>
+            <span class="font-mono font-medium text-gray-900 dark: text-white">{{ order.code }}</span>
         </td>
 
         {# Type Badge #}
         <td class="px-3 py-3 whitespace-nowrap">
             {% include 'components/badge.html.twig' with {
                 text: order.type,
-                color: order.typeColor|default('blue')
+                color: order.typeColor|default('blue'),
+                size: 'md'
             } %}
         </td>
 
         {# Amount #}
-        <td class="px-3 py-3 whitespace-nowrap text-right font-bold text-gray-900 dark:text-white">
+        <td class="px-3 py-3 whitespace-nowrap text-right font-bold text-gray-900 dark: text-white">
             {{ order.amount }} {{ app_currency }}
         </td>
 
@@ -41,29 +42,71 @@ Table Macros - Reusable table row components
 
         {# Status Badge #}
         <td class="px-3 py-3 whitespace-nowrap text-center">
-            {% include 'components/status_badge.html.twig' with {
-                status: order.status
+            {% include 'components/badge.html.twig' with {
+                text:  order.status,
+                color: order.statusColor|default('blue'),
+                shape: 'pill',
+                size: 'md'
             } %}
         </td>
 
-        {# Actions #}
+        {# Actions :  4 boutons d'édition de statut + lien détail #}
         <td class="px-3 py-3 whitespace-nowrap text-right">
-            <div class="flex items-center justify-end gap-2">
-                {% include 'components/icon_button.html.twig' with {
-                    icon: 'edit_note',
-                    title: 'Changer statut'
-                } %}
-                <a href="{{ path('app_details_order') }}">
-                    {% include 'components/icon_button.html.twig' with {
-                        icon: 'arrow_forward',
-                        title: 'Voir détails'
+            <div class="flex items-center justify-end gap-1">
+                {# Boutons de changement de statut #}
+                {% for statusKey, statusData in order.edit_status %}
+                    {% if statusData.allowed %}
+                        {# Formulaire POST pour changer le statut #}
+                        <form
+                            action="{{ path('app_order_change_status', {id: order.id}) }}"
+                            method="post"
+                            class="inline"
+                        >
+                            <input type="hidden" name="_token" value="{{ csrf_token('change-status-' ~ order.id) }}">
+                            <input type="hidden" name="etat" value="{{ statusData.value }}">
+                            <button
+                                type="submit"
+                                class="w-7 h-7 flex items-center justify-center rounded-md {{ statusData.colorSolid }} hover:scale-110 hover:shadow-md active:scale-95 transition-all cursor-pointer"
+                                title="{{ statusData.label }}"
+                            >
+                                {% include 'components/icon.html.twig' with {
+                                    name: statusData.icon,
+                                    size:  'text-[14px]'
+                                } %}
+                            </button>
+                        </form>
+                    {% else %}
+                        {# Bouton inactif (grisé, pas cliquable) #}
+                        <span
+                            class="w-7 h-7 flex items-center justify-center rounded-md bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-50"
+                            title="{{ statusData.label }} (non disponible)"
+                        >
+                            {% include 'components/icon.html.twig' with {
+                                name: statusData.icon,
+                                size: 'text-[14px]'
+                            } %}
+                        </span>
+                    {% endif %}
+                {% endfor %}
+
+                {# Séparateur vertical #}
+                <div class="w-px h-5 bg-gray-200 dark:bg-gray-600 mx-1"></div>
+
+                {# Lien vers détails #}
+                <a
+                    href="{{ path('app_details_order') }}"
+                    class="w-7 h-7 flex items-center justify-center rounded-md text-gray-500 hover:text-primary hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all"
+                    title="Voir détails"
+                >
+                    {% include 'components/icon.html.twig' with {
+                        name: 'arrow_forward',
+                        size: 'text-[16px]'
                     } %}
                 </a>
             </div>
         </td>
     </tr>
 {% endmacro %}
-
 
 {# ========================================
    MACRO 2: Order Item Row (pour les articles dans les détails de commande)

@@ -17,10 +17,10 @@ enum EtatCommande: string implements DisplayEnumInterface
     #[\Override] public function getLabel(): string
     {
         return match($this) {
-            self::EN_ATTENTE => throw new \Exception('To be implemented'),
-            self::EN_PREPARATION => throw new \Exception('To be implemented'),
-            self::TERMINER => throw new \Exception('To be implemented'),
-            self::ANNULER => throw new \Exception('To be implemented'),
+            self::EN_ATTENTE => 'En attente',
+            self::EN_PREPARATION => 'En preparation',
+            self::TERMINER => 'Terminer',
+            self::ANNULER => 'Annuler',
         };
     }
 
@@ -69,8 +69,32 @@ enum EtatCommande: string implements DisplayEnumInterface
     {
         return match ($this) {
             self::EN_ATTENTE => [self::EN_PREPARATION, self::ANNULER],
-            self::EN_PREPARATION => [self:: TERMINER, self::ANNULER],
+            self::EN_PREPARATION => [self::TERMINER, self::ANNULER],
             self::TERMINER, self::ANNULER => [],
         };
     }
+
+    /**
+     * Retourne un tableau indiquant pour chaque état s'il est accessible depuis l'état actuel
+     *
+     * @return array<string, array{value: string, allowed: bool, label: string, icon: string, colorSolid:  string}>
+     */
+    public function getEditableStatusMap(): array
+    {
+        $allowedTransitions = $this->getAllowedTransitions();
+        $map = [];
+
+        foreach (self::cases() as $case) {
+            $map[$case->value] = [
+                'value' => $case->value,
+                'allowed' => in_array($case, $allowedTransitions, true),
+                'label' => $case->getLabel(),
+                'icon' => $case->getIcon(),
+                'colorSolid' => $case->getColor()->getSolidBadgeClasses(),
+            ];
+        }
+
+        return $map;
+    }
+
 }

@@ -1,20 +1,23 @@
 {#
 Pagination Component
 
-@param int currentPage - Current page number
-@param int totalPages - Total number of pages
 @param int totalItems - Total number of items
 @param int itemsPerPage - Items per page
 @param int displayedItems - Number of items currently displayed
 #}
-{% set current = currentPage|default(1) %}
-{% set total = totalPages|default(1) %}
 {% set totalCount = totalItems|default(0) %}
 {% set perPage = itemsPerPage|default(10) %}
 {% set displayed = displayedItems|default(perPage) %}
 
+{% set current = app.request.query.get('page', 1) %}
+{% set total = (totalCount/displayed)|round(0, 'ceil') %}
 {% set startItem = ((current - 1) * perPage) + 1 %}
 {% set endItem = startItem + displayed - 1 %}
+
+{% set route = app.request.attributes.get('_route') %}
+{% set query_params = app.request.query.all %}
+{% set is_first_page = current <= 1 %}
+{% set is_last_page = current >= total %}
 
 <div class="px-6 py-4 border-t border-gray-100 dark:border-border-dark flex items-center justify-between">
     <p class="text-sm text-gray-500 dark:text-text-muted-dark">
@@ -27,46 +30,77 @@ Pagination Component
         commandes
     </p>
 
-    <nav class="flex items-center gap-4">
+    <nav class="flex items-center gap-4" aria-label="Pagination">
         {# Previous Button #}
-        <button
-            type="button"
-            {% if current <= 1 %}disabled{% endif %}
-            class="h-10 w-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-border-dark text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-            {% include 'components/icon.html.twig' with {
-                name: 'chevron_left',
-                size: 'text-[20px]'
-            } %}
-        </button>
+        {% if is_first_page %}
+            <button
+                disabled
+                aria-label="Page précédente"
+                class="h-10 w-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-border-dark text-gray-500 opacity-50 cursor-not-allowed transition-colors"
+            >
+                {% include 'components/icon.html.twig' with {
+                    name: 'chevron_left',
+                    size: 'text-[20px]'
+                } %}
+            </button>
+        {% else %}
+            <a
+                href="{{ path(route, query_params|merge({'page': current - 1})) }}"
+                aria-label="Page précédente"
+                class="h-10 w-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-border-dark text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+            >
+                {% include 'components/icon.html.twig' with {
+                    name: 'chevron_left',
+                    size: 'text-[20px]'
+                } %}
+            </a>
+        {% endif %}
 
         {# Page Selector #}
         <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-            <span class="font-medium">Page</span>
+            <label for="page-select" class="font-medium">Page</label>
             <div class="relative">
                 <select
+                    id="page-select"
                     name="page"
+                    onchange="window.location.href = '{{ path(route, query_params|merge({'page': '__PAGE__'})) }}'.replace('__PAGE__', this.value)"
+                    aria-label="Sélectionner une page"
                     class="appearance-none pl-3 pr-8 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-white font-bold focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all cursor-pointer"
                 >
                     {% for page in 1..total %}
-                        <option value="{{ page }}" {% if page == current %}selected{% endif %}>{{ page }}</option>
+                        <option value="{{ page }}" {% if page == current %}selected{% endif %}>
+                            {{ page }}
+                        </option>
                     {% endfor %}
                 </select>
-                <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[18px]">expand_more</span>
+
             </div>
             <span class="font-medium">sur {{ total }}</span>
         </div>
 
         {# Next Button #}
-        <button
-            type="button"
-            {% if current >= total %}disabled{% endif %}
-            class="h-10 w-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-border-dark text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-            {% include 'components/icon.html.twig' with {
-                name: 'chevron_right',
-                size: 'text-[20px]'
-            } %}
-        </button>
+        {% if is_last_page %}
+            <button
+                disabled
+                aria-label="Page suivante"
+                class="h-10 w-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-border-dark text-gray-500 opacity-50 cursor-not-allowed transition-colors"
+            >
+                {% include 'components/icon.html.twig' with {
+                    name: 'chevron_right',
+                    size: 'text-[20px]'
+                } %}
+            </button>
+        {% else %}
+            <a
+                href="{{ path(route, query_params|merge({'page': current + 1})) }}"
+                aria-label="Page suivante"
+                class="h-10 w-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-border-dark text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+            >
+                {% include 'components/icon.html.twig' with {
+                    name: 'chevron_right',
+                    size: 'text-[20px]'
+                } %}
+            </a>
+        {% endif %}
     </nav>
 </div>

@@ -21,108 +21,14 @@
         filters: filters|default({})
     } %}
 
-    {# Orders Table #}
-    {% set sampleOrders = [
-        {
-            date: '24 Oct 2024',
-            time: '14:30',
-            code: '#CMD-8924',
-            type: 'MENU',
-            typeColor: 'blue',
-            amount: '4 500',
-            clientName: 'Amadou Diallo',
-            clientPhone: '+221 77 123 45 67',
-            status: 'processing'
-        },
-        {
-            date: '24 Oct 2024',
-            time: '14:45',
-            code: '#CMD-8925',
-            type: 'BURGER SIMPLE',
-            typeColor: 'yellow',
-            amount: '3 500',
-            clientName: 'Fatou Diop',
-            clientPhone: '+221 76 890 12 34',
-            status: 'pending'
-        },
-        {
-            date: '24 Oct 2024',
-            time: '13:15',
-            code: '#CMD-8920',
-            type: 'MENU',
-            typeColor: 'blue',
-            amount: '9 000',
-            clientName: 'Oumar Sow',
-            clientPhone: '+221 70 654 98 70',
-            status: 'completed'
-        },
-        {
-            date: '24 Oct 2024',
-            time: '11:50',
-            code: '#CMD-8912',
-            type: 'BURGER SIMPLE',
-            typeColor: 'yellow',
-            amount: '3 000',
-            clientName: 'Amina Fall',
-            clientPhone: '+221 77 333 22 11',
-            status: 'cancelled'
-        },
-        {
-            date: '24 Oct 2024',
-            time: '15:10',
-            code: '#CMD-8926',
-            type: 'MENU',
-            typeColor: 'blue',
-            amount: '6 000',
-            clientName: 'Ndèye Gueye',
-            clientPhone: '+221 78 555 44 33',
-            status: 'completed'
-        },
-        {
-            date: '24 Oct 2024',
-            time: '15:12',
-            code: '#CMD-8927',
-            type: 'BURGER SIMPLE',
-            typeColor: 'yellow',
-            amount: '3 500',
-            clientName: 'Cheikh Ba',
-            clientPhone: '+221 77 999 88 77',
-            status: 'pending'
-        },
-        {
-            date: '23 Oct 2024',
-            time: '19:05',
-            code: '#CMD-8901',
-            type: 'MENU',
-            typeColor: 'blue',
-            amount: '5 000',
-            clientName: 'Mariama Camara',
-            clientPhone: '+221 76 111 22 33',
-            status: 'cancelled'
-        },
-        {
-            date: '23 Oct 2024',
-            time: '20:30',
-            code: '#CMD-8905',
-            type: 'MENU',
-            typeColor: 'blue',
-            amount: '4 500',
-            clientName: 'Ibrahim Ndiaye',
-            clientPhone: '+221 70 777 66 55',
-            status: 'processing'
-        }
-    ] %}
-
     {% include 'partials/orders/orders_table.html.twig' with {
-        orders: orders|default(sampleOrders)
+        orders: orders|default([])
     } %}
 
     {# Pagination #}
     {% include 'components/pagination.html.twig' with {
-        currentPage: currentPage|default(1),
-        totalPages: totalPages|default(8),
         totalItems: totalItems|default(128),
         itemsPerPage: itemsPerPage|default(8),
-        displayedItems: orders|default(sampleOrders)|length
+        displayedItems: orders|default(orders)|length
     } %}
 {% endblock %}

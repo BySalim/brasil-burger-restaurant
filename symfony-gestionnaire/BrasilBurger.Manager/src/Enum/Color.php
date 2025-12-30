@@ -56,6 +56,26 @@ enum Color: string
         };
     }
 
+    /**
+     * Retourne les classes Tailwind CSS pour un badge foncé (fond coloré, texte blanc)
+     */
+    public function getSolidBadgeClasses(): string
+    {
+        return match($this) {
+            self::BLUE => 'bg-blue-600 text-white border-blue-700 dark:bg-blue-700 dark:border-blue-800',
+            self:: INDIGO => 'bg-indigo-600 text-white border-indigo-700 dark: bg-indigo-700 dark:border-indigo-800',
+            self::PURPLE => 'bg-purple-600 text-white border-purple-700 dark:bg-purple-700 dark:border-purple-800',
+            self::PINK => 'bg-pink-600 text-white border-pink-700 dark:bg-pink-700 dark:border-pink-800',
+            self::RED => 'bg-red-600 text-white border-red-700 dark:bg-red-700 dark:border-red-800',
+            self::ORANGE => 'bg-orange-600 text-white border-orange-700 dark:bg-orange-700 dark:border-orange-800',
+            self::YELLOW => 'bg-yellow-500 text-white border-yellow-600 dark:bg-yellow-600 dark:border-yellow-700',
+            self::GREEN => 'bg-green-600 text-white border-green-700 dark:bg-green-700 dark:border-green-800',
+            self::TEAL => 'bg-teal-600 text-white border-teal-700 dark:bg-teal-700 dark:border-teal-800',
+            self::CYAN => 'bg-cyan-600 text-white border-cyan-700 dark:bg-cyan-700 dark:border-cyan-800',
+            self::GRAY => 'bg-gray-600 text-white border-gray-700 dark:bg-gray-700 dark:border-gray-800',
+            self::SLATE => 'bg-slate-600 text-white border-slate-700 dark:bg-slate-700 dark:border-slate-800',
+        };
+    }
 
     /**
      * Retourne le label traduit de la couleur
