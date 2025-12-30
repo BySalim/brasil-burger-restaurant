@@ -29,7 +29,7 @@ final class TestVueController extends AbstractController
     private const ETATS_ACTIONS = [
 
     ];
-    #[Route('/test/orders', name: 'app_orders')]
+    #[Route('/test/orders', name: 'dddd')]
     public function commandes(Request $request): Response
     {
         $form = $this->createForm(OrderFilterType::class);

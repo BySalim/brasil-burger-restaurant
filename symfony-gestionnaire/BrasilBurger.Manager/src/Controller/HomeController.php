@@ -8,6 +8,7 @@ use App\Repository\ArticleRepository;
 use App\Repository\CommandeRepository;
 use App\Service\RevenueCalcService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,10 +18,13 @@ class HomeController extends AbstractController
     private const ITEMS_TOP_PRODUCTS_DEFAULT = 3;
     private const ADD_ITEMS_TOP_PRODUCTS_DEFAULT = 3;
 
-    public function __construct(private readonly CommandeRepository $commandeRepository, private readonly ArticleRepository $articleRepository)
+    public function __construct(
+        private readonly CommandeRepository $commandeRepository,
+        private readonly ArticleRepository  $articleRepository,
+        private readonly ParameterBagInterface $params,
+    )
     {
     }
-
 
 
     #[Route(['/', '/dashboard'], name: 'app_home')]
@@ -36,21 +40,23 @@ class HomeController extends AbstractController
             $selectedDate = new \DateTime();
         }
 
-        $limit = $request->query->getInt('limit', self::ITEMS_TOP_PRODUCTS_DEFAULT);
+        $per_page = $this->params->get('app.pagination.default_per_page');
+        $limit = $request->query->getInt('limit', $per_page);
+        $limit = $limit < $per_page ? $per_page : $limit;
 
         $dailyStats = $this->commandeRepository->getDailyStatsByDate($selectedDate);
 
         $stats = $dashboardView->createStatsView(
-                DailyStatsDTO::indexByEtat($dailyStats),
-                $revunueCalc->calculateTotalRevenue($dailyStats)
-            );
+            DailyStatsDTO::indexByEtat($dailyStats),
+            $revunueCalc->calculateTotalRevenue($dailyStats)
+        );
 
         $articlesVendu = $this->articleRepository->findTopArticlesByDate($selectedDate, $limit);
         $totalProducts = $this->articleRepository->countDistinctArticlesSold($selectedDate);
         $products = $dashboardView->createTopProductsView($articlesVendu);
 
-        // 3. Calcul pour le bouton "Afficher plus"
-        $nextLimit = $limit + self::ADD_ITEMS_TOP_PRODUCTS_DEFAULT;
+        // Calcul la suite
+        $nextLimit = $limit + $per_page;
 
         return $this->render('dashboard/index.html.twig', [
             'dailyStats' => $stats,

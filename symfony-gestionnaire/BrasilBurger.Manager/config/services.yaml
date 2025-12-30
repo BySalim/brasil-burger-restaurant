@@ -3,6 +3,12 @@ parameters:
     cloudinary.cloud_name: '%env(CLOUDINARY_CLOUD_NAME)%'
     cloudinary.base_url: 'https://res.cloudinary.com'
     app.default_currency: 'F CFA'
+    app.pagination.per_page_choices:
+        "4": 4
+        "8": 8
+        "15": 15
+        "20": 20
+    app.pagination.default_per_page: 4
 
 services:
     _defaults:

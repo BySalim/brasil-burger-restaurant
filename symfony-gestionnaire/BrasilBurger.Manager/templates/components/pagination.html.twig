@@ -10,7 +10,7 @@ Pagination Component
 {% set displayed = displayedItems|default(perPage) %}
 
 {% set current = app.request.query.get('page', 1) %}
-{% set total = (totalCount/displayed)|round(0, 'ceil') %}
+{% set total = (totalCount/perPage)|round(0, 'ceil') %}
 {% set startItem = ((current - 1) * perPage) + 1 %}
 {% set endItem = startItem + displayed - 1 %}
 
