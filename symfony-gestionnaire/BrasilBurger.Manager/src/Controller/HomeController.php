@@ -25,7 +25,8 @@ class HomeController extends AbstractController
     }
 
 
-    #[Route('/dashboard', name: 'app_home')]
+
+    #[Route(['/', '/dashboard'], name: 'app_home')]
     public function index(Request $request, DashboardViewFactory $dashboardView, RevenueCalcService $revunueCalc): Response
     {
         $dateString = $request->query->get('date', new \DateTime()->format('Y-m-d'));
@@ -38,7 +39,6 @@ class HomeController extends AbstractController
             $selectedDate = new \DateTime();
         }
 
-        // Si pas de limite, on affiche 5 produits par défaut.
         $limit = $request->query->getInt('limit', self::ITEMS_TOP_PRODUCTS_DEFAULT);
 
         $dailyStats = $this->commandeRepository->getDailyStatsByDate($selectedDate);
@@ -49,8 +49,8 @@ class HomeController extends AbstractController
             );
 
         $articlesVendu = $this->articleRepository->findTopArticlesByDate($selectedDate, $limit);
-        var_dump($articlesVendu);die();
-        ['items' => $products, 'total' => $totalProducts] = $this->getTopProducts($dateString, $limit);
+        $totalProducts = $this->articleRepository->countDistinctArticlesSold($selectedDate);
+        $products = $dashboardView->createTopProductsView($articlesVendu);
 
         // 3. Calcul pour le bouton "Afficher plus"
         $nextLimit = $limit + self::ADD_ITEMS_TOP_PRODUCTS_DEFAULT;

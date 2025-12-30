@@ -22,7 +22,7 @@ enum CategoriePanier: string implements DisplayEnumInterface
     {
         return match($this) {
             self::BURGER => 'blue',
-            self::MENU => 'green',
+            self::MENU => 'yellow',
         };
     }
 

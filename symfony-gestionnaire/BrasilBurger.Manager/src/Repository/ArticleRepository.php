@@ -53,29 +53,36 @@ class ArticleRepository extends ServiceEntityRepository
      * Récupére les articles les plus populaires d'une journée
      * @return ArticleVenduDTO[]
      */
-    public function findTopArticlesByDate(\DateTimeInterface $date, int $limit): array
+    public function findTopArticlesByDate(\DateTimeInterface $date, int $limit = 5): array
     {
+        // Créer la plage horaire de la journée (00:00:00 à 23:59:59)
+        $startDate = (clone $date)->setTime(0, 0, 0);
+        $endDate   = (clone $date)->setTime(23, 59, 59);
+
         return $this->createQueryBuilder('a')
+            // Sélection via le DTO
             ->select(sprintf(
                 'NEW %s(a, SUM(aq.quantite))',
                 ArticleVenduDTO::class
             ))
 
-            // Les Jointures (Article -> Quantifier -> Panier -> Commande)
+            // Les Jointures
             ->join('a.articleQuantifiers', 'aq')
             ->join('aq.panier', 'p')
             ->join('p.commande', 'c')
 
-            ->groupBy('a.id')
+            ->groupBy('a')
+
             ->orderBy('SUM(aq.quantite)', 'DESC')
             ->setMaxResults($limit)
 
-            ->where('c.dateDebut = :date')
+            ->where('c.dateDebut BETWEEN :start AND :end')
             ->andWhere('c.etat != :etatAnnule')
 
-            ->setParameter('date', $date->format('Y-m-d'))
-
-            ->setParameter('etatAnnule', EtatCommande::ANNULER->value)
+            // Paramètres
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->setParameter('etatAnnule', EtatCommande::ANNULER)
 
             ->getQuery()
             ->getResult();
@@ -86,20 +93,26 @@ class ArticleRepository extends ServiceEntityRepository
      */
     public function countDistinctArticlesSold(\DateTimeInterface $date): int
     {
-        return $this->createQueryBuilder('a')
+        // Définir la plage horaire de 00:00:00 à 23:59:59
+        $startDate = (clone $date)->setTime(0, 0, 0);
+        $endDate   = (clone $date)->setTime(23, 59, 59);
+
+        $result = $this->createQueryBuilder('a')
             ->select('COUNT(DISTINCT a.id)')
 
             ->join('a.articleQuantifiers', 'aq')
             ->join('aq.panier', 'p')
             ->join('p.commande', 'c')
 
-            ->where('c.dateDebut = :date')
+            ->where('c.dateDebut BETWEEN :start AND :end')
             ->andWhere('c.etat != :etatAnnule')
 
-            ->setParameter('date', $date->format('Y-m-d'))
-            ->setParameter('etatAnnule', EtatCommande::ANNULER->value)
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->setParameter('etatAnnule', EtatCommande::ANNULER)
 
             ->getQuery()
             ->getSingleScalarResult();
-    }
-}
+
+        return (int) $result;
+    }}

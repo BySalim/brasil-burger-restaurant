@@ -42,18 +42,18 @@ enum CategorieArticle: string implements DisplayEnumInterface
     #[\Override] public function getLabel(): string
     {
         return match($this) {
-            self::BURGER => throw new \Exception('To be implemented'),
-            self::MENU => throw new \Exception('To be implemented'),
-            self::COMPLEMENT => throw new \Exception('To be implemented'),
+            self::BURGER => 'Burger',
+            self::MENU => 'Menu',
+            self::COMPLEMENT => 'Complément',
         };
     }
 
     #[\Override] public function getColor(): string
     {
         return match($this) {
-            self::BURGER => throw new \Exception('To be implemented'),
-            self::MENU => throw new \Exception('To be implemented'),
-            self::COMPLEMENT => throw new \Exception('To be implemented'),
+            self::BURGER => 'blue',
+            self::MENU => 'yellow',
+            self::COMPLEMENT => 'gray',
         };
     }
 
