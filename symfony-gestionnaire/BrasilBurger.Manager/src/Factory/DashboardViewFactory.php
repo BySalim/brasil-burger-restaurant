@@ -17,9 +17,10 @@ class DashboardViewFactory
         $stats = [];
 
         foreach (EtatCommande::cases() as $etat) {
+            $value = $dailyStatsByState[$etat->value]->count ?? 0;
             $stats[] = new DashboardStatViewModel(
                 title: $etat->getCardTitle(),
-                value: $dailyStatsByState[$etat->value]->count,
+                value: $value,
                 icon: $etat->getIcon(),
                 iconBg: $etat->getIconBg(),
             );

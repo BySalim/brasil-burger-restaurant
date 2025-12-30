@@ -6,6 +6,7 @@ use App\DTO\DailyStatsDTO;
 use App\Enum\CategoriePanier;
 use App\Enum\EtatCommande;
 use App\Factory\DashboardViewFactory;
+use App\Repository\CommandeRepository;
 use App\Service\RevenueCalcService;
 use App\ViewModel\TopProductViewModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,22 +19,36 @@ class HomeController extends AbstractController
     private const ITEMS_TOP_PRODUCTS_DEFAULT = 3;
     private const ADD_ITEMS_TOP_PRODUCTS_DEFAULT = 3;
 
+    public function __construct(private CommandeRepository $commandeRepository)
+    {
+    }
+
+
     #[Route('/dashboard', name: 'app_home')]
     public function index(Request $request, DashboardViewFactory $dashboardView, RevenueCalcService $revunueCalc): Response
     {
-        $selectedDate = $request->query->get('date', new \DateTime()->format('Y-m-d'));
+        $dateString = $request->query->get('date', new \DateTime()->format('Y-m-d'));
+
+        try {
+            // Transformation en Objet
+            $selectedDate = new \DateTime($dateString);
+        } catch (\Exception $e) {
+            // Sécurité : Si le format est invalide, on force la date du jour
+            $selectedDate = new \DateTime();
+        }
 
         // Si pas de limite, on affiche 5 produits par défaut.
         $limit = $request->query->getInt('limit', self::ITEMS_TOP_PRODUCTS_DEFAULT);
 
-        // 2. Récupération des données (Ici je simule, plus tard on appellera un Service/Repository)
-        $dailyStats = $this->getDailyStats($selectedDate);
-        $stats = $dashboardView
-            ->createStatsView(
+        $dailyStats = $this->commandeRepository->getDailyStatsByDate($selectedDate);
+//        var_dump($dailyStats);die();
+
+        $stats = $dashboardView->createStatsView(
                 DailyStatsDTO::indexByEtat($dailyStats),
                 $revunueCalc->calculateTotalRevenue($dailyStats)
             );
-        ['items' => $products, 'total' => $totalProducts] = $this->getTopProducts($selectedDate, $limit);
+
+        ['items' => $products, 'total' => $totalProducts] = $this->getTopProducts($dateString, $limit);
 
         // 3. Calcul pour le bouton "Afficher plus"
         $nextLimit = $limit + self::ADD_ITEMS_TOP_PRODUCTS_DEFAULT;
@@ -42,7 +57,7 @@ class HomeController extends AbstractController
             'dailyStats' => $stats,
             'topProducts' => $products,
             'totalProducts' => $totalProducts,
-            'selectedDate' => $selectedDate,
+            'selectedDate' => $dateString,
             'currentLimit' => $limit,
             'nextLimit' => $nextLimit,
         ]);
