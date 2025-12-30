@@ -1,14 +1,19 @@
 {#
-Top Products Table
+Top Products Table Partial
 
-@param array products - Array of top products
-    Each product: name, category, categoryColor, price, sales, total, imageUrl, fallbackIcon
-@param string title - Table title
-@param string subtitle - Table subtitle
+@param array products - Array of TopProductDTO objects
+@param string title - Table title (default: 'Burgers ou menu les plus vendus')
+@param string subtitle - Table subtitle (default: 'Performance des ventes')
+@param string currentDate - The currently selected date (to keep context in pagination)
+@param int nextLimit - The limit to apply when clicking "Show More"
 #}
 {% set productsList = products|default([]) %}
+{% set totalProducts = totalProducts|default(products|length) %}
 {% set tableTitle = title|default('Burgers ou menu les plus vendus') %}
 {% set tableSubtitle = subtitle|default('Performance des ventes') %}
+{% set dateParam = currentDate|default('now'|date('Y-m-d')) %}
+{% set nextLimitParam = nextLimit|default(6) %}
+{% set limit = limit|default(3) %}
 
 <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm">
     {# Header #}
@@ -17,8 +22,8 @@ Top Products Table
         <p class="text-sm text-gray-500 dark:text-text-muted-dark">{{ tableSubtitle }}</p>
     </div>
 
-    {# Table #}
-    <div class="overflow-x-auto">
+    {# Table Wrapper #}
+    <div class="">
         <table class="w-full text-left">
             <thead>
             <tr class="bg-gray-50/50 dark:bg-slate-900/30 text-xs uppercase tracking-wider text-gray-500 dark:text-text-muted-dark font-semibold border-b border-gray-100 dark:border-border-dark">
@@ -49,22 +54,36 @@ Top Products Table
                             color: product.categoryColor|default('blue')
                         } %}
                     </td>
-                    <td class="px-6 py-4 text-right font-medium text-gray-600 dark:text-text-muted-dark">{{ product.price }} FCFA</td>
+                    <td class="px-6 py-4 text-right font-medium text-gray-600 dark:text-text-muted-dark">{{ product.price|app_number_formated }} {{ app_currency }}</td>
                     <td class="px-6 py-4 text-center">
-                        <span class="font-bold text-gray-900 dark:text-white">{{ product.sales }}</span>
+                        <span class="font-bold text-gray-900 dark:text-white">{{ product.sales|app_number_formated }}</span>
                     </td>
-                    <td class="px-6 py-4 text-right font-bold text-primary">{{ product.total }} FCFA</td>
+                    <td class="px-6 py-4 text-right font-bold text-primary">{{ (product.price * product.sales)|app_number_formated }} {{ app_currency }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-slate-400">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            {% include 'components/icon.html.twig' with { name: 'inbox', size: 'text-4xl', class: 'opacity-50' } %}
+                            <p>Aucune vente enregistrée pour cette date.</p>
+                        </div>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
-    {# Footer #}
-    <div class="px-6 py-4 border-t border-gray-100 dark:border-border-dark bg-gray-50/50 dark:bg-slate-900/30 flex justify-center">
-        {% include 'components/button_text.html.twig' with {
-            text: 'Afficher plus de résultats',
-            href: '#'
-        } %}
-    </div>
+    {# Footer avec lien de pagination #}
+    {% if productsList is not empty and totalProducts > limit %}
+        <div class="px-6 py-4 border-t border-gray-100 dark:border-border-dark bg-gray-50/50 dark:bg-slate-900/30 flex justify-center">
+            {% include 'components/button_text.html.twig' with {
+                text: 'Afficher plus de résultats',
+                href: path('app_home', {
+                    'date': dateParam,
+                    'limit': nextLimitParam
+                })
+            } %}
+        </div>
+    {% endif %}
 </div>

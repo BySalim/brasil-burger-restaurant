@@ -1,12 +1,11 @@
 {#
-Statistics Grid
+Statistics Grid - Simple Auto Layout
 
 @param array stats - Array of statistics
-    Each stat should have: title, value, icon, iconBg, valueUnit (optional)
 #}
 {% set statistics = stats|default([]) %}
 
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+<div class="flex flex-wrap gap-3 mb-6">
     {% for stat in statistics %}
         {% include 'components/stat_card.html.twig' with {
             title: stat.title,

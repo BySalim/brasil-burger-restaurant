@@ -5,6 +5,7 @@ twig:
         site_logo_icon_main: 'images/logos/logo_thème_color_sans_fond-no_title.png'
         site_logo_icon_black: 'images/logos/logo_thème_black_sans_fond-no_title.png'
         site_logo_icon_white: 'images/logos/logo_thème_blanc_sans_fond-no_title.png'
+        app_currency: '%app.default_currency%'
 
 when@test:
     twig:
