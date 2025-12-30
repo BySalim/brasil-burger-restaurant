@@ -6,6 +6,7 @@ use App\DTO\DailyStatsDTO;
 use App\Enum\CategoriePanier;
 use App\Enum\EtatCommande;
 use App\Factory\DashboardViewFactory;
+use App\Repository\ArticleRepository;
 use App\Repository\CommandeRepository;
 use App\Service\RevenueCalcService;
 use App\ViewModel\TopProductViewModel;
@@ -19,7 +20,7 @@ class HomeController extends AbstractController
     private const ITEMS_TOP_PRODUCTS_DEFAULT = 3;
     private const ADD_ITEMS_TOP_PRODUCTS_DEFAULT = 3;
 
-    public function __construct(private CommandeRepository $commandeRepository)
+    public function __construct(private readonly CommandeRepository $commandeRepository, private readonly ArticleRepository $articleRepository)
     {
     }
 
@@ -41,13 +42,14 @@ class HomeController extends AbstractController
         $limit = $request->query->getInt('limit', self::ITEMS_TOP_PRODUCTS_DEFAULT);
 
         $dailyStats = $this->commandeRepository->getDailyStatsByDate($selectedDate);
-//        var_dump($dailyStats);die();
 
         $stats = $dashboardView->createStatsView(
                 DailyStatsDTO::indexByEtat($dailyStats),
                 $revunueCalc->calculateTotalRevenue($dailyStats)
             );
 
+        $articlesVendu = $this->articleRepository->findTopArticlesByDate($selectedDate, $limit);
+        var_dump($articlesVendu);die();
         ['items' => $products, 'total' => $totalProducts] = $this->getTopProducts($dateString, $limit);
 
         // 3. Calcul pour le bouton "Afficher plus"
@@ -63,22 +65,6 @@ class HomeController extends AbstractController
         ]);
     }
 
-    /**
-     * Simule la récupération des stats depuis la BDD
-     * @param string $date
-     * @return DailyStatsDTO[]
-     */
-    private function getDailyStats(string $date): array
-    {
-        // TODO: Remplacer par $repository->countOrdersByDate($date)...
-        $data = [];
-        $data[] = new DailyStatsDTO(EtatCommande::EN_ATTENTE, 10, 5000);
-        $data[] = new DailyStatsDTO(EtatCommande::EN_PREPARATION, 12, 10000);
-        $data[] = new DailyStatsDTO(EtatCommande::TERMINER, 15, 8000);
-        $data[] = new DailyStatsDTO(EtatCommande::ANNULER, 5, 6000);
-
-        return $data;
-    }
 
     /**
      * Simule la récupération des produits
