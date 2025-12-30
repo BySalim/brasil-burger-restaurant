@@ -8,10 +8,7 @@ use App\ViewModel\DashboardStatViewModel;
 class DashboardViewMapper
 {
     /**
-     * @param array<string, int> $dataBase Données brutes.
-     * Structure attendue :
-     * + Clés dynamiques : correspond aux valeurs de l'enum EtatCommande (ex: 'EN_ATTENTE' => 10)
-     * + Clé spéciale : 'total_revenu' (int) pour la recette
+     * @param array<value-of<EtatCommande>|'total_revenue', int> $dataBase
      * @return DashboardStatViewModel[]
      */
     public function createStats(array $dataBase): array
@@ -52,5 +49,10 @@ class DashboardViewMapper
     private function extractValueForState(array $data, EtatCommande $etat): int
     {
         return $data[$etat->value] ?? 0;
+    }
+
+    public function createTopProducts()
+    {
+
     }
 }
