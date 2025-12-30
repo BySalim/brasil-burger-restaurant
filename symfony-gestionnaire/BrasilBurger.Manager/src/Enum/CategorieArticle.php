@@ -37,4 +37,40 @@ enum CategorieArticle: string
             self::COMPLEMENT => 'complements',
         };
     }
+
+    public function getLabel(): string
+    {
+        return match($this) {
+            self::BURGER => throw new \Exception('To be implemented'),
+            self::MENU => throw new \Exception('To be implemented'),
+            self::COMPLEMENT => throw new \Exception('To be implemented'),
+        };
+    }
+
+    public function getColor(): string
+    {
+        return match($this) {
+            self::BURGER => throw new \Exception('To be implemented'),
+            self::MENU => throw new \Exception('To be implemented'),
+            self::COMPLEMENT => throw new \Exception('To be implemented'),
+        };
+    }
+
+    public function getIcon(): string
+    {
+        return match($this) {
+            self::BURGER => throw new \Exception('To be implemented'),
+            self::MENU => throw new \Exception('To be implemented'),
+            self::COMPLEMENT => throw new \Exception('To be implemented'),
+        };
+    }
+
+    public function getIconBg(): string
+    {
+        return match($this) {
+            self::BURGER => throw new \Exception('To be implemented'),
+            self::MENU => throw new \Exception('To be implemented'),
+            self::COMPLEMENT => throw new \Exception('To be implemented'),
+        };
+    }
 }
