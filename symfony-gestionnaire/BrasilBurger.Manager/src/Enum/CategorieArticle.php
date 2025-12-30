@@ -63,27 +63,27 @@ enum CategorieArticle: string implements DisplayEnumInterface
     #[\Override] public function getIcon(): string
     {
         return match($this) {
-            self::BURGER => throw new \Exception('To be implemented'),
-            self::MENU => throw new \Exception('To be implemented'),
-            self::COMPLEMENT => throw new \Exception('To be implemented'),
+            self::BURGER => 'lunch_dining',
+            self::MENU => 'restaurant_menu',
+            self::COMPLEMENT => 'fastfood',
         };
     }
 
     #[\Override] public function getIconBg(): string
     {
         return match($this) {
-            self::BURGER => throw new \Exception('To be implemented'),
-            self::MENU => throw new \Exception('To be implemented'),
-            self::COMPLEMENT => throw new \Exception('To be implemented'),
+            self::BURGER => 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
+            self::MENU => 'bg-yellow-50 dark:bg-yellow-900/10 text-yellow-600',
+            self::COMPLEMENT => 'bg-gray-50 dark:bg-gray-900/10 text-gray-600',
         };
     }
 
     #[\Override] public function getCardTitle(): string
     {
         return match($this) {
-            self::BURGER => throw new \Exception('To be implemented'),
-            self::MENU => throw new \Exception('To be implemented'),
-            self::COMPLEMENT => throw new \Exception('To be implemented'),
+            self::BURGER => 'Burgers',
+            self::MENU => 'Menus',
+            self::COMPLEMENT => 'Compléments',
         };
     }
 }

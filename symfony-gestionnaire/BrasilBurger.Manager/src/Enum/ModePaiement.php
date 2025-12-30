@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Enum;
 
 use App\Base\DisplayEnumInterface;
@@ -15,40 +14,40 @@ enum ModePaiement: string implements DisplayEnumInterface
     #[\Override] public function getLabel(): string
     {
         return match($this) {
-            self::WAVE => throw new \Exception('To be implemented'),
-            self::OM => throw new \Exception('To be implemented'),
+            self:: WAVE => 'Wave',
+            self::OM => 'Orange Money',
         };
     }
 
     #[\Override] public function getColor(): string
     {
         return match($this) {
-            self::WAVE => throw new \Exception('To be implemented'),
-            self::OM => throw new \Exception('To be implemented'),
+            self::WAVE => 'blue',
+            self::OM => 'orange',
         };
     }
 
     #[\Override] public function getIcon(): string
     {
         return match($this) {
-            self::WAVE => throw new \Exception('To be implemented'),
-            self::OM => throw new \Exception('To be implemented'),
+            self::WAVE => 'account_balance_wallet',
+            self::OM => 'phone_android',
         };
     }
 
     #[\Override] public function getIconBg(): string
     {
         return match($this) {
-            self::WAVE => throw new \Exception('To be implemented'),
-            self::OM => throw new \Exception('To be implemented'),
+            self::WAVE => 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
+            self::OM => 'bg-orange-50 dark:bg-orange-900/10 text-orange-600',
         };
     }
 
     #[\Override] public function getCardTitle(): string
     {
         return match($this) {
-            self::WAVE => throw new \Exception('To be implemented'),
-            self::OM => throw new \Exception('To be implemented'),
+            self::WAVE => 'Paiements Wave',
+            self::OM => 'Paiements Orange Money',
         };
     }
 }

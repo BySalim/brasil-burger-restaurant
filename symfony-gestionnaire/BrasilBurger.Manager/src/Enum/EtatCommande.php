@@ -63,4 +63,24 @@ enum EtatCommande: string implements DisplayEnumInterface
             self::ANNULER => 'bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-500',
         };
     }
+
+    /*
+     * Déterminer si on peut changer l'état
+     */
+    public function isFinal(): bool
+    {
+        return in_array($this, [self:: TERMINER, self::ANNULER]);
+    }
+
+    /*
+     * Définir les règles de conversion de chaque état
+     */
+    public function getAllowedTransitions(): array
+    {
+        return match ($this) {
+            self::EN_ATTENTE => [self::EN_PREPARATION, self::ANNULER],
+            self::EN_PREPARATION => [self:: TERMINER, self::ANNULER],
+            self::TERMINER, self::ANNULER => [],
+        };
+    }
 }
