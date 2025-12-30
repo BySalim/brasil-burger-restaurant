@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\DTO\DashboardStatDTO;
 use App\DTO\TopProductDTO;
 use App\Enum\CategoriePanier;
+use App\Enum\EtatCommande;
+use App\Mapper\DashboardMapper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +18,7 @@ class HomeController extends AbstractController
     private const ADD_ITEMS_TOP_PRODUCTS_DEFAULT = 3;
 
     #[Route('/dashboard', name: 'app_home')]
-    public function index(Request $request): Response
+    public function index(Request $request, DashboardMapper $dashboardMapper): Response
     {
         $selectedDate = $request->query->get('date', new \DateTime()->format('Y-m-d'));
 
@@ -24,11 +26,11 @@ class HomeController extends AbstractController
         $limit = $request->query->getInt('limit', self::ITEMS_TOP_PRODUCTS_DEFAULT);
 
         // 2. Récupération des données (Ici je simule, plus tard on appellera un Service/Repository)
-        $stats = $this->getDailyStats($selectedDate);
+        $stats = $this->getDailyStats($selectedDate, $dashboardMapper);
         ['items' => $products, 'total' => $totalProducts] = $this->getTopProducts($selectedDate, $limit);
 
         // 3. Calcul pour le bouton "Afficher plus"
-        $nextLimit = $limit + self::ITEMS_TOP_PRODUCTS_DEFAULT;
+        $nextLimit = $limit + self::ADD_ITEMS_TOP_PRODUCTS_DEFAULT;
 
         return $this->render('dashboard/index.html.twig', [
             'dailyStats' => $stats,
@@ -43,12 +45,23 @@ class HomeController extends AbstractController
     /**
      * Simule la récupération des stats depuis la BDD
      * @param string $date
-     * @return DashboardStatDTO
+     * @param DashboardMapper $dashboardMapper
+     * @return DashboardStatDTO[]
      */
-    private function getDailyStats(string $date): DashboardStatDTO
+    private function getDailyStats(string $date, DashboardMapper $dashboardMapper): array
     {
         // TODO: Remplacer par $repository->countOrdersByDate($date)...
-        return new DashboardStatDTO(10, 12, 15, 5, 450000000);
+
+        /** * @var array<value-of<EtatCommande>|'total_revenue', int> $donnes */
+        $donnes = [
+          EtatCommande::EN_ATTENTE->value => 10,
+          EtatCommande::EN_PREPARATION->value => 12,
+          EtatCommande::TERMINER->value => 15,
+          EtatCommande::ANNULER->value => 5,
+          'total_revenue' => 450000,
+        ];
+
+        return $dashboardMapper->createStats($donnes);
     }
 
     /**

@@ -9,10 +9,10 @@ Statistics Grid - Simple Auto Layout
     {% for stat in statistics %}
         {% include 'components/stat_card.html.twig' with {
             title: stat.title,
-            value: stat.value,
+            value: stat.value|app_number_formated,
             icon: stat.icon,
             iconBg: stat.iconBg,
-            valueUnit: stat.valueUnit|default('')
+            valueUnit: stat.isPrice ? app_currency : ''
         } %}
     {% endfor %}
 </div>

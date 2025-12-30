@@ -9,7 +9,7 @@ enum CategorieArticleQuantifier: string  implements DisplayEnumInterface
     case MENU = 'MENU';
     case COMMANDE = 'COMMANDE';
 
-    public function getLabel(): string
+    #[\Override] public function getLabel(): string
     {
         return match($this) {
             self::MENU => 'Menu',
@@ -17,7 +17,7 @@ enum CategorieArticleQuantifier: string  implements DisplayEnumInterface
         };
     }
 
-    public function getColor(): string
+    #[\Override] public function getColor(): string
     {
         return match($this) {
             self::MENU => throw new \Exception('To be implemented'),
@@ -25,7 +25,7 @@ enum CategorieArticleQuantifier: string  implements DisplayEnumInterface
         };
     }
 
-    public function getIcon(): string
+    #[\Override] public function getIcon(): string
     {
         return match($this) {
             self::MENU => throw new \Exception('To be implemented'),
@@ -33,7 +33,15 @@ enum CategorieArticleQuantifier: string  implements DisplayEnumInterface
         };
     }
 
-    public function getIconBg(): string
+    #[\Override] public function getIconBg(): string
+    {
+        return match($this) {
+            self::MENU => throw new \Exception('To be implemented'),
+            self::COMMANDE => throw new \Exception('To be implemented'),
+        };
+    }
+
+    #[\Override] public function getCardTitle(): string
     {
         return match($this) {
             self::MENU => throw new \Exception('To be implemented'),

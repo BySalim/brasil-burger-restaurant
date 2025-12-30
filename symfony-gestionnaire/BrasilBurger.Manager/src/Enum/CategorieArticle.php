@@ -39,7 +39,7 @@ enum CategorieArticle: string implements DisplayEnumInterface
         };
     }
 
-    public function getLabel(): string
+    #[\Override] public function getLabel(): string
     {
         return match($this) {
             self::BURGER => throw new \Exception('To be implemented'),
@@ -48,7 +48,7 @@ enum CategorieArticle: string implements DisplayEnumInterface
         };
     }
 
-    public function getColor(): string
+    #[\Override] public function getColor(): string
     {
         return match($this) {
             self::BURGER => throw new \Exception('To be implemented'),
@@ -57,7 +57,7 @@ enum CategorieArticle: string implements DisplayEnumInterface
         };
     }
 
-    public function getIcon(): string
+    #[\Override] public function getIcon(): string
     {
         return match($this) {
             self::BURGER => throw new \Exception('To be implemented'),
@@ -66,7 +66,16 @@ enum CategorieArticle: string implements DisplayEnumInterface
         };
     }
 
-    public function getIconBg(): string
+    #[\Override] public function getIconBg(): string
+    {
+        return match($this) {
+            self::BURGER => throw new \Exception('To be implemented'),
+            self::MENU => throw new \Exception('To be implemented'),
+            self::COMPLEMENT => throw new \Exception('To be implemented'),
+        };
+    }
+
+    #[\Override] public function getCardTitle(): string
     {
         return match($this) {
             self::BURGER => throw new \Exception('To be implemented'),

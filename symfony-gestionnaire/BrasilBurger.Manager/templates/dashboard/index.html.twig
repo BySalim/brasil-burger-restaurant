@@ -15,42 +15,8 @@
 
 {% block content %}
     {# 1. Grille de statistiques #}
-    {% set dailyStatsGroupe = [
-        {
-            title: 'Commandes en attente',
-            value: dailyStats.commandesEnAttente|app_number_formated,
-            icon: 'schedule',
-            iconBg: 'bg-amber-50 dark:bg-amber-900/10 text-amber-600 dark:text-amber-500'
-        },
-        {
-            title: 'Commandes en cours',
-            value: dailyStats.commandesEnCours|app_number_formated,
-            icon: 'restaurant',
-            iconBg: 'bg-orange-50 dark:bg-orange-900/10 text-orange-600 dark:text-orange-500'
-        },
-        {
-            title: 'Commandes Terminées',
-            value: dailyStats.commandesTermine|app_number_formated,
-            icon: 'check_circle',
-            iconBg: 'bg-green-50 dark:bg-green-900/10 text-green-600 dark:text-green-500'
-        },
-        {
-            title: 'Commandes Annulées',
-            value: dailyStats.commandesAnnule|app_number_formated,
-            icon: 'cancel',
-            iconBg: 'bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-500'
-        },
-        {
-            title: 'Recettes',
-            value: dailyStats.recettes|app_number_formated,
-            icon: 'paid',
-            iconBg: 'bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-500',
-            valueUnit: app_currency
-        }
-    ] %}
-
     {% include 'partials/dashboard/stats_grid.html.twig' with {
-        stats: dailyStatsGroupe
+        stats: dailyStats
     } %}
 
     {# 2. Tableau des produits #}

@@ -5,10 +5,10 @@ namespace App\DTO;
 class DashboardStatDTO
 {
     public function __construct(
-        public int $commandesEnAttente,
-        public int $commandesEnCours,
-        public int $commandesTermine,
-        public int $commandesAnnule,
-        public int $recettes,
+        public string $title,
+        public int $value,
+        public string $icon,
+        public string $iconBg,
+        public bool $isPrice = false,
     ) {}
 }

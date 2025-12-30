@@ -10,7 +10,7 @@ enum CategoriePanier: string implements DisplayEnumInterface
     case MENU = 'MENU';
 
 
-    public function getLabel(): string
+    #[\Override] public function getLabel(): string
     {
         return match($this) {
             self::BURGER => 'Burger simple',
@@ -18,7 +18,7 @@ enum CategoriePanier: string implements DisplayEnumInterface
         };
     }
 
-    public function getColor(): string
+    #[\Override] public function getColor(): string
     {
         return match($this) {
             self::BURGER => 'blue',
@@ -26,7 +26,7 @@ enum CategoriePanier: string implements DisplayEnumInterface
         };
     }
 
-    public function getIcon(): string
+    #[\Override] public function getIcon(): string
     {
         return match($this) {
             self::BURGER => throw new \Exception('To be implemented'),
@@ -34,7 +34,7 @@ enum CategoriePanier: string implements DisplayEnumInterface
         };
     }
 
-    public function getIconBg(): string
+    #[\Override] public function getIconBg(): string
     {
         return match($this) {
             self::BURGER => throw new \Exception('To be implemented'),
@@ -42,4 +42,11 @@ enum CategoriePanier: string implements DisplayEnumInterface
         };
     }
 
+    #[\Override] public function getCardTitle(): string
+    {
+        return match($this) {
+            self::BURGER => throw new \Exception('To be implemented'),
+            self::MENU => throw new \Exception('To be implemented'),
+        };
+    }
 }
