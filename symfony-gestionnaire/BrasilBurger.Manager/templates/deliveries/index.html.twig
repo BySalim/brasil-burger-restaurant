@@ -2,12 +2,18 @@
 
 {% block title %}{{ acronyme_sn }} - Livraisons{% endblock %}
 
-{% block page_title %}Suivi des Livraisons{% endblock %}
+{% block page_title %}
+    {% if livreurName is defined and livreaurName %}
+        Livraisons de {{ livreurName }}
+    {% else %}
+        Suivi des livraisons
+    {% endif %}
+{% endblock %}
 {% block page_subtitle %}Suivez l'état des livraisons en cours et l'historique.{% endblock %}
 
 {% block header_actions %}
     {% include 'components/button_link.html.twig' with {
-        buttonLink: 'app_deliveries'
+        buttonLink: 'app_deliveries_index'
     } %}
 {% endblock %}
 
@@ -28,9 +34,9 @@
 
         {# Deliveries Table #}
         {% include 'partials/deliveries/deliveries_table.html.twig' with {
-            deliveries: deliveries|default(sampleDeliveries),
-            statusTerminer: statusTerminer|default(sampleStatusTerminerData),
-            pagination: paginationData|default(samplePaginationData)
+            deliveries: livraisons,
+            statusTerminer: statusTerminer,
+            pagination: paginationData
         } %}
     </div>
 {% endblock %}
@@ -40,131 +46,5 @@
     <script src="{{ asset('js/deliveries_table.js') }}"></script>
 {% endblock %}
 
-{# Sample Data for Development #}
-{% set samplePaginationData = {
-    'totalItems': 10,
-    'itemsPerPage': 4,
-    'currentPage': 1,
-} %}
-
-{% set sampleZones = [
-    {id: 'plateau', name: 'Plateau'},
-    {id: 'almadies', name: 'Almadies'},
-    {id: 'mermoz', name: 'Mermoz'},
-    {id: 'parcelles', name: 'Parcelles'}
-] %}
-
-{% set sampleStatusTerminerData = {
-    label: 'Terminée',
-    icon: 'check_circle',
-    color: 'bg-green-600 text-white border-green-700 dark:bg-green-700 dark:border-green-800'
-}%}
-
-{% set sampleDeliveries = [
-    {
-        id: 1,
-        date: '24/05/2024',
-        time: '12:30',
-        zone: 'Plateau',
-        delivererName: 'Moussa Diop',
-        delivererPhone: '76 543 21 09',
-        clientName: 'Amadou Diallo',
-        clientPhone: '77 123 45 67',
-        statusLabel: 'Terminée',
-        statusBadgeColor: 'bg-green-50 dark:bg-green-900/10 text-green-600',
-        isCompleted: true,
-    },
-    {
-        id: 2,
-        date: '24/05/2024',
-        time: '11:45',
-        zone: 'Almadies',
-        delivererName: 'Omar Sy',
-        delivererPhone: '76 543 21 09',
-        clientName: 'Fatou Ndiaye',
-        clientPhone: '76 888 99 00',
-        statusLabel: 'Terminée',
-        statusBadgeColor: 'bg-green-50 dark:bg-green-900/10 text-green-600',
-        isCompleted: true,
-    },
-    {
-        id: 3,
-        date: '24/05/2024',
-        time: '10:15',
-        zone: 'Mermoz',
-        delivererName: 'Cheikh Fall',
-        delivererPhone: '76 543 21 09',
-        clientName: 'Babacar Diop',
-        clientPhone: '70 555 44 33',
-        statusLabel: 'En cours',
-        statusBadgeColor: 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-        isCompleted: false,
-    },
-    {
-        id: 4,
-        date: '23/05/2024',
-        time: '18:45',
-        zone: 'Plateau',
-        delivererName: 'Moussa Diop',
-        delivererPhone: '76 543 21 09',
-        clientName: 'Amina Sow',
-        clientPhone: '77 999 00 11',
-        statusLabel: 'En cours',
-        statusBadgeColor: 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-        isCompleted: false,
-    },
-    {
-        id: 5,
-        date: '23/05/2024',
-        time: '17:20',
-        zone: 'Parcelles',
-        delivererName: 'Ibrahima Konate',
-        delivererPhone: '76 543 21 09',
-        clientName: 'Sophie Gueye',
-        clientPhone: '77 444 33 22',
-        statusLabel: 'En cours',
-        statusBadgeColor: 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-        isCompleted: false,
-    },
-    {
-        id: 6,
-        date: '23/05/2024',
-        time: '16:10',
-        zone: 'Almadies',
-        delivererName: 'Omar Sy',
-        delivererPhone: '76 543 21 09',
-        clientName: 'Paul Gomis',
-        clientPhone: '77 212 34 56',
-        statusLabel: 'En cours',
-        statusBadgeColor: 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-        isCompleted: false,
-    },
-    {
-        id: 7,
-        date: '23/05/2024',
-        time: '15:45',
-        zone: 'Mermoz',
-        delivererName: 'Cheikh Fall',
-        delivererPhone: '76 543 21 09',
-        clientName: 'Awa Diop',
-        clientPhone: '70 987 65 43',
-        statusLabel: 'En cours',
-        statusBadgeColor: 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-        isCompleted: false,
-    },
-    {
-        id: 8,
-        date: '23/05/2024',
-        time: '14:30',
-        zone: 'Plateau',
-        delivererName: 'Moussa Diop',
-        delivererPhone: '76 543 21 09',
-        clientName: 'Marc Ndiaye',
-        clientPhone: '76 543 21 09',
-        statusLabel: 'En cours',
-        statusBadgeColor: 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
-        isCompleted: false,
-    }
-] %}
 
 

@@ -8,6 +8,7 @@ use App\Factory\OrdersViewFactory;
 use App\Form\OrderFilterType;
 use App\Repository\CommandeRepository;
 use App\Service\CommandeService;
+use App\ViewModel\PaginationViewModel;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -46,18 +47,18 @@ class OrderController extends AbstractController
             status: $filters['status'] ?? null
         );
 
-        $per_page = $filters['per_page'] ?? $this->params->get('app.pagination.default_per_page');
+        $perPage = $filters['per_page'] ?? $this->params->get('app.pagination.default_per_page');
         $kPagination = $paginator->paginate(
             $queryBuilder,
             $request->query->getInt('page', 1),
-            $per_page
+            $perPage
         );
 
-        $paginationData = [
-            'totalItems' => $kPagination->getTotalItemCount(),
-            'currentPage' => $kPagination->getCurrentPageNumber(),
-            'itemsPerPage' => $per_page,
-        ];
+        $paginationData = new PaginationViewModel(
+            totalItems: $kPagination->getTotalItemCount(),
+            itemsPerPage: $perPage,
+            currentPage: $kPagination->getCurrentPageNumber(),
+        );
 
         $cmd_items = $kPagination->getItems();
 

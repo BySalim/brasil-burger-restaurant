@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/deliveries')]
+#[Route('/deliveries', name: 'app_deliveries_')]
 class DeliveryInfoController extends AbstractController
 {
     public function __construct(
@@ -24,7 +24,7 @@ class DeliveryInfoController extends AbstractController
     }
 
 
-    #[Route('/info/{id}', name: 'app_deliveries_info_show', requirements: ['id' => '\d+'])]
+    #[Route('/info/{id}', name: 'info_show', requirements: ['id' => '\d+'])]
     public function show(int $id): Response
     {
         /** @var InfoLivraison  $infoLivraison */

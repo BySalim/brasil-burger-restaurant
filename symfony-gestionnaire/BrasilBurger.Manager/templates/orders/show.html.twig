@@ -8,13 +8,13 @@
 {% endblock %}
 
 {% block header_actions %}
-    <a href="{{ path('app_orders') }}" class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white transition-all shadow-sm font-medium text-sm">
+    <button type="button" onclick="history.back()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
         {% include 'components/icon.html.twig' with {
             name: 'arrow_back',
-            size: 'text-[18px]'
+            size: 'text-[20px]'
         } %}
         Retour
-    </a>
+    </button>
 {% endblock %}
 
 {% block content %}

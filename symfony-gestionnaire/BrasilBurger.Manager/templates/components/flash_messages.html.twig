@@ -1,0 +1,190 @@
+{# templates/components/flash_messages.html.twig #}
+
+<div id="flashContainer" class="fixed top-6 right-6 z-[99999] space-y-3 max-w-md pointer-events-none">
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            {% set colors = {
+                'success':  {
+                    'bg': 'bg-green-50 dark:bg-green-900/20 border-green-200 dark: border-green-800',
+                    'text': 'text-green-800 dark:text-green-200',
+                    'icon': 'check_circle',
+                    'iconBg':  'bg-green-100 dark:bg-green-800 text-green-600 dark: text-green-300',
+                    'bar': 'bg-green-500'
+                },
+                'error':  {
+                    'bg': 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
+                    'text': 'text-red-800 dark:text-red-200',
+                    'icon': 'cancel',
+                    'iconBg': 'bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-300',
+                    'bar': 'bg-red-500'
+                },
+                'warning': {
+                    'bg': 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800',
+                    'text':  'text-orange-800 dark:text-orange-200',
+                    'icon': 'warning',
+                    'iconBg': 'bg-orange-100 dark:bg-orange-800 text-orange-600 dark:text-orange-300',
+                    'bar': 'bg-orange-500'
+                },
+                'info': {
+                    'bg': 'bg-blue-50 dark: bg-blue-900/20 border-blue-200 dark: border-blue-800',
+                    'text': 'text-blue-800 dark:text-blue-200',
+                    'icon': 'info',
+                    'iconBg': 'bg-blue-100 dark: bg-blue-800 text-blue-600 dark:text-blue-300',
+                    'bar': 'bg-blue-500'
+                }
+            } %}
+
+            {% set style = colors[type] ??  colors['info'] %}
+
+            <div class="flash-toast pointer-events-auto relative overflow-hidden rounded-xl border {{ style.bg }} shadow-xl backdrop-blur-sm"
+                 data-type="{{ type }}">
+
+                {# Content #}
+                <div class="flex items-start gap-3 p-4 pr-12">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-lg {{ style.iconBg }} flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[22px]">{{ style.icon }}</span>
+                    </div>
+
+                    <div class="flex-1 pt-2">
+                        <p class="text-sm font-medium {{ style.text }} leading-relaxed">{{ message|raw }}</p>
+                    </div>
+
+                    <button type="button" onclick="window.dismissToast(this)"
+                            class="absolute top-3 right-3 w-8 h-8 rounded-lg hover: bg-black/5 dark: hover:bg-white/5 transition-colors flex items-center justify-center {{ style.text }}"
+                            title="Fermer">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>
+
+                {# Progress Bar Container #}
+                <div class="progress-container h-1 bg-black/5 dark:bg-white/5">
+                    <div class="progress-bar h-full {{ style.bar }} transition-all"></div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+
+<style>
+    /* Animations */
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0) scale(1);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px) scale(0.8);
+            opacity: 0;
+        }
+    }
+
+    /* Entrée du toast */
+    .flash-toast {
+        animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Sortie du toast */
+    .flash-toast.dismissing {
+        animation: slideOut 0.3s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+    }
+
+    /* Progress bar initialement pleine */
+    .flash-toast .progress-bar {
+        width:  100%;
+    }
+</style>
+
+<script>
+    (function() {
+        'use strict';
+
+        // Attendre que le DOM soit chargé
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFlashMessages);
+        } else {
+            initFlashMessages();
+        }
+
+        function initFlashMessages() {
+            const toasts = document.querySelectorAll('.flash-toast');
+
+            if (toasts.length === 0) return;
+
+            console.log(`✅ ${toasts.length} flash message(s) détecté(s)`);
+
+            toasts.forEach((toast, index) => {
+                const progressBar = toast.querySelector('.progress-bar');
+
+                if (! progressBar) {
+                    console.warn('⚠️ Progress bar non trouvée');
+                    return;
+                }
+
+                // Démarrer l'animation de la barre après un court délai (pour l'effet)
+                setTimeout(() => {
+                    progressBar.style.transition = 'width 5s linear';
+                    progressBar.style.width = '0%';
+                }, 50);
+
+                // Auto-dismiss après 5 secondes + délai entre chaque toast
+                const delay = 5000 + (index * 100);
+
+                const timer = setTimeout(() => {
+                    dismissToast(toast);
+                }, delay);
+
+                // Stocker le timer pour pouvoir l'annuler
+                toast.dataset.timerId = timer;
+            });
+        }
+
+        // Fonction globale pour fermer un toast
+        window.dismissToast = function(element) {
+            // Si c'est le bouton, récupérer le toast parent
+            const toast = element.classList && element.classList.contains('flash-toast')
+                ? element
+                : element.closest('.flash-toast');
+
+            if (! toast) {
+                console.warn('❌ Toast non trouvé');
+                return;
+            }
+
+            // Annuler le timer auto-dismiss si existe
+            if (toast.dataset.timerId) {
+                clearTimeout(parseInt(toast.dataset.timerId));
+            }
+
+            // Ajouter la classe dismissing
+            toast.classList.add('dismissing');
+
+            console.log('🗑️ Suppression du toast.. .');
+
+            // Supprimer après l'animation (300ms)
+            setTimeout(() => {
+                toast.remove();
+                console.log('✅ Toast supprimé');
+
+                // Supprimer le conteneur si vide
+                const container = document.getElementById('flashContainer');
+                if (container && container.querySelectorAll('.flash-toast').length === 0) {
+                    container.remove();
+                    console.log('🧹 Conteneur flash vide supprimé');
+                }
+            }, 300);
+        };
+
+        console.log('✅ Système de flash messages initialisé');
+    })();
+</script>

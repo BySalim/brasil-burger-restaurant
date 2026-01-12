@@ -59,8 +59,8 @@ enum StatutLivraison: string implements DisplayEnumInterface
     public function getAllowedTransitions(): array
     {
         return match ($this) {
-            self:: EN_COURS => [self:: TERMINER],
-            self:: TERMINER => [],
+            self::EN_COURS => [self:: TERMINER],
+            self::TERMINER => [],
         };
     }
 

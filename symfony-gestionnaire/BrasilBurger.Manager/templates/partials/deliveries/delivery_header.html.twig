@@ -51,7 +51,7 @@ Delivery Header V2 Component (Simplified)
 
     {% if isEnCours %}
         <form
-            action="{{ path('app_order_change_status', {id: deliveryId}) }}"
+            action="{{ path('app_order_complete', {id: deliveryId}) }}"
             method="post"
             class="inline"
         >

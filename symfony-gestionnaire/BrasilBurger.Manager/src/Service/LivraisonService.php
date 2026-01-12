@@ -29,7 +29,7 @@ readonly class LivraisonService
      */
     public function canComplete(Livraison $livraison): bool
     {
-        return $this->canChangeStatus($livraison->getStatut(), StatutLivraison::EN_COURS);
+        return $this->canChangeStatus($livraison->getStatut(), StatutLivraison::TERMINER);
     }
 
     /**
@@ -40,13 +40,14 @@ readonly class LivraisonService
     public function complete(Livraison $livraison): void
     {
         if (!$this->canComplete($livraison)) {
+            var_dump("test ok");
             throw new \LogicException(sprintf(
                 'La livraison %d est déjà terminée',
                 $livraison->getId()
             ));
         }
 
-        $livraison->setStatut(StatutLivraison:: TERMINER);
+        $livraison->setStatut(StatutLivraison::TERMINER);
         $livraison->setDateFin(new \DateTime());
 
         $this->livraisonRepository->save($livraison, true);
@@ -77,7 +78,14 @@ readonly class LivraisonService
 
         $livraisons = [];
         foreach ($livraisonIds as $livraisonId) {
-            $livraisons[] = $this->livraisonRepository->find($livraisonId);
+            $livraison = $this->livraisonRepository->findById($livraisonId);
+
+            if ($livraison === null) {
+                $result['errors'][] = sprintf('Livraison #%d introuvable', $livraisonId);
+                continue;
+            }
+
+            $livraisons[] = $livraison;
         }
 
         // Garder en mémoire les groupes à vérifier pour éviter les doublons

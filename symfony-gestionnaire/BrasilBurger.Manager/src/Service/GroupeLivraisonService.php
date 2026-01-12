@@ -3,13 +3,14 @@
 namespace App\Service;
 
 use App\Entity\GroupeLivraison;
+use App\Entity\Livraison;
 use App\Enum\StatutLivraison;
 use App\Repository\GroupeLivraisonRepository;
 
 readonly class GroupeLivraisonService
 {
     public function __construct(
-        private GroupeLivraisonRepository $groupeLivraisonRepository
+        private GroupeLivraisonRepository $groupeLivraisonRepository,
     ) {
     }
 
@@ -32,7 +33,10 @@ readonly class GroupeLivraisonService
             return false;
         }
 
-        return array_all((array)$livraisons, fn($livraison) => $livraison->getStatut() !== StatutLivraison::EN_COURS);
+        return $livraisons->forAll(
+            fn ($key, Livraison $livraison) =>
+                $livraison->getStatut()->isFinal()
+        );
 
     }
 
