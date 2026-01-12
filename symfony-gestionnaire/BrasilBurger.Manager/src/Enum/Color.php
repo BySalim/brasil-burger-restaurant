@@ -16,6 +16,9 @@ enum Color: string
     case CYAN = 'cyan';
     case GRAY = 'gray';
     case SLATE = 'slate';
+    case BLACK = 'black';
+    case WHITE = 'white';
+
 
     /**
      * Retourne les classes Tailwind CSS pour ce badge de couleur
@@ -35,6 +38,8 @@ enum Color: string
             self::CYAN => 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800',
             self::GRAY => 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800',
             self::SLATE => 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+            self::BLACK => 'bg-gray-200 text-gray-900 border-gray-300 dark:bg-gray-900/40 dark:text-gray-100 dark:border-gray-800',
+            self::WHITE => 'bg-white text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700',
         };
     }
 
@@ -53,6 +58,8 @@ enum Color: string
             self::CYAN   => 'bg-cyan-50 dark:bg-cyan-900/10 text-cyan-600',
             self::GRAY   => 'bg-gray-50 dark:bg-gray-900/10 text-gray-600',
             self::SLATE  => 'bg-slate-50 dark:bg-slate-900/10 text-slate-600',
+            self::BLACK => 'bg-gray-200 dark:bg-gray-900/10 text-gray-900',
+            self::WHITE => 'bg-white dark:bg-gray-800 text-gray-600',
         };
     }
 
@@ -74,6 +81,8 @@ enum Color: string
             self::CYAN => 'bg-cyan-600 text-white border-cyan-700 dark:bg-cyan-700 dark:border-cyan-800',
             self::GRAY => 'bg-gray-600 text-white border-gray-700 dark:bg-gray-700 dark:border-gray-800',
             self::SLATE => 'bg-slate-600 text-white border-slate-700 dark:bg-slate-700 dark:border-slate-800',
+            self::BLACK => 'bg-gray-900 text-white border-gray-900 dark:bg-black dark:border-black',
+            self::WHITE => 'bg-white text-gray-800 border-gray-300 dark:bg-gray-100 dark:text-gray-900 dark:border-gray-300',
         };
     }
 
@@ -95,6 +104,8 @@ enum Color: string
             self::CYAN => 'Cyan',
             self::GRAY => 'Gris',
             self::SLATE => 'Ardoise',
+            self::BLACK => 'Black',
+            self::WHITE => 'White',
         };
     }
 }

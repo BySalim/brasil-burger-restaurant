@@ -13,6 +13,11 @@ Table Macros - Reusable table row components
             <span class="text-xs text-gray-400 block">{{ order.time }}</span>
         </td>
 
+        {# ID #}
+        <td class="px-3 py-3 whitespace-nowrap text-gray-600 dark:text-gray-300">
+            {{ order.id }}
+        </td>
+
         {# Code #}
         <td class="px-3 py-3 whitespace-nowrap">
             <span class="font-mono font-medium text-gray-900 dark: text-white">{{ order.code }}</span>
@@ -41,7 +46,7 @@ Table Macros - Reusable table row components
         </td>
 
         {# Status Badge #}
-        <td class="px-3 py-3 whitespace-nowrap text-center">
+        <td class="px-3 py-3 whitespace-nowrap text-right">
             {% include 'components/badge.html.twig' with {
                 text:  order.status,
                 color: order.statusColorClasses|default('blue'),
@@ -94,7 +99,7 @@ Table Macros - Reusable table row components
 
                 {# Lien vers détails #}
                 <a
-                    href="{{ path('app_order_show', { id: order.id }) }}"
+                    href="{{ path('app_orders_show_order', { id: order.id }) }}"
                     class="w-7 h-7 flex items-center justify-center rounded-md text-gray-500 hover:text-primary hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all"
                     title="Voir détails"
                 >
@@ -114,29 +119,39 @@ Table Macros - Reusable table row components
 {% macro order_item_row(item) %}
     <tr>
         {# Article with Image #}
+    <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
         <td class="px-6 py-4">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
                 {% include 'components/product_image.html.twig' with {
-                    imageUrl: item.image|default(null),
-                    fallbackIcon: 'lunch_dining',
-                    size: 'h-12 w-12'
+                    imageUrl: item.imageUrl|default(null),
+                    fallbackIcon: product.fallbackIcon|default('lunch_dining')
                 } %}
-                <span class="font-medium text-gray-900 dark:text-white">{{ item.name|default('Article') }}</span>
+                <div>
+                    <p class="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">{{ item.name|default('Article') }}</p>
+                </div>
             </div>
         </td>
 
         {# Category #}
-        <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ item.category|default('--') }}</td>
+        <td class="px-6 py-4">
+            {% include 'components/badge.html.twig' with {
+                text: item.categoryLabel,
+                color: item.categoryClass
+            } %}
+        </td>
 
         {# Unit Price #}
-        <td class="px-6 py-4 text-right text-gray-600 dark:text-gray-300">{{ item.unitPrice|default('0') }} {{ app_currency }}</td>
+    <td class="px-6 py-4 text-right font-medium text-gray-600 dark:text-text-muted-dark">{{ item.unitPrice|app_number_formated }} {{ app_currency }}</td>
 
         {# Quantity #}
-        <td class="px-6 py-4 text-center font-medium text-gray-900 dark:text-white">{{ item.quantity|default(1) }}</td>
+    <td class="px-6 py-4 text-center">
+        <span class="font-bold text-gray-900 dark:text-white">{{ item.quantity|app_number_formated }}</span>
+    </td>
 
         {# Total #}
-        <td class="px-6 py-4 text-right font-bold text-gray-900 dark:text-white">{{ item.total|default('0') }} {{ app_currency }}</td>
-    </tr>
+    <td class="px-6 py-4 text-right font-bold text-gray-900 dark:text-white">{{ (item.unitPrice * item.quantity)|app_number_formated }} {{ app_currency }}</td>
+
+</tr>
 {% endmacro %}
 
 
@@ -159,7 +174,8 @@ Table Macros - Reusable table row components
 
         {# Order Code #}
         <td class="px-6 py-4">
-            <span class="font-mono font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">
+            <span
+                class="font-mono font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">
                 {{ order.code|default('#CMD-0000') }}
             </span>
         </td>
@@ -224,7 +240,8 @@ Table Macros - Reusable table row components
 
         {# Code #}
         <td class="px-4 py-4 whitespace-nowrap">
-            <span class="font-mono font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">
+            <span
+                class="font-mono font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">
                 {{ delivery.code|default('#LIV-0000') }}
             </span>
         </td>
@@ -237,8 +254,10 @@ Table Macros - Reusable table row components
         {# Deliverer Info #}
         <td class="px-4 py-4 whitespace-nowrap">
             <div class="flex flex-col">
-                <span class="text-gray-900 dark:text-white font-medium">{{ delivery.delivererName|default('--') }}</span>
-                <span class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.delivererCode|default('--') }}</span>
+                <span
+                    class="text-gray-900 dark:text-white font-medium">{{ delivery.delivererName|default('--') }}</span>
+                <span
+                    class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.delivererCode|default('--') }}</span>
             </div>
         </td>
 
@@ -246,7 +265,8 @@ Table Macros - Reusable table row components
         <td class="px-4 py-4 whitespace-nowrap">
             <div class="flex flex-col">
                 <span class="font-medium text-gray-900 dark:text-white">{{ delivery.clientName|default('--') }}</span>
-                <span class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.clientPhone|default('--') }}</span>
+                <span
+                    class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.clientPhone|default('--') }}</span>
             </div>
         </td>
 

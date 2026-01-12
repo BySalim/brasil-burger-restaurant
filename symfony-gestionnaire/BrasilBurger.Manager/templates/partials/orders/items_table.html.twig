@@ -6,14 +6,17 @@ Order Items Table
 #}
 {% import 'macros/table_macros.html.twig' as table %}
 {% set orderItems = items|default([]) %}
-{% set total = totalAmount|default('0 FCFA') %}
+{% set nextLimitParam = nextLimit|default(6) %}
+{% set limit = limit|default(3) %}
+{% set totalItems = items|length %}
+{% set total = 0 %}
 
 <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm overflow-hidden">
     {# Header #}
     <div class="px-6 py-4 border-b border-gray-100 dark:border-border-dark flex justify-between items-center">
         <h3 class="font-bold text-gray-900 dark:text-white">Articles achetés</h3>
         <span class="text-xs font-medium px-2 py-1 rounded bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300">
-            {{ orderItems|length }} article{{ orderItems|length > 1 ? 's' : '' }}
+            {{ totalItems }} article{{ totalItems > 1 ? 's' : '' }}
         </span>
     </div>
 
@@ -31,6 +34,7 @@ Order Items Table
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-border-dark text-sm">
             {% for item in orderItems %}
+                {% set total = total + (item.unitPrice * item.quantity)  %}
                 {{ table.order_item_row(item) }}
             {% else %}
                 <tr>
@@ -45,11 +49,22 @@ Order Items Table
                 <td colspan="5" class="px-6 py-4 text-right">
                     <div class="flex justify-end items-center gap-4 text-sm font-medium text-gray-900 dark:text-white">
                         <span>Total:</span>
-                        <span class="text-lg font-bold">{{ total }}</span>
+                        <span class="text-lg font-bold text-primary">{{ total|app_number_formated }} {{ app_currency }}</span>
                     </div>
                 </td>
             </tr>
             </tfoot>
         </table>
     </div>
+    {# Footer avec lien de pagination #}
+    {% if orderItems is not empty and totalItems > limit %}
+        <div class="px-6 py-4 border-t border-gray-100 dark:border-border-dark bg-gray-50/50 dark:bg-slate-900/30 flex justify-center">
+            {% include 'components/button_text.html.twig' with {
+                text: 'Afficher plus de résultats',
+                href: path('app_home', {
+                    'limit': nextLimitParam
+                })
+            } %}
+        </div>
+    {% endif %}
 </div>

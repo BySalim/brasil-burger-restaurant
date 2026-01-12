@@ -12,13 +12,13 @@ Deliveries Header Tabs
         text: 'Commandes terminées à livrer',
         active: currentTab == 'orders',
         badge: ordersCount > 0 ? ordersCount : null,
-        href: path('app_default')
+        href: path('app_orders_to_delivered')
     } %}
 
     {% include 'components/tab_button.html.twig' with {
         text: 'Livraisons',
         active: currentTab == 'deliveries',
-        href: path('app_default')
+        href: path('app_deliveries')
     } %}
 
     {% include 'components/tab_button.html.twig' with {

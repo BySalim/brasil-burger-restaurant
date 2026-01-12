@@ -5,29 +5,15 @@ Delivery Mode Badge Component
 @param string icon - Custom icon (optional)
 @param string text - Custom text (optional)
 #}
-{% set deliveryMode = mode|default('delivery') %}
 
-{% set modeConfig = {
-    'delivery': {
-        'icon': 'delivery_dining',
-        'text': 'À Livrer',
-        'class': 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800'
-    },
-    'pickup': {
-        'icon': 'shopping_bag',
-        'text': 'À Emporter',
-        'class': 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800'
-    }
-} %}
+{% set label = deliveryLabel|default('') %}
+{% set icon = deliveryIcon|default('') %}
+{% set color = deliveryColor|default('') %}
 
-{% set config = modeConfig[deliveryMode]|default(modeConfig['delivery']) %}
-{% set badgeIcon = icon|default(config.icon) %}
-{% set badgeText = text|default(config.text) %}
-
-<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg {{ config.class }} border font-medium text-sm">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg {{ color }} border font-medium text-sm">
     {% include 'components/icon.html.twig' with {
-        name: badgeIcon,
+        name: icon,
         size: 'text-[18px]'
     } %}
-    {{ badgeText }}
+    {{ label }}
 </div>

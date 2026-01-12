@@ -1,43 +1,104 @@
 {#
-Order Header - Main order information
+Order Header - Compact + Pro
 
-@param object order - Order object with code, date, time, type, status
+@param object order - Order data (id, code, date, time, type, typeColor, totalAmount, statusLabel, statusIcon, statusColorClasses)
+@param array statusActions - list of action buttons (value, label, icon, bgClasses, allowed)
 #}
+
 {% set orderData = order|default({}) %}
+{% set actions = statusActions|default([]) %}
 
-<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm p-6">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        {# Order Information Grid #}
-        <div class="grid grid-cols-2 md:flex md:items-center gap-x-12 gap-y-4 text-sm">
-            {# Code #}
+<div
+    class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm px-4 py-2 mb-4">
+    <div class="flex items-center justify-between gap-3 flex-nowrap whitespace-nowrap overflow-x-auto">
+        <div class="flex items-center gap-8 flex-nowrap min-w-max">
             <div>
-                <p class="text-gray-500 dark:text-text-muted-dark mb-1">Code commande</p>
-                <p class="font-mono font-bold text-gray-900 dark:text-white text-lg">{{ orderData.code|default('#CMD-0000') }}</p>
+                <p class="text-[10px] text-gray-500 dark:text-text-muted-dark leading-none">Id</p>
+                <p class="font-mono font-bold text-gray-900 dark:text-white leading-tight">
+                    {{ orderData.id|default(0) }}
+                </p>
             </div>
 
-            {# Date #}
             <div>
-                <p class="text-gray-500 dark:text-text-muted-dark mb-1">Date de la commande</p>
-                <p class="font-medium text-gray-900 dark:text-white">{{ orderData.date|default('--') }} - {{ orderData.time|default('--') }}</p>
+                <p class="text-[10px] text-gray-500 dark:text-text-muted-dark leading-none">Date</p>
+                <p class="font-semibold text-gray-900 dark:text-white leading-tight">
+                    {{ orderData.date|default('--') }} <span
+                        class="text-gray-400">·</span> {{ orderData.time|default('--') }}
+                </p>
             </div>
 
-            {# Type Badge #}
             <div>
-                <p class="text-gray-500 dark:text-text-muted-dark mb-1">Type</p>
+                <p class="text-[11px] text-gray-500 dark:text-text-muted-dark leading-none">Type</p>
                 {% include 'components/badge.html.twig' with {
-                    text: orderData.type|default('Burger'),
-                    color: orderData.typeColor|default('blue'),
-                    size: 'sm'
+                    text: orderData.typeLabel|default('--'),
+                    color: orderData.typeClass|default('bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-700'),
                 } %}
+            </div>
+
+            <div
+                class="px-3 py-1 rounded-lg border border-gray-200 dark:border-border-dark bg-gray-50 dark:bg-slate-800/40">
+                <p class="text-[15px] font-semibold text-gray-600 dark:text-gray-300 leading-none">
+                    Total:
+                    <span class="text-[16px] font-extrabold text-primary leading-none">
+            {{ orderData.totalAmount|default('0')|app_number_formated }} {{ app_currency }}
+        </span>
+                </p>
             </div>
         </div>
 
-        {# Status Select #}
-        <form method="post" action="{{ path('app_default', {id: orderData.id|default(0)}) }}">
-            {% include 'components/order_status_select.html.twig' with {
-                currentStatus: orderData.status|default('pending'),
-                orderId: orderData.id|default('')
-            } %}
-        </form>
+        <div class="flex items-center gap-2 flex-nowrap min-w-max">
+
+            <div class="flex items-center gap-2 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-border-dark">
+    <span
+        class="inline-flex items-center justify-center w-6 h-6 rounded-md {{ orderData.statusIconBg|default('bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-200') }}">
+        {% include 'components/icon.html.twig' with {
+            name: orderData.statusIcon|default('help'),
+            size: 'text-[16px]'
+        } %}
+    </span>
+
+                {% include 'components/badge.html.twig' with {
+                    text: orderData.statusLabel|default('--'),
+                    color: orderData.statusColor|default('bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-700'),
+                    size: 'md',
+                    shape: 'pill'
+                } %}
+            </div>
+
+            <div class="flex items-center gap-1.5 flex-nowrap">
+                {% for a in actions %}
+                    {% set allowed = a.allowed|default(false) %}
+                    {% if allowed %}
+                        <form action="{{ path('app_order_change_status', {id: orderData.id|default(0)}) }}"
+                              method="post" class="inline">
+                            <input type="hidden" name="_token"
+                                   value="{{ csrf_token('change-status-' ~ (orderData.id|default(0))) }}">
+                            <input type="hidden" name="etat" value="{{ a.value }}">
+                            <button
+                                type="submit"
+                                class="h-7 px-2.5 inline-flex items-center gap-1.5 rounded-lg font-bold text-xs
+           {{ a.colorSolid|default('bg-gray-100 text-gray-800 hover:bg-gray-200') }}
+           transition-all duration-150 hover:shadow-sm shrink-0"
+                                title="{{ a.label }}"
+                            >
+                                {% include 'components/icon.html.twig' with { name: a.icon|default('sync'), size: 'text-[16px]' } %}
+                                <span class="hidden md:inline truncate min-w-0">{{ a.label }}</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        <span
+                            class="h-7 px-2.5 inline-flex items-center gap-1.5 rounded-lg font-bold text-xs
+                                   bg-gray-100/60 dark:bg-slate-800/40 text-gray-400 dark:text-gray-500
+                                   border border-gray-200 dark:border-border-dark
+                                   cursor-not-allowed opacity-70"
+                            title="{{ a.label }} (non disponible)"
+                        >
+                            {% include 'components/icon.html.twig' with { name: a.icon|default('sync'), size: 'text-[16px]' } %}
+                            <span class="hidden md:inline truncate min-w-0">{{ a.label }}</span>
+                        </span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>

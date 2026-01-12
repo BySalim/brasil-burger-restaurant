@@ -187,14 +187,20 @@ final class TestVueController extends AbstractController
         return $this->render('deliveries/orders.html.twig', []);
     }
 
-    #[Route('/test/delivery_info', name: 'app_delivery_info')]
-    public function showDelivredInfos(): Response
+    #[Route('/test/delivery_info/{id}', name: 'app_info_delivery')]
+    public function showDelivredInfos(int $id): Response
     {
         return $this->render('delivery_info/show.html.twig', []);
     }
 
     #[Route('/test/deliveries/list', name: 'app_deliveries')]
     public function deliveries(): Response
+    {
+        return $this->render('deliveries/list.html.twig', []);
+    }
+
+    #[Route('/test/delivery/{id}', name: 'app_deliveries_show_delivery')]
+    public function showDelivery(int $id): Response
     {
         return $this->render('deliveries/list.html.twig', []);
     }

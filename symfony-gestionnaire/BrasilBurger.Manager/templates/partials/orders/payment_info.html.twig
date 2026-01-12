@@ -8,49 +8,58 @@ Payment Information Card
 @param string reference - Payment reference
 @param string methodImage - Custom logo URL (optional)
 #}
-{% set paymentAmount = amount|default('0 FCFA') %}
-{% set paymentMethod = method|default('wave') %}
-{% set paymentDate = date|default('--') %}
-{% set paymentTime = time|default('--') %}
-{% set paymentRef = reference|default('--') %}
-{% set methodImage = methodImage|default(null) %}
+{% set paymentData = paymentCard|default({}) %}
+{% set paymentAmount = paymentCard.amount|default(0) %}
+{% set paymentDate = paymentCard.date|default('--') %}
+{% set paymentTime = paymentCard.time|default('--') %}
+{% set paymentRef = paymentCard.reference|default('--') %}
+
+{# Nouveau: données badge fournies par la page #}
+{% set methodLabel = paymentCard.methodLabel|default('---') %}
+{% set methodBadgeClass = paymentCard.methodBadgeClass|default('bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-700') %}
+{% set methodImage = paymentCard.methodImageUrl|default(null) %}
 
 {% embed 'components/info_card.html.twig' with {
-    title: 'Infos de paiement',
+    title: 'Paiement',
     icon: 'payments',
     titleSize: 'text-sm',
-    class: 'p-4'
+    dense: true
 } %}
     {% block card_content %}
-        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-gray-100 dark:border-border-dark flex flex-col gap-3">
-            {# Amount and Method #}
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">Montant</p>
-                    <p class="text-xl font-bold text-primary">{{ paymentAmount }}</p>
-                </div>
-                <div class="text-right">
-                    {% include 'components/payment_method_badge.html.twig' with {
-                        method: paymentMethod,
-                        imageUrl: methodImage
+        <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold leading-none">
+                    Montant
+                </p>
+                <p class="text-lg font-extrabold text-primary leading-tight whitespace-nowrap">
+                    {{ paymentAmount|app_number_formated }} {{ app_currency }}
+                </p>
+            </div>
+
+            {# Badge méthode (data-driven) #}
+            <div class="shrink-0 inline-flex items-center gap-2 px-2.5 py-1">
+                {% if methodImage %}
+                    {% include 'components/badge.html.twig' with {
+                        text: methodLabel,
+                        badgeIconUrl: methodImage,
+                        color: methodBadgeClass,
+                        size: 'md'
                     } %}
-                </div>
+                {% else %}
+                    {# fallback icon minimal #}
+                    {% include 'components/icon.html.twig' with { name: 'credit_card', size: 'text-[16px]' } %}
+                {% endif %}
             </div>
+        </div>
 
-            {# Divider #}
-            <div class="h-px bg-gray-200 dark:bg-slate-700 w-full"></div>
+        <div class="mt-2 flex items-center justify-between gap-3 text-xs text-gray-600 dark:text-gray-300">
+            <span class="whitespace-nowrap">
+                {{ paymentDate }} <span class="text-gray-400">·</span> {{ paymentTime }}
+            </span>
 
-            {# Date and Reference #}
-            <div class="flex justify-between items-center text-xs">
-                <div>
-                    <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase mb-0.5">Date</p>
-                    <p class="font-medium text-gray-700 dark:text-gray-300">{{ paymentDate }} - {{ paymentTime }}</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase mb-0.5">Réf.</p>
-                    <p class="font-mono font-medium text-gray-700 dark:text-gray-300">{{ paymentRef }}</p>
-                </div>
-            </div>
+            <span class="font-mono whitespace-nowrap">
+                {{ paymentRef }}
+            </span>
         </div>
     {% endblock %}
 {% endembed %}

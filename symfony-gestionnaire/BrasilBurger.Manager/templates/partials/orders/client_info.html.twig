@@ -4,23 +4,44 @@ Client Information Card
 @param object client - Client object with name and phone
 #}
 {% set clientData = client|default({}) %}
+{% set fullName = clientData.name|default('Client inconnu') %}
+{% set phone = clientData.phone|default('---') %}
+{% set initials = clientData.initials|upper %}
 
-{% embed 'components/info_card.html.twig' with {
-    title: 'Client',
-    icon: 'person'
-} %}
-    {% block card_content %}
-        <div class="flex items-start gap-4">
-            <div>
-                <p class="font-bold text-gray-900 dark:text-white text-lg">{{ clientData.name|default('Client inconnu') }}</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1.5">
-                    {% include 'components/icon.html.twig' with {
-                        name: 'call',
-                        size: 'text-[16px]'
-                    } %}
-                    {{ clientData.phone|default('--') }}
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm p-4">
+    <div class="flex items-center gap-4">
+        {# Left: label "Client" + icône #}
+        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+            {% include 'components/icon.html.twig' with {
+                name: 'person',
+                size: 'text-[20px]',
+                class: 'text-gray-400'
+            } %}
+            <span class="font-bold text-sm whitespace-nowrap">Client</span>
+        </div>
+
+        {# Vertical separator (visible) #}
+        <div class="h-12 w-px bg-gray-300 dark:bg-border-dark"></div>
+
+        {# Right:  infos client (avatar + textes) #}
+        <div class="flex items-center gap-3 flex-1 min-w-0">
+            {# Avatar monogramme #}
+            <div class="h-10 w-10 rounded-full bg-primary/15 text-primary border border-primary/20 flex items-center justify-center font-extrabold text-sm shrink-0">
+                {{ initials|default('CL') }}
+            </div>
+
+            {# Texts #}
+            <div class="min-w-0">
+                <p class="font-semibold text-gray-900 dark:text-white text-sm leading-tight truncate">
+                    {{ fullName }}
+                </p>
+
+                <p class="text-xs text-gray-500 dark:text-gray-400 leading-tight flex items-center gap-1 mt-0.5">
+                    {% include 'components/icon.html.twig' with { name: 'call', size: 'text-[14px]' } %}
+                    <span class="truncate">{{ phone }}</span>
                 </p>
             </div>
         </div>
-    {% endblock %}
-{% endembed %}
+
+    </div>
+</div>

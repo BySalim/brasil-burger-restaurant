@@ -19,6 +19,7 @@ Badge Component (Pro Version)
 {% set badgeSize = size|default('sm') %}
 {% set badgeShape = shape|default('rounded') %}
 {% set badgeIcon = icon|default(null) %}
+{% set badgeIconUrl = badgeIconUrl|default(null) %}
 {% set badgeIconPosition = iconPosition|default('left') %}
 {% set badgeIconBg = iconBg|default(null) %}
 {% set badgeOutline = outline|default(false) %}
@@ -52,8 +53,18 @@ Badge Component (Pro Version)
 {% set outlineClass = badgeOutline ? 'bg-transparent border-2' : 'border' %}
 
 <span class="inline-flex items-center font-bold tracking-wide {{ sizeClasses[badgeSize] }} {{ shapeClasses[badgeShape] }} {{ outlineClass }} {{ badgeColorClasses }} {{ badgeUppercase ? 'uppercase' : '' }} {{ badgeCustomClass }}">
+    {# Pour les images #}
+    {% if badgeIconUrl %}
+        <span class="inline-flex items-center justify-center overflow-hidden rounded-full {{ badgeSize == 'xs' ? 'h-3 w-3' : (badgeSize == 'sm' ? 'h-3.5 w-3.5' : (badgeSize == 'md' ? 'h-4 w-4' : 'h-5 w-5')) }}">
+            <img
+                src="{{ badgeIconUrl }}"
+                alt="{{ badgeText }}"
+                class="h-full w-full object-cover"
+            />
+        </span>
+
     {# Icon with optional background (left position) #}
-    {% if badgeIcon and badgeIconPosition == 'left' %}
+    {% elseif badgeIcon and badgeIconPosition == 'left' %}
         {% if badgeIconBg %}
             {# Complex badge with icon background #}
             <span class="inline-flex items-center justify-center rounded-full {{ badgeIconBg }} {{ badgeSize == 'xs' ? 'h-3 w-3' : (badgeSize == 'sm' ? 'h-3.5 w-3.5' : (badgeSize == 'md' ? 'h-4 w-4' : 'h-5 w-5')) }}">

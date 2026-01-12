@@ -1,10 +1,10 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
-{% block title %}Détails de la Commande {{ order.code|default('#CMD-0000') }} - {{ site_name }}{% endblock %}
+{% block title %}{{ acronyme_sn }} - Commande {{ orderHeader.id|default('#') }}{% endblock %}
 
 {% block page_title %}
     Détails de la Commande
-    <span class="text-lg font-normal text-gray-500 dark:text-text-muted-dark">{{ order.code|default('#CMD-0000') }}</span>
+    <span class="text-lg font-normal text-gray-500 dark:text-text-muted-dark">{{ orderHeader.code|default('#CMD-0000') }}</span>
 {% endblock %}
 
 {% block header_actions %}
@@ -20,7 +20,8 @@
 {% block content %}
     {# Order Header - Code, Date, Type, Status #}
     {% include 'partials/orders/order_header.html.twig' with {
-        order: order|default(sampleOrder)
+        order: orderHeader,
+        statusAction: statusActions
     } %}
 
     {# Main Content Grid #}
@@ -29,14 +30,9 @@
         <div class="lg:col-span-2 space-y-6">
             {# Items Table #}
             {% include 'partials/orders/items_table.html.twig' with {
-                items: order.items|default(sampleItems),
-                totalAmount: order.itemsTotal|default('4 500 FCFA')
-            } %}
-
-            {# Order Summary #}
-            {% include 'partials/orders/order_summary.html.twig' with {
-                deliveryPrice: order.deliveryPrice|default('1 000 FCFA'),
-                totalAmount: order.totalAmount|default('5 500 FCFA')
+                items: productsSales,
+                limit: limit,
+                nextLimit: nextLimit,
             } %}
         </div>
 
@@ -44,83 +40,18 @@
         <div class="lg:col-span-1 space-y-6">
             {# Client Info #}
             {% include 'partials/orders/client_info.html.twig' with {
-                client: order.client|default(sampleClient)
+                client: clientCard
             } %}
 
             {# Delivery Info #}
             {% include 'partials/orders/delivery_info.html.twig' with {
-                mode: order.deliveryMode|default('delivery'),
-                deliveryCode: order.deliveryCode|default('#LIV-2290'),
-                deliveryId: order.deliveryId|default('')
+                delivery: deliveryCard
             } %}
 
             {# Payment Info #}
             {% include 'partials/orders/payment_info.html.twig' with {
-                amount: order.totalAmount|default('5 500 FCFA'),
-                method: order.paymentMethod|default('wave'),
-                date: order.paymentDate|default('24/10/24'),
-                time: order.paymentTime|default('14:32'),
-                reference: order.paymentReference|default('WV-992837112')
+                payment: paymentCard
             } %}
         </div>
     </div>
-
-    {# Footer Copyright #}
-    <div class="mt-8 mb-8">
-        {% include 'partials/footer_copyright.html.twig' with {
-            year: 2024,
-            company: '{{ site_name }} - Interface de Gestion'
-        } %}
-    </div>
 {% endblock %}
-
-{# Sample Data for Development #}
-{% set sampleOrder = {
-    id: 1,
-    code: '#CMD-8924',
-    date: '24 Oct 2024',
-    time: '14:30',
-    type: 'Burger',
-    typeColor: 'blue',
-    status: 'processing',
-    itemsTotal: '4 500 FCFA',
-    deliveryPrice: '1 000 FCFA',
-    totalAmount: '5 500 FCFA',
-    deliveryMode: 'delivery',
-    deliveryCode: '#LIV-2290',
-    deliveryId: 1,
-    paymentMethod: 'wave',
-    paymentDate: '24/10/24',
-    paymentTime: '14:32',
-    paymentReference: 'WV-992837112'
-} %}
-{% set sampleClient = {
-    name: 'Amadou Diallo',
-    phone: '+221 77 123 45 67'
-} %}
-{% set sampleItems = [
-    {
-        name: 'Double Cheese Burger',
-        category: 'Burger',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuALHI5od0TqhYzf5SaDnFGbus1BpfuzXmstnrCotANsfdBWmNlIOyOVjRY6sAgcCKMbBIQnW_5F5W78DyC0RqLGOihhIuuf8Aj5W9r8kCFb-kv3mstisapJLqzIGiLemqtstIdsHQEEHhlQJYLJ9byUzke7e9O7ICmSjQeU-rRHtgNAuTbja5BHGpzVDY8dhn_bRFL0Tct6gPC2Y8M2qC0BUcPHcdYxDBbgSrtPOA8xoT2PyQ0_NKctp4__Om417sgdd01oJzUZBL8',
-        unitPrice: '2 500',
-        quantity: 1,
-        total: '2 500'
-    },
-    {
-        name: 'Frites Moyennes',
-        category: 'Complément',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBd3qmDl1g0g9pij5xW1OzcHEvvB6XGeQ238fydLEUUSRHUvS0ungt-mE3f8qiwlS--sdyO-U2E4NPqsDe4zVHQdCAerIs0jp6w6cpanU6KBKpjRp4V4UYRe_YZvxxCxZLP5Vt1eMyhKHS_mawrLnm9Xgwo_vpZ_pskl-ScuH0_cc9oUutdv-vqhAAV65SNOkN-fnGyXKE1H-JAatnLqy0YfljIo2ZUgr0_RAUBPZ8liWQOneY600b0uUPCma7hdjWnO1Uol4etxww',
-        unitPrice: '1 000',
-        quantity: 1,
-        total: '1 000'
-    },
-    {
-        name: 'Coca Cola 33cl',
-        category: 'Complément',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDO6BVfdXAh93WD-mzEpH3rENPOz0Yq7wUbwSEF-tBVDl4LwqfUOCnWI0yJi9-49YJfy4Ct3Txoj3FFo0BzGiqGnkD7isqn6Rv25IPVg3gPxr0_DyGlo719nEDezOXQzrQ6SBmtbMYaRUbujMHf5lpLsuIytsUv5TIOlB3a94FJWjVmviudV27cL03IsVR1iVKr2YT88xE8c2PVXk58ml1hRFNfrqUEBFiXeXeFSJU2iuVL1rii2BBjxssaZykAFJjfA05jhfU7L2E',
-        unitPrice: '1 000',
-        quantity: 1,
-        total: '1 000'
-    }
-] %}

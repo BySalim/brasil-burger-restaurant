@@ -19,10 +19,10 @@ use Symfony\Component\Routing\Attribute\Route;
 class OrderController extends AbstractController
 {
     public function __construct(
-        private readonly CommandeRepository $commandeRepository,
-        private readonly CommandeService    $commandeService,
+        private readonly CommandeRepository    $commandeRepository,
+        private readonly CommandeService       $commandeService,
         private readonly ParameterBagInterface $params,
-        private readonly OrdersViewFactory $ordersViewFactory
+        private readonly OrdersViewFactory     $ordersViewFactory
     )
     {
     }
@@ -52,7 +52,7 @@ class OrderController extends AbstractController
             $request->query->getInt('page', 1),
             $per_page
         );
-        $totalItems  = $pagination->getTotalItemCount();
+        $totalItems = $pagination->getTotalItemCount();
 
         $cmd_items = $pagination->getItems();
 
@@ -62,7 +62,7 @@ class OrderController extends AbstractController
             'form' => $form,
             'orders' => $orders,
             'totalItems' => $totalItems,
-            'itemsPerPage' =>  $per_page,
+            'itemsPerPage' => $per_page,
         ]);
     }
 
@@ -102,20 +102,37 @@ class OrderController extends AbstractController
     /**
      * Page détail d'une commande
      */
-    #[Route('/{id}', name: 'app_order_show', requirements: ['id' => '\d+'])]
-    public function show(int $id): Response
+    #[Route('/{id}', name: 'app_orders_show_order', requirements: ['id' => '\d+'])]
+    public function show(int $id, Request $request): Response
     {
-//        $commande = $this->commandeRepository->findOneWithFullDetails($id);
-//
-//        if (!$commande) {
-//            throw $this->createNotFoundException('Commande introuvable');
-//        }
-//
-//        $allowedStatuses = $this->commandeService->getAllowedNextStatuses($commande);
+        $per_page = $this->params->get('app.pagination.default_per_page');
+        $limit = $request->query->getInt('limit', $per_page);
+        $limit = $limit < $per_page ? $per_page : $limit;
+
+        $commande = $this->commandeRepository->findById($id);
+
+        if (!$commande) {
+            throw $this->createNotFoundException('Commande introuvable');
+        }
+
+        $orderHeader = $this->ordersViewFactory->createOrderHeader($commande);
+        $productsSales = $this->ordersViewFactory->createProductsSales($commande);
+        $clientCard = $this->ordersViewFactory->createCardClient($commande);
+        $deliveryCard = $this->ordersViewFactory->createDeliveryCard($commande);
+        $paymentCard = $this->ordersViewFactory->createPaymentCard($commande);
+        $statusActions = $commande->getEtat()->getEditableStatusMap();
+
+        $nextLimit = $limit + $per_page;
 
         return $this->render('orders/show.html.twig', [
-//            'commande' => $commande,
-//            'allowedStatuses' => $allowedStatuses,
+            'orderHeader' => $orderHeader,
+            'productsSales' => $productsSales,
+            'clientCard' => $clientCard,
+            'deliveryCard' => $deliveryCard,
+            'paymentCard' => $paymentCard,
+            'statusActions' => $statusActions,
+            'limit' => $limit,
+            'nextLimit' => $nextLimit,
         ]);
     }
 

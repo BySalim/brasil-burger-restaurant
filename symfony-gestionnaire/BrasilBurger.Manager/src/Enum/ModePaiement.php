@@ -23,7 +23,7 @@ enum ModePaiement: string implements DisplayEnumInterface
     {
         return match($this) {
             self::WAVE => Color::BLUE,
-            self::OM => Color::ORANGE,
+            self::OM => Color::BLACK,
         };
     }
 
@@ -40,6 +40,14 @@ enum ModePaiement: string implements DisplayEnumInterface
         return match($this) {
             self::WAVE => 'Paiements Wave',
             self::OM => 'Paiements Orange Money',
+        };
+    }
+
+    public function getImageUrl(): string
+    {
+        return match($this) {
+            self::WAVE => 'https://play-lh.googleusercontent.com/B2sfLVgRWgV_bk5rtF51w6AieJWXc0qWbyWoaA8pMNp-is41AmvhJYVr95Dq9hT97Es=w480-h960-rw',
+            self::OM => 'https://play-lh.googleusercontent.com/VGOxVRf_AtRYSFbYCr1qZ-eZDDldQxt8dpjQ62MFpoS9JXK-f2l1DIKxjt8TJ8MX-txu',
         };
     }
 }

@@ -7,7 +7,7 @@ use App\DTO\DailyStatsDTO;
 use App\Enum\EtatCommande;
 use App\Infrastructure\Images\ImageStorageInterface;
 use App\ViewModel\DashboardStatViewModel;
-use App\ViewModel\TopProductViewModel;
+use App\ViewModel\ProductSaleRowViewModel;
 
 readonly class DashboardViewFactory
 {
@@ -46,7 +46,7 @@ readonly class DashboardViewFactory
 
     /**
      * @param ArticleVenduDTO[] $articlesVenduDto
-     * @return TopProductViewModel[]
+     * @return ProductSaleRowViewModel[]
      */
     public function createTopProductsView(array $articlesVenduDto): array
     {
@@ -57,12 +57,12 @@ readonly class DashboardViewFactory
             $a = $dto->article;
             $categorie = $a->getCategorie();
             $imgPublicId = $a->getImagePublicId();
-            $products[] = new TopProductViewModel(
+            $products[] = new ProductSaleRowViewModel(
                 name: $a->getLibelle(),
-                category: $categorie->getLabel(),
-                categoryColor: $categorie->getColor()->getBadgeClasses(),
-                price: $a->getPrix(),
-                sales: $sales,
+                categoryLabel: $categorie->getLabel(),
+                categoryClass: $categorie->getColor()->getBadgeClasses(),
+                unitPrice: $a->getPrix(),
+                quantity: $sales,
                 imageUrl: $this->imageStorage->getImageUrl($imgPublicId),
             );
         }

@@ -7,6 +7,8 @@ Top Products Table Partial
 @param string currentDate - The currently selected date (to keep context in pagination)
 @param int nextLimit - The limit to apply when clicking "Show More"
 #}
+{% import 'macros/table_macros.html.twig' as table %}
+
 {% set productsList = products|default([]) %}
 {% set totalProducts = totalProducts|default(products|length) %}
 {% set tableTitle = title|default('Burgers ou menu les plus vendus') %}
@@ -36,30 +38,7 @@ Top Products Table Partial
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-border-dark text-sm">
             {% for product in productsList %}
-                <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-4">
-                            {% include 'components/product_image.html.twig' with {
-                                imageUrl: product.imageUrl|default(null),
-                                fallbackIcon: product.fallbackIcon|default('lunch_dining')
-                            } %}
-                            <div>
-                                <p class="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">{{ product.name }}</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
-                        {% include 'components/badge.html.twig' with {
-                            text: product.category,
-                            color: product.categoryColor
-                        } %}
-                    </td>
-                    <td class="px-6 py-4 text-right font-medium text-gray-600 dark:text-text-muted-dark">{{ product.price|app_number_formated }} {{ app_currency }}</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="font-bold text-gray-900 dark:text-white">{{ product.sales|app_number_formated }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-right font-bold text-primary">{{ (product.price * product.sales)|app_number_formated }} {{ app_currency }}</td>
-                </tr>
+                {{ table.order_item_row(product) }}
             {% else %}
                 <tr>
                     <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-slate-400">

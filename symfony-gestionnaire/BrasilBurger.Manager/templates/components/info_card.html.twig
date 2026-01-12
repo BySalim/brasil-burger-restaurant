@@ -1,28 +1,35 @@
 {#
 Information Card Component
 
-@param string title - Card title (required)
-@param string icon - Material icon name (required)
-@param string titleSize - Title size class (default: font-bold)
-@param string class - Additional CSS classes
+@param string title
+@param string icon
+@param string titleSize
+@param string class
+@param bool dense - compact mode
 #}
 {% set cardTitle = title|default('Titre') %}
 {% set cardIcon = icon|default('info') %}
 {% set titleSize = titleSize|default('') %}
 {% set cardClass = class|default('') %}
+{% set dense = dense|default(false) %}
 
-<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm p-6 {{ cardClass }}">
-    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 {{ titleSize }}">
+{# compact spacing #}
+{% set paddingClass = dense ? 'p-4' : 'p-6' %}
+{% set titleClass = dense ? 'text-sm' : 'text-base' %}
+{% set titleMargin = dense ? 'mb-2' : 'mb-4' %}
+{% set iconSize = dense ? 'text-[18px]' : 'text-[20px]' %}
+
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm {{ paddingClass }} {{ cardClass }}">
+    <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2 {{ titleClass }} {{ titleMargin }} {{ titleSize }}">
         {% include 'components/icon.html.twig' with {
             name: cardIcon,
+            size: iconSize,
             class: 'text-gray-400'
         } %}
         {{ cardTitle }}
     </h3>
 
     <div>
-        {% block card_content %}
-            {# Content will be injected here #}
-        {% endblock %}
+        {% block card_content %}{% endblock %}
     </div>
 </div>

@@ -15,9 +15,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
-    private const ITEMS_TOP_PRODUCTS_DEFAULT = 3;
-    private const ADD_ITEMS_TOP_PRODUCTS_DEFAULT = 3;
-
     public function __construct(
         private readonly CommandeRepository $commandeRepository,
         private readonly ArticleRepository  $articleRepository,
@@ -40,7 +37,7 @@ class HomeController extends AbstractController
             $selectedDate = new \DateTime();
         }
 
-        $per_page = $this->params->get('app.pagination.default_per_page');
+        $per_page = $this->params->get('app.pagination.default_per_page') - 1;
         $limit = $request->query->getInt('limit', $per_page);
         $limit = $limit < $per_page ? $per_page : $limit;
 

@@ -2,7 +2,11 @@
 
 namespace App\ViewModel;
 
-class ClientCardViewModel
+final readonly class ClientCardViewModel
 {
-
+    public function __construct(
+        public string $name,
+        public string $phone,
+        public ?string $initials = null,
+    ) {}
 }

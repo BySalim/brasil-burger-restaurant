@@ -85,13 +85,15 @@ enum EtatCommande: string implements DisplayEnumInterface
         $map = [];
 
         foreach (self::cases() as $case) {
-            $map[$case->value] = [
-                'value' => $case->value,
-                'allowed' => in_array($case, $allowedTransitions, true),
-                'label' => $case->getLabel(),
-                'icon' => $case->getIcon(),
-                'colorSolid' => $case->getColor()->getSolidBadgeClasses(),
-            ];
+            if ($case !== self::EN_ATTENTE) {
+                $map[$case->value] = [
+                    'value' => $case->value,
+                    'allowed' => in_array($case, $allowedTransitions, true),
+                    'label' => $case->getLabel(),
+                    'icon' => $case->getIcon(),
+                    'colorSolid' => $case->getColor()->getSolidBadgeClasses(),
+                ];
+            }
         }
 
         return $map;
