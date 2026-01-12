@@ -1,0 +1,40 @@
+{#
+Client Card Component
+
+@param object client - Client object {name, phone}
+#}
+{% set clientData = client|default({}) %}
+{% set clientName = clientData.name|default('Client') %}
+{% set clientPhone = clientData.phone|default('--') %}
+
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-xl overflow-hidden shadow-sm flex flex-col">
+    {% include 'components/card_header.html.twig' with {
+        icon: 'person',
+        title: 'Client',
+        iconColor: 'text-blue-600 dark:text-blue-400'
+    } %}
+
+    <div class="p-4 flex items-center gap-4">
+        {% include 'components/avatar_initials.html.twig' with {
+            name: clientName,
+            color: 'blue'
+        } %}
+
+        <div class="flex flex-col min-w-0">
+            <p class="font-bold text-base text-gray-900 dark:text-white truncate">{{ clientName }}</p>
+
+            {% if clientPhone %}
+                <a
+                    href="tel:{{ clientPhone|replace({' ': '', '+': ''}) }}"
+                    class="flex items-center gap-1.5 mt-1 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+                >
+                    {% include 'components/icon.html.twig' with {
+                        name: 'call',
+                        size: 'text-[14px]'
+                    } %}
+                    <span class="text-xs font-semibold">{{ clientPhone }}</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

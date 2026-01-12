@@ -3,11 +3,13 @@
 namespace App\Factory;
 
 use App\Entity\ArticleQuantifier;
+use App\Entity\Client;
 use App\Entity\Commande;
 use App\Enum\ModeRecuperation;
 use App\Infrastructure\Images\ImageStorageInterface;
+use App\Service\PersonService;
 use App\Service\PhoneNumberService;
-use App\ViewModel\ClientCardViewModel;
+use App\ViewModel\PersonCardViewModel;
 use App\ViewModel\DeliveryCardViewModel;
 use App\ViewModel\OrderHeaderViewModel;
 use App\ViewModel\OrderRowViewModel;
@@ -19,7 +21,8 @@ final readonly class OrdersViewFactory
 {
     public function __construct(
         private PhoneNumberService $phoneNumberService,
-        private ImageStorageInterface $imageStorage
+        private ImageStorageInterface $imageStorage,
+        private PersonService  $personService,
     )
     {
 
@@ -135,19 +138,18 @@ final readonly class OrdersViewFactory
         return $rows;
     }
 
-    public function createCardClient(Commande $commande): ClientCardViewModel
+    public function createCardClient(Client $client): PersonCardViewModel
     {
-        $client = $commande->getClient();
 
         $nom = $client->getNom() ?? '';
         $prenom = $client->getPrenom() ?? '';
         $name = $nom . ' ' . $prenom;
         $phone = $this->phoneNumberService->formatSn($client->getTelephone());
 
-        return new ClientCardViewModel(
+        return new PersonCardViewModel(
             name: $name,
             phone: $phone,
-            initials: $this->initials($nom, $prenom),
+            initials: $this->personService->initials($nom, $prenom),
         );
     }
 
@@ -201,9 +203,4 @@ final readonly class OrdersViewFactory
         );
     }
 
-
-    private function initials(string $nom, string $prenom): string
-    {
-        return strtoupper($nom[0] ?? 'C') . strtoupper($prenom[0] ?? 'L');
-    }
 }

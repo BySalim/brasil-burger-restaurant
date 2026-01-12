@@ -1,0 +1,41 @@
+{#
+Deliverer Card Component
+
+@param object deliverer - Deliverer object {name, phone, deliveryCount}
+#}
+{% set delivererData = deliverer|default({}) %}
+{% set delivererName = delivererData.name|default('Non assigné') %}
+{% set delivererPhone = delivererData.phone|default('') %}
+{% set deliveryId = delivererData.id|default('') %}
+
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-xl overflow-hidden shadow-sm flex flex-col">
+    {% include 'components/card_header.html.twig' with {
+        icon: 'two_wheeler',
+        title: 'Livreur Assigné',
+        iconColor: 'text-purple-600 dark:text-purple-400',
+        badge: deliveryId
+    } %}
+
+    <div class="p-4 flex items-center gap-4">
+        {% include 'components/avatar_initials.html.twig' with {
+            name: delivererName,
+            color: 'purple'
+        } %}
+
+        <div class="flex flex-col min-w-0">
+            <p class="font-bold text-base text-gray-900 dark:text-white truncate">{{ delivererName }}</p>
+
+            {% if delivererPhone %}
+                <a
+                    class="flex items-center gap-1.5 mt-1 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+                >
+                    {% include 'components/icon.html.twig' with {
+                        name: 'call',
+                        size: 'text-[14px]'
+                    } %}
+                    <span class="text-xs font-semibold">{{ delivererPhone }}</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

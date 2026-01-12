@@ -1,0 +1,82 @@
+{#
+Delivery Header V2 Component (Simplified)
+
+@param object delivery - Delivery object {id, status, date, time}
+#}
+{% set deliveryId = delivery.id|default('') %}
+{% set deliveryStatusLabel = delivery.statusLabel|default('En cours') %}
+{% set deliveryStatusColor = delivery.statusColor|default('bg-gray-600 text-white border-gray-700 dark:bg-gray-700 dark:border-gray-800') %}
+{% set deliveryStatusIcon = delivery.statusIcon|default('pending') %}
+{% set isEnCours = delivery.isEnCours|default(false) %}
+{% set deliveryDate = delivery.date|default('-- -- ----') %}
+{% set deliveryTime = delivery.time|default('-:-') %}
+
+<div class="px-2 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-4 flex-wrap">
+            {% include 'components/icon.html.twig' with {
+                name: 'local_shipping',
+                size: 'text-3xl',
+                class: 'text-primary',
+            } %}
+            <h3 class="text-3xl font-bold text-gray-900 dark:text-white font-mono">ID: {{ deliveryId }}</h3>
+
+            {% include 'components/badge.html.twig' with {
+                text: deliveryStatusLabel,
+                icon: deliveryStatusIcon,
+                color: deliveryStatusColor,
+                shape: 'pill',
+                size: 'md',
+            } %}
+        </div>
+
+        <div class="flex items-center gap-3 text-gray-500 dark:text-text-muted-dark text-sm">
+            <div class="flex items-center gap-1.5">
+                {% include 'components/icon.html.twig' with {
+                    name: 'calendar_today',
+                    size: 'text-[18px]'
+                } %}
+                <span>{{ deliveryDate }}</span>
+            </div>
+            <span class="w-1 h-1 bg-gray-400 rounded-full"></span>
+            <div class="flex items-center gap-1.5">
+                {% include 'components/icon.html.twig' with {
+                    name: 'schedule',
+                    size: 'text-[18px]'
+                } %}
+                <span>{{ deliveryTime }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if isEnCours %}
+        <form
+            action="{{ path('app_order_change_status', {id: deliveryId}) }}"
+            method="post"
+            class="inline"
+        >
+            <button
+                type="submit"
+                class="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white hover:bg-green-700 rounded-lg text-sm font-bold shadow-md transition-all"
+            >
+                {% include 'components/icon.html.twig' with {
+                    name: 'check_circle',
+                    size: 'text-[20px]'
+                } %}
+                Terminer la livraison
+            </button>
+        </form>
+    {% else %}
+        <button
+            type="button"
+            disabled
+            class="flex items-center justify-center gap-2 px-6 py-3 bg-gray-800 text-gray-200 rounded-lg text-sm font-bold shadow-md cursor-not-allowed"
+        >
+            {% include 'components/icon.html.twig' with {
+                name: 'check_circle',
+                size: 'text-[20px]'
+            } %}
+            Terminer la livraison
+        </button>
+    {% endif %}
+</div>

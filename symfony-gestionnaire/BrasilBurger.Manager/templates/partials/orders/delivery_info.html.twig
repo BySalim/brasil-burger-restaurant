@@ -10,8 +10,8 @@ Delivery Information Card
 {% set deliveryIcon = delivery.icon|default('') %}
 {% set deliveryData = delivery.color|default('') %}
 {% set deliveryPrice = delivery.deliveryPrice|default('') %}
-{% set deliveryId = delivery.deliveryId|default('') %}
-{% set deliveryInfoId = delivery.deliveryInfoId|default('') %}
+{% set deliveryId = delivery.deliveryId|default(null) %}
+{% set deliveryInfoId = delivery.deliveryInfoId|default(null) %}
 {% set isDelivered = delivery.isDelivered|default(false) %}
 
 {% embed 'components/info_card.html.twig' with {
@@ -30,14 +30,14 @@ Delivery Information Card
 
                 {% if isDelivered %}
                     <span class="text-xs font-semibold text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                Prix :
-                <span class="font-extrabold text-primary">{{ deliveryPrice|app_number_formated }} {{ app_currency }}</span>
-            </span>
+                        Prix :
+                        <span class="font-extrabold text-primary">{{ deliveryPrice|app_number_formated }} {{ app_currency }}</span>
+                    </span>
                 {% endif %}
             </div>
 
             {% if isDelivered %}
-                <a href="{{ deliveryInfoId ?? path('app_info_delivery', {id: deliveryInfoId}) }}"
+                <a href="{{ deliveryInfoId ? path('app_deliveries_info_show', {id: deliveryInfoId}) : '' }}"
                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">
                     {% include 'components/icon.html.twig' with { name: 'info', size: 'text-[16px]' } %}
                     Infos
@@ -54,7 +54,7 @@ Delivery Information Card
                     </p>
                 </div>
 
-                <a href="{{ deliveryId ?? path('app_deliveries_show_delivery', {id: deliveryId}) }}"
+                <a href="{{ deliveryId ? path('app_deliveries_show', {id: deliveryId}) : '' }}"
                    class="h-8 w-8 inline-flex items-center justify-center rounded-lg bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
                     {% include 'components/icon.html.twig' with { name: 'visibility', size: 'text-[18px]' } %}
                 </a>

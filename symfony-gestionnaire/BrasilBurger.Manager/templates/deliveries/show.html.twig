@@ -1,0 +1,64 @@
+{% extends 'layouts/dashboard_layout.html.twig' %}
+
+{% block title %}{{ acronyme_sn }} - Info Livraison {{ infos.deliveryId }}{% endblock %}
+
+{% block page_title %}Détails de la Livraison{% endblock %}
+{% block page_subtitle %}Consultez et gérez les informations logistiques de cette course en temps réel.{% endblock %}
+
+{% block header_actions %}
+    <button type="button" onclick="history.back()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+        {% include 'components/icon.html.twig' with {
+            name: 'arrow_back',
+            size: 'text-[20px]'
+        } %}
+        Retour
+    </button>
+{% endblock %}
+
+{% block content %}
+    <div class="space-y-6 max-w-5xl w-full mx-auto">
+        {# Header with ID, Status, Date and Action #}
+        {% include 'partials/deliveries/delivery_header.html.twig' with {
+            delivery: deliveryHeader
+        } %}
+
+        {# Main Content Grid #}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {# Left Column #}
+            <div class="space-y-6">
+                {# Destination Card #}
+                {% include 'partials/deliveries/destination_card.html.twig' with {
+                    zone :  deliveryLocation.zone,
+                    qartier : deliveryLocation.neighborhood,
+                } %}
+
+                {# Delivery Note Card #}
+                {% include 'partials/deliveries/note_card.html.twig' with {
+                    note: deliveryLocation.note
+                } %}
+            </div>
+
+            {# Right Column #}
+            <div class="space-y-6">
+                {# Price & Order Card #}
+                {% include 'partials/deliveries/price_order_card.html.twig' with {
+                    deliveryPrice: infos.priceDelivery,
+                    orderCode: infos.orderCode,
+                    orderId: infos.orderId
+                } %}
+
+                {# Client & Deliverer Cards #}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% include 'partials/deliveries/client_card.html.twig' with {
+                        client: deliveryClient
+                    } %}
+
+                    {% include 'partials/deliveries/deliverer_card.html.twig' with {
+                        deliverer: deliveryLivreur
+                    } %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

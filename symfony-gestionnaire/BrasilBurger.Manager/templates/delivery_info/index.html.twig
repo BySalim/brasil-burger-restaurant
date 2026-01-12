@@ -1,0 +1,81 @@
+{% extends 'layouts/dashboard_layout.html.twig' %}
+
+{% block title %}{{ acronyme_sn }} - Détails Livraison {{ deliveryInfoId }}{% endblock %}
+
+{% block page_title %}Information sur la Livraison{% endblock %}
+{% block page_subtitle %}Détails logistiques et informations client pour le suivi de la livraison.{% endblock %}
+
+{% block header_actions %}
+    <button type="button" onclick="history.back()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+        {% include 'components/icon.html.twig' with {
+            name: 'arrow_back',
+            size: 'text-[20px]'
+        } %}
+        Retour
+    </button>
+{% endblock %}
+
+{% block content %}
+    <div class="space-y-6 max-w-5xl w-full mx-auto">
+        {# Header with ID #}
+        <div class="px-2 py-4">
+            <div class="flex items-center gap-3">
+                {% include 'components/icon.html.twig' with {
+                    name: 'package_2',
+                    size: 'text-3xl',
+                    class: 'text-primary'
+                } %}
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white font-mono">
+                    ID: {{ deliveryInfoId }}
+                </h3>
+            </div>
+        </div>
+
+        {# Main Content Grid #}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {# Left Column #}
+            <div class="space-y-6">
+                {# Destination Card #}
+                {% include 'partials/deliveries/destination_card.html.twig' with {
+                    zone :  deliveryLocation.zone,
+                    qartier : deliveryLocation.neighborhood,
+                } %}
+
+                {# Delivery Note Card #}
+                {% include 'partials/deliveries/note_card.html.twig' with {
+                    note: deliveryLocation.note
+                } %}
+            </div>
+
+            {# Right Column #}
+            <div class="space-y-6">
+                {# Price & Order Card #}
+                {% include 'partials/deliveries/price_order_card.html.twig' with {
+                    deliveryPrice: infos.priceDelivery,
+                    orderCode: infos.orderCode,
+                    orderId: infos.orderId
+                } %}
+
+                {# Client Card Only #}
+                {% include 'partials/deliveries/client_card.html.twig' with {
+                    client: deliveryClient
+                } %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{# Sample Data for Development #}
+{% set sampleLocation = {
+    zone: 'Plateau',
+    neighborhood: 'Centre-Ville',
+    address: '15 Avenue Jean Jaurès, Immeuble K, Appt 4B'
+} %}
+
+{% set sampleNote = 'S\'il vous plaît, appelez-moi une fois arrivé, je descends!' %}
+
+{% set sampleClient = {
+    name: 'Amadou Diallo',
+    phone: '77 123 45 67'
+} %}

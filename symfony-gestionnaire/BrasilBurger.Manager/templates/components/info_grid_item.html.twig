@@ -1,0 +1,13 @@
+{#
+Info Grid Item Component
+
+@param string label - Label text (required)
+@param string value - Value text (required)
+#}
+{% set itemLabel = label|default('Label') %}
+{% set itemValue = value|default('Value') %}
+
+<div>
+    <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">{{ itemLabel }}</p>
+    <p class="font-bold text-gray-900 dark:text-white">{{ itemValue }}</p>
+</div>

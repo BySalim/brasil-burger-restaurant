@@ -1,0 +1,39 @@
+{#
+Price & Order Card Component
+
+@param string deliveryPrice - Delivery price
+@param string orderCode - Order code
+@param int orderId - Order ID for link
+#}
+{% set price = deliveryPrice|default(0) %}
+{% set orderCode = orderCode|default('#CMD-0000') %}
+{% set orderId = orderId|default(1) %}
+
+<div class="bg-white dark:bg-surface-dark p-5 rounded-xl border border-gray-200 dark:border-border-dark shadow-sm flex items-center justify-between">
+    <div class="flex items-center gap-8">
+        <div>
+            <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Prix Livraison</p>
+            <p class="font-mono font-bold text-lg text-gray-900 text-primary">{{ price|app_number_formated }} {{ app_currency }}</p>
+        </div>
+
+        <div class="w-px h-10 bg-gray-100 dark:bg-slate-700"></div>
+
+        <div>
+            <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Commande liée</p>
+            <p class="font-mono font-bold text-lg text-gray-900 dark:text-white">{{ orderCode }}</p>
+        </div>
+    </div>
+
+    {% if orderId %}
+        <a
+            href="{{ path('app_orders_show_order', {id: orderId}) }}"
+            class="p-2 text-gray-400 hover:text-primary hover:bg-gray-50 dark:hover:bg-slate-800 rounded-lg transition-all"
+            title="Voir la commande"
+        >
+            {% include 'components/icon.html.twig' with {
+                name: 'open_in_new',
+                size: 'text-[24px]'
+            } %}
+        </a>
+    {% endif %}
+</div>

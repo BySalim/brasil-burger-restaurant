@@ -1,0 +1,31 @@
+{#
+Avatar with Initials Component
+
+@param string name - Full name to extract initials (required)
+@param string color - Color variant: blue, purple, green, orange (default: blue)
+@param string size - Size variant: sm, md, lg (default: md)
+#}
+{% set fullName = name|default('User') %}
+{% set avatarColor = color|default('blue') %}
+{% set avatarSize = size|default('md') %}
+
+{# Extract initials from name #}
+{% set nameParts = fullName|split(' ') %}
+{% set initials = nameParts[0]|slice(0, 1)|upper ~ (nameParts[1]|default('')|slice(0, 1)|upper) %}
+
+{% set colorClasses = {
+    'blue': 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/50',
+    'purple': 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/50',
+    'green': 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800/50',
+    'orange': 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800/50'
+} %}
+
+{% set sizeClasses = {
+    'sm': 'h-10 w-10 text-sm',
+    'md': 'h-12 w-12 text-base',
+    'lg': 'h-14 w-14 text-lg'
+} %}
+
+<div class="{{ sizeClasses[avatarSize] }} flex-shrink-0 rounded-full {{ colorClasses[avatarColor] }} flex items-center justify-center font-bold border shadow-sm">
+    {{ initials }}
+</div>

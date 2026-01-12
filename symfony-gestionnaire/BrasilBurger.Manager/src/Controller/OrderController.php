@@ -117,7 +117,7 @@ class OrderController extends AbstractController
 
         $orderHeader = $this->ordersViewFactory->createOrderHeader($commande);
         $productsSales = $this->ordersViewFactory->createProductsSales($commande);
-        $clientCard = $this->ordersViewFactory->createCardClient($commande);
+        $clientCard = $this->ordersViewFactory->createCardClient($commande->getClient());
         $deliveryCard = $this->ordersViewFactory->createDeliveryCard($commande);
         $paymentCard = $this->ordersViewFactory->createPaymentCard($commande);
         $statusActions = $commande->getEtat()->getEditableStatusMap();

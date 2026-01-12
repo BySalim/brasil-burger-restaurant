@@ -19,7 +19,7 @@ Client Section
             <p class="font-bold text-gray-900 dark:text-white text-lg truncate">{{ clientName }}</p>
 
             <div class="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700/50 flex items-center gap-3">
-                <a href="tel:{{ clientPhone|replace({' ': '', '+': ''}) }}" class="flex items-center gap-2 text-primary hover:text-orange-600 transition-colors">
+                <a class="flex items-center gap-2 text-primary hover:text-orange-600 transition-colors">
                     <div class="p-1.5 rounded-full bg-primary/10 text-primary">
                         {% include 'components/icon.html.twig' with {
                             name: 'call',

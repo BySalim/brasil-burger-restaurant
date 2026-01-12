@@ -1,0 +1,29 @@
+{#
+Destination Card Component
+
+@param object location - Location object {zone, quartier, address}
+#}
+{% set zone = zone|default('--') %}
+{% set quartier = quartier|default('--') %}
+
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-xl overflow-hidden shadow-sm">
+    {% include 'components/card_header.html.twig' with {
+        icon: 'location_on',
+        title: 'Destination',
+        iconColor: 'text-primary'
+    } %}
+
+    <div class="p-5 space-y-5">
+        <div class="grid grid-cols-2 gap-4">
+            {% include 'components/info_grid_item.html.twig' with {
+                label: 'Zone',
+                value: zone
+            } %}
+
+            {% include 'components/info_grid_item.html.twig' with {
+                label: 'Quartier',
+                value: quartier
+            } %}
+        </div>
+    </div>
+</div>

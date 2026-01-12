@@ -70,7 +70,7 @@ enum Color: string
     {
         return match($this) {
             self::BLUE => 'bg-blue-600 text-white border-blue-700 dark:bg-blue-700 dark:border-blue-800',
-            self:: INDIGO => 'bg-indigo-600 text-white border-indigo-700 dark: bg-indigo-700 dark:border-indigo-800',
+            self::INDIGO => 'bg-indigo-600 text-white border-indigo-700 dark: bg-indigo-700 dark:border-indigo-800',
             self::PURPLE => 'bg-purple-600 text-white border-purple-700 dark:bg-purple-700 dark:border-purple-800',
             self::PINK => 'bg-pink-600 text-white border-pink-700 dark:bg-pink-700 dark:border-pink-800',
             self::RED => 'bg-red-600 text-white border-red-700 dark:bg-red-700 dark:border-red-800',
