@@ -5,6 +5,7 @@ Orders Table
 #}
 {% import 'macros/table_macros.html.twig' as table %}
 {% set ordersList = orders|default([]) %}
+{% set pagination = pagination|default([]) %}
 
 <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
@@ -42,4 +43,12 @@ Orders Table
             </tbody>
         </table>
     </div>
+    {# Pagination #}
+    {% include 'components/pagination.html.twig' with {
+        totalItems: pagination.totalItems,
+        itemsPerPage: pagination.itemsPerPage,
+        currentPage: pagination.currentPage,
+        displayedItems: orders|length,
+        labelItem: 'commandes'
+    } %}
 </div>

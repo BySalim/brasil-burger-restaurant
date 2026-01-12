@@ -49,7 +49,7 @@ Table Macros - Reusable table row components
         <td class="px-3 py-3 whitespace-nowrap text-right">
             {% include 'components/badge.html.twig' with {
                 text:  order.status,
-                color: order.statusColorClasses|default('blue'),
+                color: order.statusColorClasses,
                 shape: 'pill',
                 size: 'md'
             } %}
@@ -212,8 +212,7 @@ Table Macros - Reusable table row components
 {# ========================================
    MACRO 4: Delivery Tracking Row (pour le tableau de suivi des livraisons)
    ======================================== #}
-{% macro delivery_tracking_row(delivery) %}
-    {% set isCompleted = delivery.status == 'completed' %}
+{% macro delivery_tracking_row(delivery, statusTerminer) %}
 
     <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
         {# Checkbox #}
@@ -223,8 +222,8 @@ Table Macros - Reusable table row components
                     type="checkbox"
                     name="selected_deliveries[]"
                     value="{{ delivery.id }}"
-                    class="delivery-checkbox w-4 h-4 text-primary bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 rounded focus:ring-primary focus:ring-offset-0 transition-colors cursor-pointer {{ isCompleted ? 'text-gray-300 bg-gray-100 dark:bg-slate-900 border-gray-300 dark:border-slate-700 cursor-not-allowed opacity-50' : '' }}"
-                    {% if isCompleted %}disabled{% endif %}
+                    class="delivery-checkbox w-4 h-4 text-primary bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 rounded focus: ring-primary focus:ring-offset-0 transition-colors cursor-pointer {{ delivery.isCompleted ? 'text-gray-300 bg-gray-100 dark:bg-slate-900 border-gray-300 dark:border-slate-700 cursor-not-allowed opacity-50' : '' }}"
+                    {% if delivery.isCompleted %}disabled{% endif %}
                     onchange="updateBulkActionButton()"
                 >
             </div>
@@ -238,11 +237,11 @@ Table Macros - Reusable table row components
             </div>
         </td>
 
-        {# Code #}
+        {# Id #}
         <td class="px-4 py-4 whitespace-nowrap">
             <span
                 class="font-mono font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">
-                {{ delivery.code|default('#LIV-0000') }}
+                {{ delivery.id|default('0') }}
             </span>
         </td>
 
@@ -257,7 +256,7 @@ Table Macros - Reusable table row components
                 <span
                     class="text-gray-900 dark:text-white font-medium">{{ delivery.delivererName|default('--') }}</span>
                 <span
-                    class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.delivererCode|default('--') }}</span>
+                    class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.delivererPhone|default('--') }}</span>
             </div>
         </td>
 
@@ -272,20 +271,48 @@ Table Macros - Reusable table row components
 
         {# Status Badge #}
         <td class="px-4 py-4 whitespace-nowrap">
-            {% include 'components/delivery_status_badge.html.twig' with {
-                status: delivery.status|default('en_cours')
+            {% include 'components/badge.html.twig' with {
+                text:  delivery.statusLabel,
+                color: delivery.statusBadgeColor,
+                shape: 'pill',
+                size: 'md'
             } %}
         </td>
 
         {# Action Button (Complete) #}
         <td class="px-4 py-4 text-center whitespace-nowrap">
-            {% include 'components/action_button.html.twig' with {
-                icon: 'check',
-                color: 'success',
-                disabled: isCompleted,
-                title: isCompleted ? 'Livraison terminée' : 'Terminer la livraison',
-                onclick: isCompleted ? '' : 'completeDelivery(' ~ delivery.id ~ ')'
-            } %}
+            {% if not delivery.isCompleted %}
+                {# Formulaire POST pour terminer la livraison individuelle #}
+                <form
+                    action="{{ path('app_deliveries_complete', {id: delivery.id}) }}"
+                    method="post"
+                    class="inline"
+                >
+                    <input type="hidden" name="_token" value="{{ csrf_token('complete-delivery-' ~ delivery.id) }}">
+                    <button
+                        type="submit"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg {{ statusTerminer.color }} hover:shadow-md active:scale-95 transition-all"
+                        title="Terminer la livraison"
+                        onclick="return confirm('Confirmer la fin de cette livraison ?')"
+                    >
+                        {% include 'components/icon.html.twig' with {
+                            name: statusTerminer.icon,
+                            size: 'text-[18px]'
+                        } %}
+                    </button>
+                </form>
+            {% else %}
+                {# Bouton désactivé si déjà terminé #}
+                <span
+                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-50"
+                    title="Livraison déjà terminée"
+                >
+                    {% include 'components/icon.html.twig' with {
+                        name: statusTerminer.icon,
+                        size:  'text-[18px]'
+                    } %}
+                </span>
+            {% endif %}
         </td>
 
         {# Details Button #}

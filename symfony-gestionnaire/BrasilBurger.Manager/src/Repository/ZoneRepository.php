@@ -12,4 +12,17 @@ class ZoneRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Zone::class);
     }
+
+    /**
+     * Récupère toutes les zones actives
+     */
+    public function findActiveZones(): array
+    {
+        return $this->findBy(['estArchiver' => false], ['nom' => 'ASC']);
+    }
+
+    public function findById(int $id): ?Zone
+    {
+        return $this->findOneBy(['id' => $id]);
+    }
 }

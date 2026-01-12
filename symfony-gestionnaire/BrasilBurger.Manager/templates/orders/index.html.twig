@@ -14,18 +14,11 @@
 {% block content %}
     {# Filters Bar #}
     {% include 'partials/orders/filters_bar.html.twig' with {
-        filters: filters|default({})
+        form: form
     } %}
 
     {% include 'partials/orders/orders_table.html.twig' with {
-        orders: orders|default([])
-    } %}
-
-    {# Pagination #}
-    {% include 'components/pagination.html.twig' with {
-        totalItems: totalItems|default(128),
-        itemsPerPage: itemsPerPage|default(8),
-        nbrPages: toalPages|default(15),
-        displayedItems: orders|default(orders)|length
+        orders: orders,
+        pagination: paginationData
     } %}
 {% endblock %}

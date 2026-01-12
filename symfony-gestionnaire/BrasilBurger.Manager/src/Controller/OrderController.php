@@ -47,27 +47,31 @@ class OrderController extends AbstractController
         );
 
         $per_page = $filters['per_page'] ?? $this->params->get('app.pagination.default_per_page');
-        $pagination = $paginator->paginate(
+        $kPagination = $paginator->paginate(
             $queryBuilder,
             $request->query->getInt('page', 1),
             $per_page
         );
-        $totalItems = $pagination->getTotalItemCount();
 
-        $cmd_items = $pagination->getItems();
+        $paginationData = [
+            'totalItems' => $kPagination->getTotalItemCount(),
+            'currentPage' => $kPagination->getCurrentPageNumber(),
+            'itemsPerPage' => $per_page,
+        ];
+
+        $cmd_items = $kPagination->getItems();
 
         $orders = $this->ordersViewFactory->createOrderRows($cmd_items);
 
         return $this->render('orders/index.html.twig', [
             'form' => $form,
             'orders' => $orders,
-            'totalItems' => $totalItems,
-            'itemsPerPage' => $per_page,
+            'paginationData' => $paginationData,
         ]);
     }
 
     /**
-     * Changer le statut d'une commande (POST)
+     * Changer le statut d'une commande
      */
     #[Route('/change-status/{id}', name: 'app_order_change_status', methods: ['POST'])]
     public function changeStatus(Commande $commande, Request $request): Response

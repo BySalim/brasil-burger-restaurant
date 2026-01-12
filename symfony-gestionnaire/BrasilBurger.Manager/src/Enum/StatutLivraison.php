@@ -15,7 +15,7 @@ enum StatutLivraison: string implements DisplayEnumInterface
     {
         return match($this) {
             self::EN_COURS => 'En cours',
-            self:: TERMINER => 'Terminée',
+            self::TERMINER => 'Terminée',
         };
     }
 
@@ -41,5 +41,51 @@ enum StatutLivraison: string implements DisplayEnumInterface
             self::EN_COURS => 'Livraisons en cours',
             self::TERMINER => 'Livraisons terminées',
         };
+    }
+
+    /**
+     * Déterminer si le statut est final (ne peut plus être modifié)
+     */
+    public function isFinal(): bool
+    {
+        return $this === self::TERMINER;
+    }
+
+    /**
+     * Définir les transitions autorisées depuis chaque statut
+     *
+     * @return StatutLivraison[]
+     */
+    public function getAllowedTransitions(): array
+    {
+        return match ($this) {
+            self:: EN_COURS => [self:: TERMINER],
+            self:: TERMINER => [],
+        };
+    }
+
+    /**
+     * Retourne un tableau indiquant pour chaque statut s'il est accessible depuis le statut actuel
+     *
+     * @return array<string, array{value: string, allowed:  bool, label: string, icon:  string, colorSolid:  string}>
+     */
+    public function getEditableStatusMap(): array
+    {
+        $allowedTransitions = $this->getAllowedTransitions();
+        $map = [];
+
+        foreach (self:: cases() as $case) {
+            if ($case !== self::EN_COURS) {
+                $map[$case->value] = [
+                    'value' => $case->value,
+                    'allowed' => in_array($case, $allowedTransitions, true),
+                    'label' => $case->getLabel(),
+                    'icon' => $case->getIcon(),
+                    'colorSolid' => $case->getColor()->getSolidBadgeClasses(),
+                ];
+            }
+        }
+
+        return $map;
     }
 }

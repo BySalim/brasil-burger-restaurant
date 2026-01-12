@@ -5,11 +5,12 @@ Pagination Component
 @param int itemsPerPage - Items per page
 @param int displayedItems - Number of items currently displayed
 #}
-{% set totalCount = totalItems|default(0) %}
+{% set totalCount = totalItems|default(80) %}
 {% set perPage = itemsPerPage|default(10) %}
 {% set displayed = displayedItems|default(perPage) %}
+{% set label = labelItem|default('items') %}
+{% set current = currentPage|default(1) %}
 
-{% set current = app.request.query.get('page', 1) %}
 {% set total = (totalCount/perPage)|round(0, 'ceil') %}
 {% set startItem = ((current - 1) * perPage) + 1 %}
 {% set endItem = startItem + displayed - 1 %}
@@ -27,8 +28,10 @@ Pagination Component
         <span class="font-bold text-gray-900 dark:text-white">{{ endItem }}</span>
         sur
         <span class="font-bold text-gray-900 dark:text-white">{{ totalCount }}</span>
-        commandes
+        {{ label }}
     </p>
+
+    {% block bulk_action %}{% endblock %}
 
     <nav class="flex items-center gap-4" aria-label="Pagination">
         {# Previous Button #}

@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Livraison;
 use App\Factory\DeliveriesViewFactory;
 use App\Factory\OrdersViewFactory;
+use App\Form\DeliveryFilterType;
 use App\Form\OrderFilterType;
 use App\Repository\LivraisonRepository;
+use App\Service\LivraisonService;
 use App\ViewModel\DeliveryInfos;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +23,7 @@ class DeliveryController extends AbstractController
         private readonly LivraisonRepository $livraisonRepository,
         private readonly DeliveriesViewFactory $deliveriesViewFactory,
         private readonly OrdersViewFactory $ordersViewFactory,
+        private readonly LivraisonService $livraisonService
     )
     {
     }
@@ -28,10 +32,10 @@ class DeliveryController extends AbstractController
     public function index(Request $request, PaginatorInterface $paginator): Response
     {
 
-//        $form = $this->createForm(OrderFilterType::class);
-//        $form->handleRequest($request);
-//
-//        $filters = $form->getData();
+        $form = $this->createForm(DeliveryFilterType::class);
+        $form->handleRequest($request);
+
+        $filters = $form->getData();
 //
 //        $queryBuilder = $this->commandeRepository->findAllWithFiltersQB(
 //            search: $filters['search'] ?? null,
@@ -53,7 +57,93 @@ class DeliveryController extends AbstractController
 //        $orders = $this->ordersViewFactory->createOrderRows($cmd_items);
 
         return $this->render('deliveries/index.html.twig', [
+            'form' => $form,
         ]);
+    }
+
+    /**
+     * Terminer UNE livraison individuelle
+     */
+    #[Route('/{id}/complete', name: 'app_deliveries_complete', methods: ['POST'])]
+    public function completeDelivery(
+        Livraison $livraison,
+        Request $request
+    ): Response {
+
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('complete-delivery-' . $livraison->getId(), $token)) {
+            $this->addFlash('error', 'Token de sécurité invalide');
+            return $this->redirectToRoute('app_deliveries_index');
+        }
+
+        try {
+            $this->livraisonService->complete($livraison);
+
+            $this->addFlash('success', sprintf(
+                'Livraison #%d terminée avec succès',
+                $livraison->getId()
+            ));
+
+        } catch (\LogicException $e) {
+            $this->addFlash('error', $e->getMessage());
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue lors de la finalisation');
+        }
+
+        return $this->redirectToRoute('app_deliveries_index');
+    }
+
+    /**
+     * Terminer PLUSIEURS livraisons (bulk action)
+     */
+    #[Route('/bulk/complete', name: 'app_deliveries_bulk_complete', methods: ['POST'])]
+    public function bulkCompleteDeliveries(
+        Request $request
+    ): Response {
+        // Vérifier le token CSRF
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('bulk-complete-deliveries', $token)) {
+            $this->addFlash('error', 'Token de sécurité invalide');
+            return $this->redirectToRoute('app_deliveries_index');
+        }
+
+        // Récupérer les IDs
+        $deliveryIdsString = $request->request->get('delivery_ids', '');
+
+        if (empty($deliveryIdsString)) {
+            $this->addFlash('warning', 'Aucune livraison sélectionnée');
+            return $this->redirectToRoute('app_deliveries_index');
+        }
+
+        // Convertir en tableau d'entiers
+        $deliveryIds = array_map('intval', explode(',', $deliveryIdsString));
+
+        try {
+            $result = $this->livraisonService->bulkComplete($deliveryIds);
+
+            if ($result['success'] > 0) {
+                $this->addFlash('success', sprintf(
+                    '%d livraison(s) terminée(s) avec succès',
+                    $result['success']
+                ));
+            }
+
+            if ($result['skipped'] > 0) {
+                $this->addFlash('warning', sprintf(
+                    '%d livraison(s) ignorée(s) (déjà terminées)',
+                    $result['skipped']
+                ));
+            }
+
+            foreach ($result['errors'] as $error) {
+                $this->addFlash('error', $error);
+            }
+
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue :  ' . $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_deliveries_index');
     }
 
     #[Route('/{id}', name: 'app_deliveries_show', requirements: ['id' => '\d+'])]
@@ -86,6 +176,8 @@ class DeliveryController extends AbstractController
             'infos' => $infos,
         ]);
     }
+
+
     #[Route('/orders/', name: 'app_deliveries_orders')]
     public function listOrdersToDelivered(): Response
     {

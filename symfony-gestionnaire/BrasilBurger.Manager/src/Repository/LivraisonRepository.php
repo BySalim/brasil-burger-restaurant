@@ -12,4 +12,19 @@ class LivraisonRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Livraison::class);
     }
+
+    public function save(Livraison $livraison, bool $flush = false): void
+    {
+        $em = $this->getEntityManager();
+        $em->persist($livraison);
+
+        if ($flush) {
+            $em->flush();
+        }
+    }
+
+    public function findById(int $id): ?Livraison
+    {
+        return $this->findOneBy(['id' => $id]);
+    }
 }

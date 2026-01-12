@@ -12,4 +12,14 @@ class GroupeLivraisonRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, GroupeLivraison::class);
     }
+
+    public function save(GroupeLivraison $groupeLivraison, bool $flush = false): void
+    {
+        $em = $this->getEntityManager();
+        $em->persist($groupeLivraison);
+
+        if ($flush) {
+            $em->flush();
+        }
+    }
 }

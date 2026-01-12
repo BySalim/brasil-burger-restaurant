@@ -5,6 +5,8 @@ Deliveries Table with Checkboxes
 #}
 {% import 'macros/table_macros.html.twig' as table %}
 {% set deliveriesList = deliveries|default([]) %}
+{% set statusTerminerData = statusTerminer|default({}) %}
+{% set pagination = pagination|default([]) %}
 
 <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm overflow-hidden flex flex-col">
     <div class="overflow-x-auto">
@@ -22,7 +24,7 @@ Deliveries Table with Checkboxes
                     </div>
                 </th>
                 <th class="px-4 py-4 w-auto whitespace-nowrap">Date</th>
-                <th class="px-4 py-4 w-auto whitespace-nowrap">Code</th>
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Id</th>
                 <th class="px-4 py-4 w-auto whitespace-nowrap">Zone</th>
                 <th class="px-4 py-4 w-auto whitespace-nowrap">Livreur</th>
                 <th class="px-4 py-4 w-auto whitespace-nowrap">Client</th>
@@ -33,7 +35,7 @@ Deliveries Table with Checkboxes
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-border-dark text-sm">
             {% for delivery in deliveriesList %}
-                {{ table.delivery_tracking_row(delivery) }}
+                {{ table.delivery_tracking_row(delivery, statusTerminerData) }}
             {% else %}
                 <tr>
                     <td colspan="9" class="px-6 py-12 text-center">
@@ -50,10 +52,32 @@ Deliveries Table with Checkboxes
     </div>
 
     {# Footer with Bulk Actions & Pagination #}
-    {% include 'partials/deliveries/bulk_actions_bar.html.twig' with {
-        currentPage: currentPage|default(1),
-        totalPages: totalPages|default(8),
-        totalItems: totalItems|default(42),
-        displayedItems: deliveriesList|length
+    {% embed 'components/pagination.html.twig' with {
+        totalItems: pagination.totalItems,
+        itemsPerPage: pagination.itemsPerPage,
+        currentPage: pagination.currentPage,
+        displayedItems: deliveriesList|length,
+        labelItem: 'livraisons'
     } %}
+        {% block bulk_action %}
+            {# Bulk Action Button #}
+            <div class="flex justify-center">
+                <form id="bulkCompleteForm" action="{{ path('app_deliveries_bulk_complete') }}" method="post">
+                    <input type="hidden" name="_token" value="{{ csrf_token('bulk-complete-deliveries') }}">
+                    <input type="hidden" id="bulkSelectedIds" name="delivery_ids" value="">
+
+                    <button
+                        type="submit"
+                        id="bulkCompleteButton"
+                        disabled
+                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:dark:bg-slate-700 disabled:text-gray-400 disabled:dark:text-slate-500 enabled:bg-green-600 enabled:text-white enabled:hover:bg-green-700 enabled:hover:shadow-md enabled:active:scale-95"
+                    >
+                        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                        <span id="bulkActionText">Terminer</span>
+                        <span id="bulkActionCount" class="hidden ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs font-bold"></span>
+                    </button>
+                </form>
+            </div>
+        {% endblock %}
+    {% endembed %}
 </div>
