@@ -1,18 +1,14 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
-{% block title %}Livraisons (Tracking) - {{ site_name }}{% endblock %}
+{% block title %}{{ acronyme_sn }} - Livraisons{% endblock %}
 
 {% block page_title %}Suivi des Livraisons{% endblock %}
 {% block page_subtitle %}Suivez l'état des livraisons en cours et l'historique.{% endblock %}
 
 {% block header_actions %}
-    <button type="button" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-        {% include 'components/icon.html.twig' with {
-            name: 'refresh',
-            size: 'text-[20px]'
-        } %}
-        Actualiser
-    </button>
+    {% include 'components/button_link.html.twig' with {
+        buttonLink: 'app_deliveries'
+    } %}
 {% endblock %}
 
 {% block header_extra %}

@@ -12,7 +12,7 @@ Deliveries Header Tabs
         text: 'Commandes terminées à livrer',
         active: currentTab == 'orders',
         badge: ordersCount > 0 ? ordersCount : null,
-        href: path('app_orders_to_delivered')
+        href: path('app_deliveries_orders')
     } %}
 
     {% include 'components/tab_button.html.twig' with {
@@ -24,6 +24,6 @@ Deliveries Header Tabs
     {% include 'components/tab_button.html.twig' with {
         text: 'Livreurs',
         active: currentTab == 'deliverers',
-        href: path('app_default')
+        href: path('app_deliverers')
     } %}
 </div>
