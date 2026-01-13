@@ -9,6 +9,6 @@
 Thumbs.db
 
 # Dossier des autres branches
-.modelisation/
-.java-console/
-.symfony-gestionnaire/
+/modelisation/
+/java-console/
+/symfony-gestionnaire/
