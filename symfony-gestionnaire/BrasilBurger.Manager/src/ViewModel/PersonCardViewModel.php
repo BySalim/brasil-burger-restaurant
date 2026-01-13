@@ -9,5 +9,6 @@ final readonly class PersonCardViewModel
         public string $phone,
         public ?int $id = null,
         public ?string $initials = null,
+        public ?bool $estDisponible = null,
     ) {}
 }

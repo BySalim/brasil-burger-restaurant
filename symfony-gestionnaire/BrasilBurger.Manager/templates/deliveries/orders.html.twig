@@ -23,10 +23,10 @@
 {% block content %}
     <div class="space-y-4 max-w-5xl mx-auto w-full">
         {# Zones List #}
-        {% for zone in zones|default(sampleZones) %}
+        {% for zone in zonesWithOrders %}
             {% include 'partials/deliveries/zone_accordion.html.twig' with {
                 zone: zone,
-                deliverers: deliverers|default(sampleDeliverers)
+                deliverers: livreurs|default(sampleDeliverers)
             } %}
         {% endfor %}
     </div>
@@ -41,99 +41,134 @@
             const checkboxes = document.querySelectorAll(`input.order-checkbox[data-zone="${zoneId}"]:checked`);
             const countElement = document.getElementById(`selected-count-${zoneId}`);
             if (countElement) {
-                countElement.textContent = `(${checkboxes.length})`;
+                countElement. textContent = `(${checkboxes.length})`;
             }
         }
 
         // Toggle all orders in a zone
         function toggleAllOrders(masterCheckbox, zoneId) {
-            const checkboxes = document.querySelectorAll(`input.order-checkbox[data-zone="${zoneId}"]`);
+            const checkboxes = document. querySelectorAll(`input.order-checkbox[data-zone="${zoneId}"]`);
             checkboxes.forEach(cb => {
                 cb.checked = masterCheckbox.checked;
             });
             updateSelectedCount(zoneId);
         }
 
-        // Assign deliverer (placeholder - à implémenter côté backend)
-        function assignDeliverer(zoneId, matricule) {
+        // Assign deliverer - fonction globale unique
+        function assignDeliverer(zoneId, livreurId, livreurName) {
+            // Récupérer les commandes sélectionnées de cette zone uniquement
             const selectedOrders = Array.from(document.querySelectorAll(`input.order-checkbox[data-zone="${zoneId}"]:checked`))
                 .map(cb => cb.value);
 
+            // Vérifier qu'au moins une commande est sélectionnée
             if (selectedOrders.length === 0) {
-                alert('Veuillez sélectionner au moins une commande');
+                alert('⚠️ Veuillez sélectionner au moins une commande');
                 return;
             }
 
-            console.log('Assigning orders:', selectedOrders, 'to deliverer:', matricule);
-            // TODO: Appel AJAX pour assigner les commandes
+            // Confirmation avant envoi
+            if (! confirm(`Affecter ${selectedOrders.length} commande(s) à ${livreurName} ?`)) {
+                return;
+            }
+
+            // Remplir les champs cachés du formulaire
+            document.getElementById(`selectedOrders-${zoneId}`).value = selectedOrders.join(',');
+            document.getElementById(`selectedLivreur-${zoneId}`).value = livreurId;
+
+            // Soumettre le formulaire
+            document.getElementById(`assignForm-${zoneId}`).submit();
         }
     </script>
 {% endblock %}
 
-{# Sample Data #}
+{# Sample Data - Livreurs avec ID et booléen #}
 {% set sampleDeliverers = [
     {
-        name: 'Moussa Sow',
-        matricule: 'MAT-2023-01',
-        status: 'Dispo'
+        id: 1,
+        nom: 'Sow',
+        prenom: 'Moussa',
+        estDisponible:  true
     },
     {
-        name: 'Alioune Diop',
-        matricule: 'MAT-2023-14',
-        status: 'Dispo'
+        id: 2,
+        nom: 'Diop',
+        prenom: 'Alioune',
+        estDisponible: true
     },
     {
-        name: 'Babacar Gueye',
-        matricule: 'MAT-2023-05',
-        status: 'Dispo'
+        id: 3,
+        nom: 'Gueye',
+        prenom: 'Babacar',
+        estDisponible: false
     },
     {
-        name: 'Babacar Gueye',
-        matricule: 'MAT-2023-05',
-        status: 'Dispo'
+        id: 4,
+        nom: 'Fall',
+        prenom: 'Cheikh',
+        estDisponible: true
     },
     {
-        name: 'Babacar Gueye',
-        matricule: 'MAT-2023-05',
-        status: 'Dispo'
+        id: 4,
+        nom: 'Fall',
+        prenom: 'Cheikh',
+        estDisponible: true
+    },
+    {
+        id: 4,
+        nom: 'Fall',
+        prenom: 'Cheikh',
+        estDisponible: true
+    },
+    {
+        id: 4,
+        nom: 'Fall',
+        prenom: 'Cheikh',
+        estDisponible: true
+    },
+    {
+        id: 5,
+        nom: 'Ndiaye',
+        prenom: 'Aminata',
+        estDisponible: true
     }
 ] %}
 
+{# Sample Data - Zones avec IDs des commandes #}
 {% set sampleZones = [
     {
         id: 1,
         name: 'Plateau',
         orders: [
         {
-            id: 1,
+            id: 101,
             code: '#CMD-8924',
             neighborhood: 'Avenue Ponty',
             clientName: 'Amadou Diallo',
             clientPhone: '+221 77 123 45 67'
         },
         {
-            id: 2,
+            id: 102,
             code: '#CMD-8929',
             neighborhood: 'Rue Moussé Diop',
             clientName: 'Sophie Ndiaye',
-            clientPhone: '+221 76 888 99 00'
+            clientPhone:  '+221 76 888 99 00'
         },
         {
-            id: 3,
+            id: 103,
             code: '#CMD-8931',
             neighborhood: 'Place de l\'Indépendance',
             clientName: 'Babacar Fall',
             clientPhone: '+221 70 555 44 33'
         },
         {
-            id: 4,
+            id: 104,
             code: '#CMD-8935',
-            neighborhood: 'Rue Thiong',
+            neighborhood:  'Rue Thiong',
             clientName: 'Fatou Seck',
             clientPhone: '+221 77 222 11 00'
         },
         {
-            id: 5,
+            id: 105,
             code: '#CMD-8940',
             neighborhood: 'Corniche Est',
             clientName: 'Moussa Diagne',
@@ -143,8 +178,16 @@
     },
     {
         id: 2,
-        name: 'Almadies',
-        orders: []
+        name:  'Almadies',
+        orders: [
+        {
+            id: 201,
+            code: '#CMD-8950',
+            neighborhood: 'Ngor',
+            clientName: 'Ousmane Ba',
+            clientPhone: '+221 77 555 66 77'
+        }
+    ]
     },
     {
         id: 3,
@@ -158,13 +201,13 @@
     },
     {
         id: 5,
-        name: 'Médina',
+        name:  'Médina',
         orders: []
     },
     {
         id: 6,
         name: 'Parcelles',
-        orders: []
+        orders:  []
     },
     {
         id: 7,
@@ -173,7 +216,7 @@
     },
     {
         id: 8,
-        name: 'Centre-Ville',
+        name:  'Centre-Ville',
         orders: []
-    },
+    }
 ] %}

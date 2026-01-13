@@ -28,61 +28,11 @@
 
     {# Deliverers Table #}
     {% include 'partials/deliverers/table.html.twig' with {#}
-    deliverers: livreurs|default(sampleLivreurs),
+    deliverers: livreurs,
     pagination: paginationData
     } %}
 </div>
     {% endblock %}
 
-{% set sampleLivreurs = [
-    {
-        id: 1,
-        name:  'Diop Moussa',
-        telephone: '77 654 32 10',
-        estDisponible: true
-    },
-    {
-        id: 2,
-        name:  'Sy Omar',
-        telephone: '76 123 45 67',
-        estDisponible: false
-    },
-    {
-        id: 3,
-        name: 'Fall Cheikh',
-        telephone: '70 987 65 43',
-        estDisponible: true
-    },
-    {
-        id: 4,
-        name:  'Konaté Ibrahima',
-        telephone: '77 888 77 66',
-        estDisponible:  false
-    },
-    {
-        id: 5,
-        name: 'Ndiaye Babacar',
-        telephone: '78 111 22 33',
-        estDisponible: true
-    },
-    {
-        id: 6,
-        name: 'Sow Amadou',
-        telephone: '76 444 55 66',
-        estDisponible:  true
-    },
-    {
-        id: 7,
-        name: 'Gueye Fatou',
-        telephone: '77 999 88 77',
-        estDisponible: false
-    },
-    {
-        id: 8,
-        name: 'Seck Lamine',
-        telephone: '78 222 33 44',
-        estDisponible: true
-    }
-] %}
 
 

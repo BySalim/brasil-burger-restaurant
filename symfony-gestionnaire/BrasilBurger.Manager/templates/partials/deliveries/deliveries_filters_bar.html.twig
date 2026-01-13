@@ -6,11 +6,11 @@ Deliveries Filters Bar with Symfony Form
 
 <div class="mb-6">
     {{ form_start(form, {
-        'action': path('app_deliveries_index'),
+        'action': livreurId ? path('app_deliveries_by_livreur', {livreur_id:  livreurId}) : path('app_deliveries_index'),
         'attr': {'class': 'flex flex-wrap items-center gap-3 w-full', 'id': 'deliveryFilterForm'}
     }) }}
 
-    {# 1.Search Input (Code livraison) #}
+    {# Search Input (Code livraison) #}
     <div class="relative flex-1 min-w-[200px]">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark: text-slate-500 text-[20px]">search</span>
         {{ form_widget(form.search, {
@@ -20,7 +20,7 @@ Deliveries Filters Bar with Symfony Form
         }) }}
     </div>
 
-    {# 2.Date Input #}
+    {# Date Input #}
     <div class="relative shrink-0">
         {{ form_widget(form.date, {
             'attr': {
@@ -29,7 +29,7 @@ Deliveries Filters Bar with Symfony Form
         }) }}
     </div>
 
-    {# 3.Zone Select #}
+    {# Zone Select #}
     <div class="relative shrink-0">
         {{ form_widget(form.zone, {
             'attr':  {
@@ -40,7 +40,7 @@ Deliveries Filters Bar with Symfony Form
         <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none text-[20px]">expand_more</span>
     </div>
 
-    {# 4.Status Select (StatutLivraison) #}
+    {# Status Select (StatutLivraison) #}
     <div class="relative shrink-0">
         {{ form_widget(form.status, {
             'attr': {
@@ -54,7 +54,7 @@ Deliveries Filters Bar with Symfony Form
     {# Divider #}
     <div class="w-px h-8 bg-gray-200 dark:bg-border-dark mx-1 shrink-0"></div>
 
-    {# 5.Items Per Page #}
+    {# Items Per Page #}
     <div class="relative shrink-0">
         {{ form_widget(form.per_page, {
             'attr': {

@@ -2,9 +2,11 @@
 
 namespace App\Factory;
 
+use App\Entity\Commande;
 use App\Entity\InfoLivraison;
 use App\Entity\Livraison;
 use App\Entity\Livreur;
+use App\Entity\Zone;
 use App\Enum\StatutLivraison;
 use App\Service\PersonService;
 use App\Service\PhoneNumberService;
@@ -12,8 +14,10 @@ use App\ViewModel\DeliveryHeaderViewModel;
 use App\ViewModel\DeliveryLocationNoteViewModel;
 use App\ViewModel\DeliveryRowViewModel;
 use App\ViewModel\OrderRowViewModel;
+use App\ViewModel\OrderToDeliveredRowViewModel;
 use App\ViewModel\PersonCardViewModel;
 use App\ViewModel\StatusBadgeViewModel;
+use App\ViewModel\ZoneWhithOrdersViewModel;
 
 readonly class DeliveriesViewFactory
 {
@@ -125,6 +129,75 @@ readonly class DeliveriesViewFactory
             icon: $statut->getIcon(),
             color: $statut->getColor()->getSolidBadgeClasses(),
         );
+    }
+
+    public function createOrderToDeliveredRow(Commande $commande): OrderToDeliveredRowViewModel
+    {
+        $client = $commande->getClient();
+        $clientCard = new PersonCardViewModel(
+            name: $client->getNom() . ' ' . $client->getPrenom(),
+            phone: $this->phoneNumberService->formatSn($client->getTelephone()),
+        );
+
+        return new OrderToDeliveredRowViewModel(
+            id: $commande->getId(),
+            code: $commande->getNumCmd(),
+            zone: $commande->getInfoLivraison()->getZone()->getNom(),
+            client: $clientCard,
+        );
+    }
+
+    /**
+     * @param Commande[] $commandes
+     * @param Zone[] $zones
+     * @return ZoneWhithOrdersViewModel[]
+     */
+    public function createZonesWithOrders(array $commandes, array $zones): array
+    {
+        // 1. Initialiser toutes les zones avec tableau vide
+        $grouped = array_combine(
+            array_map(fn($zone) => $zone->getId(), $zones),
+            array_map(fn($zone) => ['zone' => $zone, 'orders' => []], $zones)
+        );
+
+        // 2. Ajouter les commandes dans leurs zones respectives
+        array_walk($commandes, function ($commande) use (&$grouped) {
+            $zoneId = $commande->getInfoLivraison()->getZone()->getId();
+            if (isset($grouped[$zoneId])) {
+                $grouped[$zoneId]['orders'][] = $this->createOrderToDeliveredRow($commande);
+            }
+        });
+
+        // 3. Trier par nombre de commandes (décroissant)
+        usort($grouped, fn($a, $b) => count($b['orders']) <=> count($a['orders']));
+
+        // 4. Transformer en ViewModels
+        return array_map(
+            fn($data) => new ZoneWhithOrdersViewModel(
+                id: $data['zone']->getId(),
+                name: $data['zone']->getNom(),
+                ordersToDelivered:  $data['orders'],
+            ),
+            $grouped
+        );
+    }
+
+    /**
+     * @param Livreur[] $livreurs
+     * @return PersonCardViewModel[] $livreurs
+     */
+    public function createDeliverersCard(iterable $livreurs): array
+    {
+        $livreursCard = [];
+        foreach ($livreurs as $livreur) {
+            $livreursCard[] = new PersonCardViewModel(
+                name: $livreur->getNom() . ' ' . $livreur->getPrenom(),
+                phone: $this->phoneNumberService->formatSn($livreur->getTelephone()),
+                id: $livreur->getId(),
+                estDisponible: $livreur->isEstDisponible(),
+            );
+        }
+        return $livreursCard;
     }
 
 }

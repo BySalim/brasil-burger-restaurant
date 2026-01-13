@@ -25,12 +25,12 @@ class DelivererFilterType extends AbstractType
             ->add('search', TextType::class, [
                 'required' => false,
                 'label' => false,
-                'attr' => ['placeholder' => 'Rechercher par matricule ou nom...']
+                'attr' => ['placeholder' => 'Rechercher...']
             ])
             ->add('disponibilite', ChoiceType::class, [
                 'required' => false,
                 'label' => false,
-                'placeholder' => 'Tout',
+                'placeholder' => 'Disponibilité',
                 'choices' => [
                     'Disponible' => true,
                     'En livraison' => false,

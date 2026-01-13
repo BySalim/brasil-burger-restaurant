@@ -19,13 +19,18 @@ class LivraisonRepository extends ServiceEntityRepository
 
     public function save(Livraison $livraison, bool $flush = false): void
     {
-        $em = $this->getEntityManager();
-        $em->persist($livraison);
+        $this->getEntityManager()->persist($livraison);
 
         if ($flush) {
-            $em->flush();
+            $this->getEntityManager()->flush();
         }
     }
+
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
+
 
     public function findById(int $id): ?Livraison
     {
@@ -79,7 +84,7 @@ class LivraisonRepository extends ServiceEntityRepository
         }
 
         if ($status) {
-            $qb->andWhere('l.statut = : status')
+            $qb->andWhere('l.statut = :status')
                 ->setParameter('status', $status);
         }
 

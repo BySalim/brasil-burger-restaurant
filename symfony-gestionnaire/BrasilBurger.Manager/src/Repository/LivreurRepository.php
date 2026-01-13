@@ -14,6 +14,25 @@ class LivreurRepository extends ServiceEntityRepository
         parent::__construct($registry, Livreur::class);
     }
 
+    public function save(Livreur $livreur, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($livreur);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
+
+    public function findById(int $id): ?Livreur
+    {
+        return $this->find($id);
+    }
+
     /**
      * Requête de base pour la liste des livreurs avec filtres
      *
@@ -48,10 +67,5 @@ class LivreurRepository extends ServiceEntityRepository
         }
 
         return $qb;
-    }
-
-    public function findById(int $livreur_id)
-    {
-        return $this->findOneBy(['id' => $livreur_id]);
     }
 }

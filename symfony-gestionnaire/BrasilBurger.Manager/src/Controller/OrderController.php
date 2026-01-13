@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Trait\RedirectBackControllerTrait;
 use App\Entity\Commande;
 use App\Enum\EtatCommande;
 use App\Factory\OrdersViewFactory;
@@ -19,6 +20,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/orders')]
 class OrderController extends AbstractController
 {
+    use RedirectBackControllerTrait;
+
     public function __construct(
         private readonly CommandeRepository    $commandeRepository,
         private readonly CommandeService       $commandeService,
@@ -101,7 +104,7 @@ class OrderController extends AbstractController
             $this->addFlash('error', $e->getMessage());
         }
 
-        return $this->redirectToRoute('app_orders');
+        return $this->redirectBack($request, 'app_orders');
     }
 
     /**

@@ -13,7 +13,8 @@
 
 {% block header_actions %}
     {% include 'components/button_link.html.twig' with {
-        buttonLink: 'app_deliveries_index'
+        buttonLink: livreurId ? 'app_deliveries_by_livreur' : 'app_deliveries_index',
+        buttonLinkParams: livreurId ? {livreur_id: livreurId} : {}
     } %}
 {% endblock %}
 

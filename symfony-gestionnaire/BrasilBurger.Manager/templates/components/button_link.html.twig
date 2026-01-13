@@ -1,8 +1,9 @@
 
 {% set label = buttonLabel|default('Rénitialiser') %}
 {% set link = buttonLink|default('') %}
+{% set linkParams = buttonLinkParams|default({}) %}
 
-<a href="{{ path(link) }}"
+<a href="{{ path(link, linkParams) }}"
    class="
             inline-flex items-center gap-2 px-4 py-2
             bg-orange-50 text-orange-700

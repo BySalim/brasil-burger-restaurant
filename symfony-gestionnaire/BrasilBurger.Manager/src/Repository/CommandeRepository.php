@@ -12,7 +12,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
-
 class CommandeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -23,7 +22,6 @@ class CommandeRepository extends ServiceEntityRepository
     public function save(Commande $commande, bool $flush = false): void
     {
         $em = $this->getEntityManager();
-
         $em->persist($commande);
 
         if ($flush) {
@@ -61,9 +59,9 @@ class CommandeRepository extends ServiceEntityRepository
         ?string $search = null,
         ?DateTimeInterface $date = null,
         ?CategoriePanier $type = null,
-        ?EtatCommande $status = null
-    ): QueryBuilder
-    {
+        ?EtatCommande $status = null,
+        ?ModeRecuperation $modeRecuperation = null
+    ): QueryBuilder {
         $qb = $this->createQueryBuilder('c')
             ->select('c', 'cl', 'p', 'info', 'z', 'q')
             ->join('c.client', 'cl')
@@ -75,16 +73,16 @@ class CommandeRepository extends ServiceEntityRepository
 
         if ($search) {
             $qb->andWhere('c.numCmd LIKE :search')
-                ->setParameter('search', '%' . $search . '%');
+                ->setParameter('search', '%' .  $search .'%');
         }
 
         if ($date instanceof \DateTimeInterface) {
-                $startOfDay = (clone $date)->setTime(0, 0, 0);
-                $endOfDay = (clone $date)->setTime(23, 59, 59);
+            $startOfDay = (clone $date)->setTime(0, 0, 0);
+            $endOfDay = (clone $date)->setTime(23, 59, 59);
 
-                $qb->andWhere('c.dateDebut BETWEEN :start AND :end')
-                    ->setParameter('start', $startOfDay)
-                    ->setParameter('end', $endOfDay);
+            $qb->andWhere('c.dateDebut BETWEEN :start AND :end')
+                ->setParameter('start', $startOfDay)
+                ->setParameter('end', $endOfDay);
         }
 
         if ($type) {
@@ -97,6 +95,11 @@ class CommandeRepository extends ServiceEntityRepository
                 ->setParameter('status', $status);
         }
 
+        if ($modeRecuperation) {
+            $qb->andWhere('c.typeRecuperation = :modeRecuperation')
+                ->setParameter('modeRecuperation', $modeRecuperation);
+        }
+
         return $qb;
     }
 
@@ -106,7 +109,7 @@ class CommandeRepository extends ServiceEntityRepository
     }
 
     /**
-     * ⭐ Compte les commandes terminées à livrer sans livraison associée
+     * Compte les commandes terminées à livrer sans livraison associée
      */
     public function countCompletedOrdersToDeliver(): int
     {
@@ -119,5 +122,60 @@ class CommandeRepository extends ServiceEntityRepository
             ->setParameter('mode', ModeRecuperation::LIVRER)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Retourne les commandes terminées à livrer sans livraison associée
+     * Triées par zone puis par date
+     *
+     * @return QueryBuilder
+     */
+    public function findPendingDeliveryOrdersQB(): QueryBuilder
+    {
+        return $this->findAllWithFiltersQB(
+            status: EtatCommande::TERMINER,
+            modeRecuperation:ModeRecuperation::LIVRER
+        )
+            ->andWhere('c.livraison IS NULL')
+            ->orderBy('z.nom', 'ASC')
+            ->addOrderBy('c.dateDebut', 'ASC');
+    }
+
+    /**
+     * Retourne les commandes terminées à livrer sans livraison associée
+     * Filtrées par zone
+     *
+     * @param int $zoneId ID de la zone
+     * @return QueryBuilder
+     */
+    public function findPendingDeliveryOrdersByZoneQB(int $zoneId): QueryBuilder
+    {
+        return $this->findPendingDeliveryOrdersQB()
+            ->andWhere('z.id = :zoneId')
+            ->setParameter('zoneId', $zoneId);
+    }
+
+    /**
+     * Récupère les commandes par leurs IDs (pour l'affectation bulk)
+     *
+     * @param int[] $ids
+     * @return Commande[]
+     */
+    public function findByIds(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('c')
+            ->select('c', 'cl', 'info', 'z', 'q')
+            ->join('c.client', 'cl')
+            ->join('c.infoLivraison', 'info')
+            ->join('info.zone', 'z')
+            ->leftJoin('info.quartier', 'q')
+            ->where('c.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
     }
 }
