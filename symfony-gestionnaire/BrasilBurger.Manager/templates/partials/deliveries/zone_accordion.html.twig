@@ -7,8 +7,8 @@ Zone Accordion Component
 {% set zoneData = zone|default({}) %}
 {% set zoneId = zoneData.id|default('zone_' ~ random()) %}
 {% set zoneName = zoneData.name|default('Zone') %}
-{% set ordersCount = zoneData.ordersCount|default(0) %}
 {% set ordersList = zoneData.orders|default([]) %}
+{% set ordersCount = ordersList|length %}
 {% set isExpanded = zoneData.isExpanded|default(false) %}
 {% set deliverersList = deliverers|default([]) %}
 

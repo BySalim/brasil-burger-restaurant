@@ -196,7 +196,7 @@ Table Macros - Reusable table row components
         {# View Details Button #}
         <td class="px-6 py-4 text-right">
             <a
-                href="{{ path('app_default', {id: order.id|default(0)}) }}"
+                href="{{ path('app_deliveries_info_show', {id: order.id|default(0)}) }}"
                 class="p-2 text-gray-400 hover:text-primary hover:bg-orange-50 dark:hover:bg-orange-900/10 rounded-full transition-all inline-flex"
                 title="Voir les détails"
             >
@@ -250,6 +250,15 @@ Table Macros - Reusable table row components
             {{ delivery.zone|default('--') }}
         </td>
 
+        {# Client Info #}
+        <td class="px-4 py-4 whitespace-nowrap">
+            <div class="flex flex-col">
+                <span class="font-medium text-gray-900 dark:text-white">{{ delivery.clientName|default('--') }}</span>
+                <span
+                    class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.clientPhone|default('--') }}</span>
+            </div>
+        </td>
+
         {# Deliverer Info #}
         <td class="px-4 py-4 whitespace-nowrap">
             <div class="flex flex-col">
@@ -260,14 +269,6 @@ Table Macros - Reusable table row components
             </div>
         </td>
 
-        {# Client Info #}
-        <td class="px-4 py-4 whitespace-nowrap">
-            <div class="flex flex-col">
-                <span class="font-medium text-gray-900 dark:text-white">{{ delivery.clientName|default('--') }}</span>
-                <span
-                    class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ delivery.clientPhone|default('--') }}</span>
-            </div>
-        </td>
 
         {# Status Badge #}
         <td class="px-4 py-4 whitespace-nowrap">
@@ -329,3 +330,60 @@ Table Macros - Reusable table row components
         </td>
     </tr>
 {% endmacro %}
+
+{# ========================================
+   MACRO 5: Deliverers Tracking Row (pour le tableau de suivi des livreurs)
+   ======================================== #}
+{% macro deliverer_tracking_row(deliverer) %}
+
+    <tr class="group hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
+        {# Id #}
+        <td class="px-4 py-4 whitespace-nowrap">
+            <span
+                class="font-mono font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">
+                {{ deliverer.id|default('0') }}
+            </span>
+        </td>
+
+        {# Livreur #}
+        <td class="px-6 py-4">
+            <div class="flex flex-col">
+                <span class="font-bold text-gray-900 dark: text-white">
+                    {{ deliverer.name }}
+                </span>
+                <span class="text-xs text-gray-500 dark: text-gray-400">
+                    {{ deliverer.phone }}
+                </span>
+            </div>
+        </td>
+
+        {# Disponibilité #}
+        <td class="px-6 py-4 text-left">
+            {% if deliverer.estDisponible %}
+                {% include 'components/badge.html.twig' with {
+                    text: 'Disponible',
+                    color: 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800',
+                    shape: 'pill'
+                } %}
+            {% else %}
+                {% include 'components/badge.html.twig' with {
+                    text:  'En livraison',
+                    color:  'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800',
+                    shape: 'pill'
+                } %}
+            {% endif %}
+        </td>
+
+        {# Actions #}
+        <td class="px-6 py-4 text-center">
+            <a
+            href="{{ path('app_deliveries_by_livreur', {livreurId: deliverer.id}) }}"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-600 border border-teal-700 rounded-lg hover:bg-teal-700 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+            >
+            <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+            <span>Voir ses livraisons</span>
+            </a>
+        </td>
+    </tr>
+{% endmacro %}
+

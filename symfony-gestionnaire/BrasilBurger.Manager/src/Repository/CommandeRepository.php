@@ -6,6 +6,7 @@ use App\DTO\DailyStatsDTO;
 use App\Entity\Commande;
 use App\Enum\CategoriePanier;
 use App\Enum\EtatCommande;
+use App\Enum\ModeRecuperation;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -102,5 +103,21 @@ class CommandeRepository extends ServiceEntityRepository
     public function findById(int $id): ?Commande
     {
         return $this->findOneBy(['id' => $id]);
+    }
+
+    /**
+     * ⭐ Compte les commandes terminées à livrer sans livraison associée
+     */
+    public function countCompletedOrdersToDeliver(): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.etat = :etat')
+            ->andWhere('c.typeRecuperation = :mode')
+            ->andWhere('c.livraison IS NULL')
+            ->setParameter('etat', EtatCommande::TERMINER)
+            ->setParameter('mode', ModeRecuperation::LIVRER)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

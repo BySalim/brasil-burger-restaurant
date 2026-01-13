@@ -1,0 +1,57 @@
+{#
+Livreurs Filter Bar
+
+@param FormView form - Symfony form object
+#}
+
+<div class="mb-6">
+    {{ form_start(form, {
+        'action': path('app_deliveries_deliverers'),
+        'attr': {'class': 'flex flex-wrap items-center gap-3 w-full', 'id': 'livreurFilterForm'}
+    }) }}
+
+    {# 1. Search Input #}
+    <div class="relative flex-1 min-w-[280px]">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 text-[20px]">search</span>
+        {{ form_widget(form.search, {
+            'attr': {
+                'class': 'w-full pl-10 pr-4 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500'
+            }
+        }) }}
+    </div>
+
+    {# 2. Disponibilité Select #}
+    <div class="relative shrink-0">
+        {{ form_widget(form.disponibilite, {
+            'attr':  {
+                'class': 'w-full pl-3 pr-8 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-600 dark:text-gray-300 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer appearance-none',
+                'onchange': 'this.form. submit()'
+            }
+        }) }}
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none text-[20px]">expand_more</span>
+    </div>
+
+    {# Divider #}
+    <div class="w-px h-8 bg-gray-200 dark:bg-border-dark mx-1 shrink-0"></div>
+
+    {# 3. Items Per Page #}
+    <div class="relative shrink-0">
+        {{ form_widget(form.per_page, {
+            'attr':  {
+                'class': 'w-full px-5 py-2.5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-600 dark:text-gray-300 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer appearance-none',
+                'onchange': 'this. form.submit()'
+            }
+        }) }}
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none text-[20px]">expand_more</span>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+<script>
+    document.querySelector('#livreurFilterForm input[name="search"]')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            this.form.submit();
+        }
+    });
+</script>

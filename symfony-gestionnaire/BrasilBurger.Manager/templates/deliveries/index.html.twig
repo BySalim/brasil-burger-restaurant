@@ -3,7 +3,7 @@
 {% block title %}{{ acronyme_sn }} - Livraisons{% endblock %}
 
 {% block page_title %}
-    {% if livreurName is defined and livreaurName %}
+    {% if livreurName %}
         Livraisons de {{ livreurName }}
     {% else %}
         Suivi des livraisons
@@ -21,7 +21,7 @@
     {# Tabs Navigation #}
     {% include 'partials/deliveries/header_tabs.html.twig' with {
         activeTab: 'deliveries',
-        ordersCount: ordersCount|default(5)
+        ordersCount: ordersToDeliveredPending
     } %}
 {% endblock %}
 

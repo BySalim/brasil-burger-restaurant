@@ -1,0 +1,47 @@
+{#
+Deliveries Table with Checkboxes
+
+@param array deliverers - Array of deliverers
+#}
+{% import 'macros/table_macros.html.twig' as table %}
+{% set deliverersList = deliverers|default([]) %}
+{% set pagination = pagination|default([]) %}
+
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm overflow-hidden flex flex-col">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+            <tr class="bg-gray-50 dark:bg-slate-800/50 text-xs uppercase tracking-wider text-gray-500 dark:text-text-muted-dark font-semibold border-b border-gray-200 dark:border-border-dark">
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Id</th>
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Nom & prénom</th>
+                <th class="px-4 py-4 w-auto whitespace-nowrap">Disponibilité</th>
+                <th class="px-4 py-4 text-center">Action</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-border-dark text-sm">
+            {% for deliverer in deliverersList %}
+                {{ table.deliverer_tracking_row(deliverer) }}
+            {% else %}
+                <tr>
+                    <td colspan="4" class="px-6 py-12 text-center">
+                        {% include 'components/empty_state.html.twig' with {
+                            text: 'Aucun livreur trouvé',
+                            icon: 'local_shipping',
+                            subtext: 'Essayez de modifier vos filtres'
+                        } %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Pagination #}
+    {% include 'components/pagination.html.twig' with {
+        totalItems: pagination.totalItems,
+        itemsPerPage: pagination.itemsPerPage,
+        currentPage: pagination.currentPage,
+        displayedItems: deliverersList|length,
+        labelItem: 'livreurs'
+    } %}
+</div>

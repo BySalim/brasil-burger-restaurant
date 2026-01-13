@@ -1,25 +1,22 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
-{% block title %}Livraisons (Manager) - {{ site_name }}{% endblock %}
+{% block title %}{{ acronyme_sn }} - Commandes à livrer {% endblock %}
 
-{% block page_title %}Gestion des Livraisons{% endblock %}
+{% block page_title %}Gestion des Commandes à livrer{% endblock %}
 {% block page_subtitle %}Assignez les commandes aux livreurs par zone géographique.{% endblock %}
 
 {% block header_actions %}
-    <button type="button" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-        {% include 'components/icon.html.twig' with {
-            name: 'refresh',
-            size: 'text-[20px]'
-        } %}
-        Actualiser
-    </button>
+    {% include 'components/button_link.html.twig' with {
+        buttonLink: 'app_deliveries_index',
+        buttonLabel: 'Actualiser'
+    } %}
 {% endblock %}
 
 {% block header_extra %}
     {# Tabs Navigation #}
     {% include 'partials/deliveries/header_tabs.html.twig' with {
         activeTab: 'orders',
-        ordersCount: totalOrdersCount|default(5)
+        ordersCount: ordersToDeliveredPending
     } %}
 {% endblock %}
 
@@ -34,13 +31,6 @@
         {% endfor %}
     </div>
 
-    {# Footer #}
-    <div class="mt-auto mb-8">
-        {% include 'partials/footer_copyright.html.twig' with {
-            year: 2024,
-            company: '{{ site_name }} - Interface Manager'
-        } %}
-    </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -111,10 +101,8 @@
 
 {% set sampleZones = [
     {
-        id: 'plateau',
+        id: 1,
         name: 'Plateau',
-        ordersCount: 5,
-        isExpanded: false,
         orders: [
         {
             id: 1,
@@ -154,52 +142,38 @@
     ]
     },
     {
-        id: 'centre_ville',
-        name: 'Centre-Ville',
-        ordersCount: 3,
-        isExpanded: false,
-        orders: []
-    },
-    {
-        id: 'almadies',
+        id: 2,
         name: 'Almadies',
-        ordersCount: 2,
-        isExpanded: false,
         orders: []
     },
     {
-        id: 'liberte',
+        id: 3,
         name: 'Liberté',
-        ordersCount: 1,
-        isExpanded: false,
         orders: []
     },
     {
-        id: 'mermoz',
+        id: 4,
         name: 'Mermoz',
-        ordersCount: 1,
-        isExpanded: false,
         orders: []
     },
     {
-        id: 'medina',
+        id: 5,
         name: 'Médina',
-        ordersCount: 1,
-        isExpanded: false,
         orders: []
     },
     {
-        id: 'parcelles',
+        id: 6,
         name: 'Parcelles',
-        ordersCount: 0,
-        isExpanded: false,
         orders: []
     },
     {
-        id: 'grand_dakar',
+        id: 7,
         name: 'Grand Dakar',
-        ordersCount: 0,
-        isExpanded: false,
         orders: []
-    }
+    },
+    {
+        id: 8,
+        name: 'Centre-Ville',
+        orders: []
+    },
 ] %}

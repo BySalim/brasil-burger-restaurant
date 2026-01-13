@@ -3,14 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Livraison;
+use App\Entity\Livreur;
 use App\Enum\StatutLivraison;
+use App\Factory\DelivererViewFactory;
 use App\Factory\DeliveriesViewFactory;
 use App\Factory\OrdersViewFactory;
+use App\Form\DelivererFilterType;
 use App\Form\DeliveryFilterType;
-use App\Form\OrderFilterType;
+use App\Repository\CommandeRepository;
 use App\Repository\LivraisonRepository;
 use App\Repository\LivreurRepository;
 use App\Service\LivraisonService;
+use App\ViewModel\DelivererRowViewModel;
 use App\ViewModel\DeliveryInfos;
 use App\ViewModel\PaginationViewModel;
 use Knp\Component\Pager\PaginatorInterface;
@@ -30,6 +34,8 @@ class DeliveryController extends AbstractController
         private readonly OrdersViewFactory $ordersViewFactory,
         private readonly LivraisonService $livraisonService,
         private readonly ParameterBagInterface $params,
+        private readonly CommandeRepository $commandeRepository,
+        private readonly DelivererViewFactory $delivererViewFactory,
     )
     {
     }
@@ -38,18 +44,20 @@ class DeliveryController extends AbstractController
      * Page liste des livraisons avec filtres optionnels par livreur
      */
     #[Route('', name: 'index', methods: ['GET'])]
-    #[Route('/livreur/{livreur_id}', name: 'by_livreur', requirements: ['livreur_id' => '\d+'], methods: ['GET'])]
-    public function index( Request $request, PaginatorInterface $paginator, ? int $livreur_id = null): Response
+    #[Route('/livreur/{livreurId}', name: 'by_livreur', requirements: ['livreurId' => '\d+'], methods: ['GET'])]
+    public function index( Request $request, PaginatorInterface $paginator, ? int $livreurId = null): Response
     {
 
+        /** @var Livreur $livreur */
         $livreur = null;
-        if ($livreur_id) {
-            $livreur = $this->livreurRepository->findById($livreur_id);
+        if ($livreurId) {
+            $livreur = $this->livreurRepository->findById($livreurId);
 
             if (!$livreur) {
                 throw $this->createNotFoundException('Livreur introuvable');
             }
         }
+        $livreurName = $livreur ? $livreur->getNom() . ' ' . $livreur->getPrenom() : null;
 
         $form = $this->createForm(DeliveryFilterType::class);
         $form->handleRequest($request);
@@ -83,8 +91,12 @@ class DeliveryController extends AbstractController
 
         $statusTerminer = $this->deliveriesViewFactory->createStatusBadge(StatutLivraison::TERMINER);
 
+        $cmdsLivEnAttente = $this->commandeRepository->countCompletedOrdersToDeliver();
+
         return $this->render('deliveries/index.html.twig', [
             'form' => $form,
+            'livreurName' => $livreurName,
+            'ordersToDeliveredPending' => $cmdsLivEnAttente,
             'livraisons' => $livraisons,
             'statusTerminer' => $statusTerminer,
             'paginationData' => $paginationData
@@ -214,9 +226,54 @@ class DeliveryController extends AbstractController
     #[Route('/orders/', name: 'orders')]
     public function listOrdersToDelivered(): Response
     {
-        return $this->render('deliveries/orders.html.twig', []);
+        $cmdsLivEnAttente = $this->commandeRepository->countCompletedOrdersToDeliver();
+
+        return $this->render('deliveries/orders.html.twig', [
+            'ordersToDeliveredPending' => $cmdsLivEnAttente,
+        ]);
     }
 
+    #[Route('/deliverers', name: 'deliverers', methods: ['GET'])]
+    public function listDeliverer(Request $request, PaginatorInterface $paginator): Response
+    {
+        $form = $this->createForm(DelivererFilterType::class);
+        $form->handleRequest($request);
+
+        $filters = $form->getData();
+
+        $disponibilite = $filters['disponibilite'] ??  null;
+
+        $queryBuilder = $this->livreurRepository->findAllWithFiltersQB(
+            search: $filters['search'] ?? null,
+            disponibilite: $disponibilite
+        );
+
+        $perPage = $filters['per_page'] ?? $this->params->get('app.pagination.default_per_page');
+        $kPagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            $perPage
+        );
+
+        $paginationData = new PaginationViewModel(
+            totalItems: $kPagination->getTotalItemCount(),
+            itemsPerPage: $perPage,
+            currentPage: $kPagination->getCurrentPageNumber(),
+        );
+
+        $cmdsLivEnAttente = $this->commandeRepository->countCompletedOrdersToDeliver();
+
+        $livreurs_item = $kPagination->getItems();
+
+        $livreurs = $this->delivererViewFactory->createDeliverersTable($livreurs_item);
+
+        return $this->render('deliverer/index.html.twig', [
+            'form' => $form,
+            'livreurs' => $livreurs,
+            'ordersToDeliveredPending' => $cmdsLivEnAttente,
+            'paginationData' => $paginationData,
+        ]);
+    }
 
 
 }
