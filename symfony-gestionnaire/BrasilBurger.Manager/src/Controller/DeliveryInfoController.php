@@ -34,11 +34,9 @@ class DeliveryInfoController extends AbstractController
         }
 
         $cmd_associe = $infoLivraison->getCommande();
-        $livreur_associe = $cmd_associe->getLivraison()->getGroupeLivraison()->getLivreur();
 
         $deliveryLocation = $this->deliveriesViewFactory->createDeliveryLocationNote($infoLivraison);
         $deliveryClient = $this->ordersViewFactory->createCardClient($cmd_associe->getClient());
-        $deliveryLivreur = $this->deliveriesViewFactory->createLivreurCard($livreur_associe);
         $deliveryInfoId = $infoLivraison->getId();
 
         $infos = new DeliveryInfos(
@@ -52,7 +50,6 @@ class DeliveryInfoController extends AbstractController
             'deliveryInfoId' => $deliveryInfoId,
             'deliveryLocation' => $deliveryLocation,
             'deliveryClient' => $deliveryClient,
-            'deliveryLivreur' => $deliveryLivreur,
             'infos' => $infos,
         ]);
     }
