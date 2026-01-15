@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrasilBurger.Client", "BrasilBurger.Client.csproj", "{8460F21D-F4C7-4E40-8888-7BC5735BD17C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrasilBurger.Client", "BrasilBurger.Client\BrasilBurger.Client.csproj", "{5DC38C0F-A08A-48B0-8311-BE808EC009C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8460F21D-F4C7-4E40-8888-7BC5735BD17C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8460F21D-F4C7-4E40-8888-7BC5735BD17C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8460F21D-F4C7-4E40-8888-7BC5735BD17C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8460F21D-F4C7-4E40-8888-7BC5735BD17C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DC38C0F-A08A-48B0-8311-BE808EC009C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DC38C0F-A08A-48B0-8311-BE808EC009C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DC38C0F-A08A-48B0-8311-BE808EC009C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DC38C0F-A08A-48B0-8311-BE808EC009C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
