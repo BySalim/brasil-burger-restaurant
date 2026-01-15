@@ -9,6 +9,6 @@
 Thumbs.db
 
 # Dossier des autres branches
-.modelisation/
-.csharp-client/
-.symfony-gestionnaire/
+/modelisation/
+/csharp-client/
+/symfony-gestionnaire/

@@ -44,7 +44,6 @@ logs/
 
 # Variables d'environnement locales
 .env
-.env.local
 .env.*.local
 
 # Configuration sensitive
