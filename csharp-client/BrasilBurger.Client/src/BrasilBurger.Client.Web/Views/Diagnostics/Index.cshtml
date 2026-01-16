@@ -1,0 +1,16 @@
+@model BrasilBurger.Client.Web.ViewModels.Diagnostics.DiagnosticsVm
+@{
+    ViewData["Title"] = "Diagnostics";
+}
+
+<h1>Diagnostics</h1>
+
+<h2>Neon</h2>
+<p><strong>Status:</strong> @(Model.DbOk ? "OK" : "KO")</p>
+<p>@Model.DbMessage</p>
+
+<hr />
+
+<h2>Cloudinary</h2>
+<p><strong>Status:</strong> @(Model.CloudinaryOk ? "OK" : "KO")</p>
+<p>@Model.CloudinaryMessage</p>

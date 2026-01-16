@@ -3,6 +3,9 @@
 .idea/
 *.suo
 *.user
+# Visual Studio / VS cache
+.vs/
+**/.vs/
 
 # OS
 .DS_Store

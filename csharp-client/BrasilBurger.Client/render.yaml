@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: brasilburger-client
+    env: docker
+    branch: csharp
+    rootDir: csharp-client/BrasilBurger.Client
+    dockerfilePath: Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+      - key: ConnectionStrings__Neon
+        sync: false
+
+      - key: Cloudinary__CloudName
+        sync: false
+      - key: Cloudinary__ApiKey
+        sync: false
+      - key: Cloudinary__ApiSecret
+        sync: false
+
+      - key: Security__AppSecret
+        sync: false

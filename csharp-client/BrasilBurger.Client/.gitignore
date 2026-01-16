@@ -1,0 +1,21 @@
+# build
+**/bin/
+**/obj/
+
+# Rider / IntelliJ
+**/.idea/
+*.sln.iml
+
+# user-specific
+**/*.user
+**/*.userosscache
+**/*.suo
+
+# Secrets / local config
+**/appsettings.Local.json
+**/.env
+**/secrets.json
+
+# OS
+.DS_Store
+Thumbs.db
