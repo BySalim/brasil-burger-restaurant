@@ -28,7 +28,6 @@ public sealed class CloudinaryPingProbe : ICloudinaryProbe
 
         try
         {
-            // Endpoint courant : https://api.cloudinary.com/v1_1/{cloud_name}/ping
             var url = $"https://api.cloudinary.com/v1_1/{_options.CloudName}/ping";
 
             var authRaw = $"{_options.ApiKey}:{_options.ApiSecret}";

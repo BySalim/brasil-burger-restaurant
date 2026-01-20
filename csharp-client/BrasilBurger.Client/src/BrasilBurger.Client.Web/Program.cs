@@ -2,14 +2,16 @@ using BrasilBurger.Client.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Charge appsettings.Local.json (non versionné) si présent
+// Fichier local non versionné (ignore via .gitignore)
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
-// DI
+// MVC
 builder.Services.AddControllersWithViews();
+
+// Infra (Neon + Cloudinary probes + options)
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// (Option) Cookie auth déjà prêt pour la suite
+// (Optionnel) Cookie auth pour la suite (connexion/inscription)
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", opt =>
     {
@@ -19,7 +21,7 @@ builder.Services.AddAuthentication("Cookies")
 
 var app = builder.Build();
 
-// Render: écouter sur 0.0.0.0 + PORT (par défaut 10000 côté Render) :contentReference[oaicite:5]{index=5}
+// Render: bind sur le port fourni par PORT si présent
 var port = Environment.GetEnvironmentVariable("PORT");
 if (!string.IsNullOrWhiteSpace(port))
 {

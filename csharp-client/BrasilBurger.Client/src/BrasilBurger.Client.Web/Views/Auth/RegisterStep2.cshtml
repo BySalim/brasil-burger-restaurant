@@ -1,0 +1,121 @@
+@model BrasilBurger.Client.ViewModels.Auth.RegisterStep2Vm
+@{
+    ViewData["Title"] = "Inscription - Étape 2 - Brazil Burger";
+}
+
+<div class="flex flex-col lg:flex-row min-h-screen">
+    <div class="w-full lg:w-1/2 flex flex-col justify-between bg-background-light dark:bg-surface-dark relative z-10">
+        <partial name="~/Views/Shared/_AuthNavbar.cshtml" />
+
+        <div class="flex-grow flex items-center justify-center px-6 sm:px-12 lg:px-20 xl:px-24">
+            <div class="w-full max-w-md space-y-6">
+                <div class="text-left">
+                    <span class="inline-block py-1 px-3 rounded-full bg-orange/10 text-orange text-xs font-bold uppercase tracking-wider mb-3">
+                        Étape 2 sur 2
+                    </span>
+                    <h2 class="text-4xl font-display font-bold text-primary dark:text-white tracking-tight leading-tight">
+                        Finaliser l'inscription
+                    </h2>
+                    <p class="mt-3 text-base text-gray-600 dark:text-gray-400">
+                        Plus que quelques détails pour configurer votre compte.
+                    </p>
+                </div>
+
+                <form action="@Url.Action("RegisterStep2", "Test")" class="mt-8 space-y-5" method="POST">
+                    @Html.AntiForgeryToken()
+
+                    <div class="relative">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5" for="phone">Numéro de téléphone</label>
+                        <div class="relative rounded-lg shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <img alt="Sénégal" class="h-4 w-6 object-cover rounded-sm shadow-sm"
+                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8vz13EobaNUjT4IyITHzxuyhgt0Ouwwzb3DHlAUXDY43nSvhA4HM9xKKL-ziMZRTfv1l0Bu9XmN1saZ9evuY1OyD1W1skOeG6OfPubd3pCAbaM_WGjeaQKKWcDkEWUvXCarHPBTKYwSozlmIHIFG1_JxBlOBP7ToK9yMyW0AFT_9Bo15iNZjV5F7BoB8rFeJfEH3rd_9SQGn9GD9FJmf6S_iRrhs-JUDjtAbNSfowzpS9wjWlE8gEyXqmGU6LrOPds6YQpgqdjLI" />
+                                <span class="text-gray-500 dark:text-gray-400 font-medium ml-2 mr-2">+221</span>
+                                <div class="h-5 w-px bg-gray-300 dark:bg-gray-600"></div>
+                            </div>
+
+                            <input class="focus:ring-2 focus:ring-orange focus:border-orange block w-full pl-[7.5rem] py-3 sm:text-sm border-gray-300 dark:border-gray-600 rounded-lg dark:bg-background-dark dark:text-white dark:placeholder-gray-500 transition-shadow"
+                                   id="phone"
+                                   name="Phone"
+                                   placeholder="77 000 00 00"
+                                   required
+                                   type="tel"
+                                   value="@(Model.Phone ?? "")" />
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5" for="payment_method">Moyen de paiement par défaut</label>
+                        <div class="relative rounded-lg shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="material-symbols-outlined text-gray-400 text-[20px]">payments</span>
+                            </div>
+                            <select class="focus:ring-2 focus:ring-orange focus:border-orange block w-full pl-10 py-3 sm:text-sm border-gray-300 dark:border-gray-600 rounded-lg dark:bg-background-dark dark:text-white transition-shadow"
+                                    id="payment_method"
+                                    name="PaymentMethod">
+                                @foreach (var opt in Model.PaymentMethodOptions)
+                                {
+                                    <option value="@opt.Value" @(Model.PaymentMethod == opt.Value ? "selected" : null)>@opt.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5" for="retrieval_method">Mode de récupération préféré</label>
+                        <div class="relative rounded-lg shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="material-symbols-outlined text-gray-400 text-[20px]">takeout_dining</span>
+                            </div>
+                            <select class="focus:ring-2 focus:ring-orange focus:border-orange block w-full pl-10 py-3 sm:text-sm border-gray-300 dark:border-gray-600 rounded-lg dark:bg-background-dark dark:text-white transition-shadow"
+                                    id="retrieval_method"
+                                    name="RetrievalMethod">
+                                @foreach (var opt in Model.RetrievalMethodOptions)
+                                {
+                                    <option value="@opt.Value" @(Model.RetrievalMethod == opt.Value ? "selected" : null)>@opt.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5" for="delivery_zone">Zone de livraison par défaut</label>
+                        <div class="relative rounded-lg shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="material-symbols-outlined text-gray-400 text-[20px]">location_on</span>
+                            </div>
+                            <select class="focus:ring-2 focus:ring-orange focus:border-orange block w-full pl-10 py-3 sm:text-sm border-gray-300 dark:border-gray-600 rounded-lg dark:bg-background-dark dark:text-white transition-shadow"
+                                    id="delivery_zone"
+                                    name="DeliveryZone">
+                                <option disabled value="" @(string.IsNullOrWhiteSpace(Model.DeliveryZone) ? "selected" : null)>Sélectionnez votre zone</option>
+                                @foreach (var opt in Model.DeliveryZoneOptions)
+                                {
+                                    <option value="@opt.Value" @(Model.DeliveryZone == opt.Value ? "selected" : null)>@opt.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button class="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-orange hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange transition-all shadow-md hover:shadow-xl transform hover:-translate-y-0.5"
+                                type="submit">
+                            S'inscrire
+                            <span class="absolute right-0 inset-y-0 flex items-center pr-3">
+                                <span class="material-symbols-outlined text-white/80 group-hover:text-white transition-colors">check_circle</span>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+
+                <p class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+                    En créant votre compte, vous acceptez nos
+                    <a class="font-bold text-orange hover:text-secondary hover:underline transition-colors" href="#">
+                        Conditions Générales
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <partial name="~/Views/Shared/_AuthSidePanel.cshtml" />
+</div>
