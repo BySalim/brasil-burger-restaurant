@@ -1,0 +1,88 @@
+﻿@{
+    var isAuthenticated = UserSession.IsAuthenticated;
+    var userName = isAuthenticated ? UserSession.FullName ?? "Utilisateur" : null;
+    var logo = AppSettings.Value.LogoMain;
+    
+    var parts = AppSettings.Value.Name
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+    var mainName = parts.FirstOrDefault();
+    var subName = parts.Skip(1).FirstOrDefault();
+}
+
+<header class="bg-surface-light/90 dark:bg-surface-dark/90 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800 transition-all duration-300">
+    <div class="container mx-auto px-6 lg:px-12 py-4 flex justify-between items-center">
+        <!-- Logo -->
+        <a class="flex items-center gap-3 group" href="@Url.Action("Index", "Home")">
+            <img alt="Brazil Burger Logo" 
+                 class="h-10 sm:h-12 w-auto dark:hidden transition-transform duration-300 group-hover:scale-105" 
+                 src="@logo" />
+            <span class="font-display font-extrabold text-xl tracking-tight text-primary dark:text-white hidden sm:block">
+                @mainName<span class="text-orange">@subName</span>
+            </span>
+        </a>
+
+        @if (isAuthenticated)
+        {
+            <!-- État connecté -->
+            <div class="flex items-center gap-3 sm:gap-6">
+                <!-- Lien Catalogue -->
+                <a class="hidden lg:inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-orange hover:bg-orange/90 dark:text-white dark:bg-orange dark:hover:bg-orange/90 transition-all duration-300 rounded-full group shadow-md" 
+                   href="@Url.Action("Index", "Catalog")">
+                    <span class="material-symbols-outlined text-[20px] transition-colors">restaurant_menu</span>
+                    <span>Catalogue</span>
+                </a>
+
+                <!-- Lien Mes Commandes -->
+                <a class="hidden lg:inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 bg-gray-100/80 hover:bg-orange hover:text-white dark:text-gray-200 dark:bg-surface-dark dark:border dark:border-gray-700 dark:hover:bg-orange dark:hover:border-orange transition-all duration-300 rounded-full group shadow-sm" 
+                   href="@Url.Action("Index", "Orders")">
+                    <span class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">receipt_long</span>
+                    <span>Mes Commandes</span>
+                </a>
+
+                <!-- Séparateur -->
+                <div class="hidden sm:block h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
+
+                <!-- Profil utilisateur -->
+                <div class="hidden sm:flex items-center gap-3 group/profile cursor-pointer">
+                    <div class="text-right hidden xl:block">
+                        <span class="block text-sm font-bold text-gray-900 dark:text-white leading-none group-hover/profile:text-orange transition-colors">
+                            @userName
+                        </span>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 group-hover/profile:bg-orange group-hover/profile:text-white transition-all duration-300 ring-2 ring-transparent shadow-sm">
+                        <span class="material-symbols-outlined text-[24px]">person</span>
+                    </div>
+                </div>
+
+                <!-- Bouton déconnexion -->
+                <form action="@Url.Action("Logout", "Auth")" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" 
+                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-full transition-all shadow-lg shadow-red-600/20 transform hover:-translate-y-0.5 flex items-center gap-2 group ml-2">
+                        <span class="material-symbols-outlined text-[18px] group-hover:rotate-180 transition-transform duration-500">logout</span>
+                        <span class="hidden md:inline">Se déconnecter</span>
+                    </button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <!-- État non connecté -->
+            <div class="flex items-center gap-3 sm:gap-6">
+                <!-- Bouton connexion -->
+                <a class="text-sm font-bold text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-white transition-colors hidden sm:block" 
+                   href="@Url.Action("Login", "Auth")">
+                    Se connecter
+                </a>
+
+                <!-- Bouton inscription -->
+                <a class="px-5 py-2.5 bg-orange-sun hover:bg-[#E67E22] text-white text-sm font-bold rounded-full transition-all shadow-lg shadow-orange-sun/20 transform hover:-translate-y-0.5 flex items-center gap-2" 
+                   href="@Url.Action("Register", "Auth")">
+                    <span class="material-symbols-outlined text-[18px]">person</span>
+                    <span>S'inscrire</span>
+                </a>
+            </div>
+        }
+    </div>
+</header>

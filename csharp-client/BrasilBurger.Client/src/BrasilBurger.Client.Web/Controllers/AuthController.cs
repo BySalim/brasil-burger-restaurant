@@ -243,6 +243,7 @@ public sealed class AuthController : Controller
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new("login", user.Login),
             new(ClaimTypes.Name, user.Login),
+            new(ClaimTypes.Name, $"{user.Prenom} {user.Nom}"),
             new("role", user.Role.ToString())
         };
 

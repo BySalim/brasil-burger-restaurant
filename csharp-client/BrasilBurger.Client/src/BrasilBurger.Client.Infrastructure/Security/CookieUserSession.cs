@@ -22,6 +22,9 @@ public sealed class CookieUserSession : IUserSession
     public string? Login
         => User?.FindFirst("login")?.Value
            ?? User?.Identity?.Name;
+    
+    public string? FullName
+        => User?.FindFirst(ClaimTypes.Name)?.Value;
 
     public Role? Role
         => TryGetEnum<Role>("role");

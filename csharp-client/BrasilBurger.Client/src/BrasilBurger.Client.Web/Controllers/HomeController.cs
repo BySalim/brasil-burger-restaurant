@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using BrasilBurger.Client.Web.Models;
+using BrasilBurger.Client.Web.ViewModels;
 
 namespace BrasilBurger.Client.Web.Controllers;
 

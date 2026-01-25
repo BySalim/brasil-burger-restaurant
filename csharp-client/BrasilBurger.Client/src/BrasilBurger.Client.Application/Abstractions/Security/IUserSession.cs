@@ -8,5 +8,6 @@ public interface IUserSession
 
     int? UserId { get; }
     string? Login { get; }
+    string? FullName { get; }
     Role? Role { get; }
 }

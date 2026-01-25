@@ -3,6 +3,8 @@
 @using BrasilBurger.Client
 @using BrasilBurger.Client.Infrastructure
 @using Microsoft.Extensions.Options
+@using BrasilBurger.Client.Application.Abstractions.Security
+@inject IUserSession UserSession
 
 @* Injection des settings *@
 @inject IOptions<AppSettings> AppSettings

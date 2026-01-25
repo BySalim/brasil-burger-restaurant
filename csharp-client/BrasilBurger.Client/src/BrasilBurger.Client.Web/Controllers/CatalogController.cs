@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BrasilBurger.Client.Web.Controllers;
 
-[Route("catalog")]
+[Route("Catalog")]
 public sealed class CatalogController : Controller
 {
     private readonly IArticleRepository _articleRepository;
