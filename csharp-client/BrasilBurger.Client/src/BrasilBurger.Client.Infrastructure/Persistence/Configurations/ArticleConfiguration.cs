@@ -33,8 +33,6 @@ public sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
             .HasColumnName("est_archiver")
             .HasDefaultValue(false);
 
-        // Colonnes présentes dans la table (nullable)
-        // => mappées une seule fois (TPH) : OK
         builder.Property(x => x.Description)
             .HasColumnName("description");
 
@@ -46,7 +44,6 @@ public sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
             .HasMaxLength(20)
             .HasConversion<string>(); // enum -> string
 
-        // Discriminator TPH (valeurs DB : BURGER, MENU, COMPLEMENT)
         builder.HasDiscriminator<string>("categorie")
             .HasValue<Burger>("BURGER")
             .HasValue<Menu>("MENU")

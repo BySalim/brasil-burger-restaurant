@@ -1,3 +1,8 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @using BrasilBurger.Client
+@using BrasilBurger.Client.Infrastructure
+@using Microsoft.Extensions.Options
+
+@* Injection des settings *@
+@inject IOptions<AppSettings> AppSettings

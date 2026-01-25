@@ -1,0 +1,114 @@
+﻿@model BrasilBurger.Client.Web.ViewModels.Shared.ChoiceCardsVm
+
+@{
+    var groupId = "cc_" + Guid.NewGuid().ToString("N");
+    var hiddenId = groupId + "_hidden";
+    var legend = Model.Legend ?? Model.Name;
+    
+    // Paramètres personnalisables via ViewData
+    var layout = ViewData["Layout"] as string ?? "grid"; // grid, inline, stacked
+    var columns = ViewData["Columns"] as string ?? "auto"; // auto, 2, 3, 4, 5
+    var size = ViewData["Size"] as string ?? "sm"; // xs, sm, md
+    var showIcons = ViewData["ShowIcons"] as bool? ?? true;
+    
+    // Classes de grille selon le nombre de colonnes
+    var gridClass = columns switch {
+        "2" => "grid-cols-2",
+        "3" => "grid-cols-2 sm:grid-cols-3",
+        "4" => "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
+        "5" => "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
+        _ => Model.Items.Count switch {
+            <= 2 => "grid-cols-2",
+            <= 3 => "grid-cols-2 sm:grid-cols-3",
+            <= 4 => "grid-cols-2 sm:grid-cols-4",
+            _ => "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+        }
+    };
+    
+    var containerClass = layout switch {
+        "inline" => "flex flex-wrap gap-2",
+        "stacked" => "flex flex-col gap-2",
+        _ => $"grid {gridClass} gap-2"
+    };
+    
+    var cardPadding = size switch {
+        "xs" => "p-2",
+        "md" => "p-4",
+        _ => "p-3"
+    };
+    
+    var iconSize = size switch {
+        "xs" => "h-5 w-5 text-xl",
+        "md" => "h-8 w-8 text-3xl",
+        _ => "h-6 w-6 text-2xl"
+    };
+    
+    var textSize = size switch {
+        "xs" => "text-xs",
+        "md" => "text-base",
+        _ => "text-sm"
+    };
+    
+    var gapSize = size switch {
+        "xs" => "gap-2",
+        "md" => "gap-4",
+        _ => "gap-3"
+    };
+}
+
+<fieldset class="space-y-2" data-choice-cards data-target-input-id="@hiddenId" aria-label="@legend">
+    <legend class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">@legend</legend>
+
+    <input type="hidden" name="@Model.Name" id="@hiddenId" value="@Model.SelectedValue" />
+
+    <div class="@containerClass" role="radiogroup" aria-label="@legend">
+        @foreach (var item in Model.Items)
+        {
+            var isSelected = string.Equals(item.Value, Model.SelectedValue, StringComparison.OrdinalIgnoreCase);
+
+            <button type="button"
+                    class="choice-card @(layout == "inline" ? "flex-shrink-0" : "w-full") text-left rounded-lg @cardPadding relative
+                           bg-white dark:bg-surface-dark
+                           transition-all duration-150
+                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
+                           @(isSelected ? "is-selected border-2 border-blue-500 bg-blue-50/50 dark:bg-blue-900/10" : "border-2 border-gray-200 dark:border-gray-700")"
+                    role="radio"
+                    aria-checked="@(isSelected.ToString().ToLowerInvariant())"
+                    data-choice-value="@item.Value"
+                    data-is-selected="@isSelected.ToString().ToLowerInvariant()"
+                    onmouseover="if(!this.classList.contains('is-selected')) this.style.borderColor='#EA5B0C'"
+                    onmouseout="if(!this.classList.contains('is-selected')) this.style.borderColor=''">
+                
+                @if (isSelected)
+                {
+                    <span class="choice-check-icon absolute top-1 right-1 material-symbols-outlined text-base text-blue-600 dark:text-blue-400">
+                        check_circle
+                    </span>
+                }
+                
+                <div class="flex items-center justify-start @gapSize" style="align-items: center;">
+                    @if (showIcons)
+                    {
+                        @if (!string.IsNullOrWhiteSpace(item.IconUrl))
+                        {
+                            <img src="@item.IconUrl" alt="" class="@iconSize object-contain flex-shrink-0" />
+                        }
+                        else if (!string.IsNullOrWhiteSpace(item.IconName))
+                        {
+                            <span class="material-symbols-outlined @iconSize flex-shrink-0" 
+                                  style="display: inline-flex; align-items: center; justify-content: center;
+                                         @(isSelected ? "color: #2563eb;" : "color: #6b7280;")">
+                                @item.IconName
+                            </span>
+                        }
+                    }
+                    <span class="@textSize font-medium leading-none" style="display: inline-flex; align-items: center;
+                                 @(isSelected ? "color: #1e40af;" : "color: #374151;")">
+                        @item.Label
+                    </span>
+                </div>
+            </button>
+        }
+    </div>
+    <span asp-validation-for="@Model.Name" class="mt-1 text-sm text-red-600 dark:text-red-400"></span>
+</fieldset>

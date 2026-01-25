@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BrasilBurger.Client.ViewModels.Auth;
+namespace BrasilBurger.Client.Web.ViewModels.Auth;
 
 public sealed class RegisterStep1Vm
 {
@@ -12,9 +12,8 @@ public sealed class RegisterStep1Vm
 
     [Required(ErrorMessage = "L'adresse e-mail est requise.")]
     [EmailAddress(ErrorMessage = "L'adresse e-mail n'est pas valide.")]
-    public string? Email { get; set; }
+    public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Le mot de passe est requis.")]
-    [MinLength(8, ErrorMessage = "Le mot de passe doit contenir au moins 8 caractères.")]
     public string? Password { get; set; }
 }

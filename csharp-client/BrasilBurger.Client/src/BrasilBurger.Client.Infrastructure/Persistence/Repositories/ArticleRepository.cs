@@ -2,6 +2,12 @@ using BrasilBurger.Client.Application.Abstractions.Persistence;
 using BrasilBurger.Client.Domain.Entities;
 using BrasilBurger.Client.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BrasilBurger.Client.Infrastructure.Persistence.Repositories;
 
@@ -13,7 +19,45 @@ public sealed class ArticleRepository : EfRepository<Article>, IArticleRepositor
         => Db.Articles.AsNoTracking().FirstOrDefaultAsync(a => a.Code == code, ct);
 
     public async Task<IReadOnlyList<Article>> ListActifsAsync(CancellationToken ct = default)
-        => await Db.Articles.AsNoTracking().Where(a => !a.EstArchiver).ToListAsync(ct);
+    {
+        // Burgers actifs
+        var burgers = await Db.Articles
+            .OfType<Burger>()
+            .AsNoTracking()
+            .Where(a => !a.EstArchiver)
+            .ToListAsync(ct);
+
+        // Menus actifs + composition + article de chaque ligne
+        var menus = await Db.Articles
+            .OfType<Menu>()
+            .AsNoTracking()
+            .Where(m => !m.EstArchiver)
+            .Include(m => m.MenuComposition)
+                .ThenInclude(aq => aq.Article)
+            .ToListAsync(ct);
+
+        // Compléments actifs
+        var complements = await Db.Articles
+            .OfType<Complement>()
+            .AsNoTracking()
+            .Where(a => !a.EstArchiver)
+            .ToListAsync(ct);
+
+        var all = new List<Article>(burgers.Count + menus.Count + complements.Count);
+        all.AddRange(burgers);
+        all.AddRange(menus);
+        all.AddRange(complements);
+
+        // Tri alphabétique global sur le libellé (fr-FR, insensible à la casse)
+        var comparer = StringComparer.Create(
+            CultureInfo.GetCultureInfo("fr-FR"),
+            ignoreCase: true
+        );
+
+        return all
+            .OrderBy(a => a.Libelle, comparer)
+            .ToList();
+    }
 
     public async Task<IReadOnlyList<Article>> ListByCategorieAsync(
         CategorieArticle categorie,

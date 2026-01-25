@@ -1,5 +1,6 @@
 ﻿@{
-    var title = ViewData["Title"] as string ?? "Brazil Burger";
+    var title = ViewData["Title"] is string ? AppSettings.Value.ShortName + " - " + ViewData["Title"] : AppSettings.Value.Name;
+    var logo = AppSettings.Value.LogoMain;
 }
 
 <!DOCTYPE html>
@@ -14,6 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;family=Open+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
 
+    <link rel="icon" href="@logo" />
+    
     <script>
       tailwind.config = {
         darkMode: "class",
@@ -47,12 +50,19 @@
     </script>
 
     @RenderSection("Styles", required: false)
+    
+    <script src="~/js/choice-cards.js" defer asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
 </head>
 
 <body class="bg-white dark:bg-background-dark font-body min-h-screen flex flex-col antialiased text-gray-800 dark:text-gray-200">
+    @RenderSection("Header", required: false)
+
     <main class="flex-grow">
         @RenderBody()
     </main>
+    
+    <partial name="_Notifications" />
 
     <partial name="~/Views/Shared/_Footer.cshtml" />
 </body>

@@ -9,7 +9,6 @@ public sealed class BcryptPasswordHasher : IPasswordHasher
 
     public bool Verify(string hashedPassword, string providedPassword)
     {
-        // Compat Symfony/PHP : certains libs .NET n'acceptent pas toujours $2y$
         if (!string.IsNullOrWhiteSpace(hashedPassword) && hashedPassword.StartsWith("$2y$"))
             hashedPassword = "$2a$" + hashedPassword.Substring(4);
 

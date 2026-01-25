@@ -1,34 +1,38 @@
 using System.ComponentModel.DataAnnotations;
+using BrasilBurger.Client.Web.Options;
+using BrasilBurger.Client.Web.ViewModels.Shared;
 
-namespace BrasilBurger.Client.ViewModels.Auth;
+namespace BrasilBurger.Client.Web.ViewModels.Auth;
 
-public sealed class RegisterStep2Vm
+// ViewModel pour le POST
+public sealed class RegisterStep2FormVm
 {
     [Required(ErrorMessage = "Le numéro de téléphone est requis.")]
+    [Phone(ErrorMessage = "Le numéro de téléphone n'est pas valide.")]
+    [RegularExpression(@"^(70|75|76|77|78)\d{7}$", ErrorMessage = "Le numéro doit commencer par 70, 75, 76, 77 ou 78 et contenir 9 chiffres.")]
     public string? Phone { get; set; }
-
-    [Required(ErrorMessage = "Veuillez choisir un moyen de paiement.")]
+    
     public string? PaymentMethod { get; set; }
-
-    [Required(ErrorMessage = "Veuillez choisir un mode de récupération.")]
     public string? RetrievalMethod { get; set; }
-
-    public string? DeliveryZone { get; set; }
-
-    // Options mockées (pas de DB)
-    public List<SelectOptionVm> PaymentMethodOptions { get; } = new();
-    public List<SelectOptionVm> RetrievalMethodOptions { get; } = new();
-    public List<SelectOptionVm> DeliveryZoneOptions { get; } = new();
+    public string? DeliveryQuartierId { get; set; }
 }
 
-public sealed class SelectOptionVm
+// ViewModel pour le GET (affichage avec les listes)
+public sealed class RegisterStep2Vm
 {
-    public SelectOptionVm(string value, string text)
-    {
-        Value = value;
-        Text = text;
-    }
+    public RegisterStep2FormVm Form { get; set; }
+    public ChoiceCardsVm PaymentMethodCards { get; set; }
+    public ChoiceCardsVm RetrievalMethodCards { get; set; }
+    public List<SelectOptionVm> DeliveryZoneOptions { get; set; }
 
-    public string Value { get; }
-    public string Text { get; }
+    public RegisterStep2Vm(
+        ChoiceCardsVm paymentMethodCards, 
+        ChoiceCardsVm retrievalMethodCards,
+        List<SelectOptionVm> deliveryZoneOptions)
+    {
+        Form = new RegisterStep2FormVm();
+        PaymentMethodCards = paymentMethodCards ?? throw new ArgumentNullException(nameof(paymentMethodCards));
+        RetrievalMethodCards = retrievalMethodCards ?? throw new ArgumentNullException(nameof(retrievalMethodCards));
+        DeliveryZoneOptions = deliveryZoneOptions ?? throw new ArgumentNullException(nameof(deliveryZoneOptions));
+    }
 }

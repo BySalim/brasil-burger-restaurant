@@ -1,27 +1,26 @@
+@{
+    var appName = AppSettings.Value.Name;
+    var logo = AppSettings.Value.LogoMain;
+}
 <nav class="px-6 sm:px-12 py-6 flex justify-between items-center">
     <div class="flex items-center gap-3">
-        <img alt="Brazil Burger Logo"
+        <img alt="@appName Logo"
              class="h-16 w-auto dark:hidden"
-             onerror="this.src='https://via.placeholder.com/50?text=BB'"
-             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd9Hwlz7KCyyyKm5IQZ5jbR_nfm6u7rk-e7T2uVhTdosqafMrw8suMBk4SZJ5FXNZ4czxkNdU8ghH1MNkgo7vgAMZI2gPWTks3KzsiQ9N9_Kt8Sth2o1BpgAAXte_t-x3i5IMVZLSSqqupR0Mg9bVO6k1lXzcyfkqTVBgUmRK92PDv1pO0QnF8Zlh5E-iyGtqOHqnL3F8NSH5Lt6qG7cS4CIkTOcnRFPVk99FkrcTk-nLGVg3kVrwPaJW7EyAsLqCIw10PapW4ufY" />
-        <img alt="Brazil Burger Logo Dark"
-             class="h-16 w-auto hidden dark:block"
-             onerror="this.src='https://via.placeholder.com/50?text=BB'"
-             src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_XGd0C5mycaz_MIK2kFjZiMLuyNhlNVr0EUI6HH6Vmw5IjjAXBF6s78jpvJMwQmx9yuW05QslM_E0_UBKoz9DXncbhmlo2d2yCerzUVqKlQXgnL4XxVs0pnsQJlJIwySLJGPDKz8tSXsS00F3nc44JqQvmmBYWjsFUaQ4lMFU47f05kxavbBKC11vm2JC9Sh6lqzBMQR0ph5ZZWYo8jpXirMneKtKoCKN3ZA3JmonGyxsoEs4zIzFFW2lhnRM2gVjd0exvha1PSc" />
+             src=@logo />
 
-        <span class="font-display font-bold text-xl tracking-tight text-primary dark:text-white hidden sm:block">
-            BRAZIL BURGER
+        <span class="font-display font-bold text-xl tracking-tight text-primary dark:text-white hidden sm:block uppercase">
+            @appName
         </span>
     </div>
 
     <div class="flex items-center gap-4">
         <a class="text-sm font-bold text-primary hover:text-orange dark:text-white transition-colors"
-           href="@Url.Action("Login", "Test")">
+           href="@Url.Action("Login", "Auth")">
             Se connecter
         </a>
 
         <a class="px-5 py-2.5 bg-orange-sun hover:bg-secondary text-white text-sm font-bold rounded-lg transition-all shadow-md transform hover:-translate-y-0.5"
-           href="@Url.Action("Register", "Test")">
+           href="@Url.Action("Register", "Auth")">
             S'inscrire
         </a>
     </div>

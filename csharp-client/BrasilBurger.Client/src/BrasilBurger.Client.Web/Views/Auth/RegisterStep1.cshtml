@@ -1,4 +1,4 @@
-@model BrasilBurger.Client.ViewModels.Auth.RegisterStep1Vm
+@model BrasilBurger.Client.Web.ViewModels.Auth.RegisterStep1Vm
 @{
     ViewData["Title"] = "Inscription - Brazil Burger";
 }
@@ -21,7 +21,7 @@
                     </p>
                 </div>
 
-                <form action="@Url.Action("Register", "Test")" class="mt-8 space-y-5" method="POST">
+                <form action="@Url.Action("Register", "Auth")" class="mt-8 space-y-5" method="POST">
                     @Html.AntiForgeryToken()
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -30,7 +30,7 @@
                             <input class="focus:ring-2 focus:ring-orange focus:border-orange block w-full py-3 px-4 sm:text-sm border-gray-300 dark:border-gray-600 rounded-lg dark:bg-background-dark dark:text-white dark:placeholder-gray-500 transition-shadow"
                                    id="nom"
                                    name="Nom"
-                                   placeholder="Diop"
+                                   placeholder="Nom"
                                    required
                                    type="text"
                                    value="@(Model.Nom ?? "")" />
@@ -41,7 +41,7 @@
                             <input class="focus:ring-2 focus:ring-orange focus:border-orange block w-full py-3 px-4 sm:text-sm border-gray-300 dark:border-gray-600 rounded-lg dark:bg-background-dark dark:text-white dark:placeholder-gray-500 transition-shadow"
                                    id="prenom"
                                    name="Prenom"
-                                   placeholder="Fatou"
+                                   placeholder="Prenom"
                                    required
                                    type="text"
                                    value="@(Model.Prenom ?? "")" />
@@ -63,6 +63,7 @@
                                    type="email"
                                    value="@(Model.Email ?? "")" />
                         </div>
+                        <span asp-validation-for="@Model.Email" class="mt-1 text-sm text-red-600 dark:text-red-400"></span>
                     </div>
 
                     <div class="relative">
@@ -75,7 +76,7 @@
                                    class="focus:ring-2 focus:ring-orange focus:border-orange block w-full pl-10 py-3 sm:text-sm border-gray-300 dark:border-gray-600 rounded-lg dark:bg-background-dark dark:text-white dark:placeholder-gray-500 transition-shadow"
                                    id="password"
                                    name="Password"
-                                   placeholder="••••••••"
+                                   placeholder="Mot de passe"
                                    required
                                    type="password" />
                         </div>
@@ -126,7 +127,7 @@
                 <p class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
                     Vous avez déjà un compte ?
                     <a class="font-bold text-orange hover:text-secondary hover:underline transition-colors"
-                       href="@Url.Action("Login", "Test")">
+                       href="@Url.Action("Login", "Auth")">
                         Se connecter
                     </a>
                 </p>

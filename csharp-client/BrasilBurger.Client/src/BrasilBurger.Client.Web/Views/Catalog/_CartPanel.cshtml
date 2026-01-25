@@ -1,0 +1,314 @@
+@using System
+@using BrasilBurger.Client.Web.ViewModels.Pages
+@model CatalogVm
+
+@{
+    string FormatFcfa(int amount) => amount.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("fr-FR"));
+
+    static bool IsDelivery(string key, string label)
+        => key.Contains("LIV", StringComparison.OrdinalIgnoreCase)
+           || label.Contains("livr", StringComparison.OrdinalIgnoreCase);
+
+    static string RecuperationIcon(string key, string label)
+    {
+        if (IsDelivery(key, label)) return "local_shipping";
+        if (key.Contains("SUR", StringComparison.OrdinalIgnoreCase) || label.Contains("place", StringComparison.OrdinalIgnoreCase))
+            return "restaurant";
+        return "shopping_bag";
+    }
+
+    static string PaiementIcon(string key, string label)
+    {
+        if (key.Contains("WAVE", StringComparison.OrdinalIgnoreCase) || label.Contains("wave", StringComparison.OrdinalIgnoreCase))
+            return "smartphone";
+        if (key.Contains("OM", StringComparison.OrdinalIgnoreCase) || label.Contains("orange", StringComparison.OrdinalIgnoreCase))
+            return "phone_iphone";
+        return "payments";
+    }
+}
+
+<aside class="js-cart-aside w-20 lg:pr-4 sticky top-4 self-start">
+    <!-- Panier réduit (visible par défaut) -->
+    <div class="js-cart-collapsed-panel w-full cursor-pointer">
+        <div class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-card-border dark:border-card-border-dark shadow-soft hover:shadow-hover transition-all p-3 flex flex-col items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-orange/10 text-orange flex items-center justify-center">
+                <span class="material-symbols-outlined">shopping_bag</span>
+            </div>
+            <div class="text-center">
+                <div class="text-[11px] font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Panier</div>
+                <div class="text-[10px] text-gray-500 dark:text-gray-400">Cliquer pour ouvrir</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panier développé -->
+    <div class="js-cart-open-panel hidden bg-surface-light dark:bg-surface-dark rounded-2xl border border-card-border dark:border-card-border-dark shadow-soft overflow-hidden flex flex-col w-full">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-orange/10 text-orange flex items-center justify-center">
+                    <span class="material-symbols-outlined">shopping_bag</span>
+                </div>
+                <div>
+                    <h3 class="js-cart-title-step1 font-display font-extrabold text-gray-900 dark:text-white">Mon panier</h3>
+                    <h3 class="js-cart-title-step2 hidden font-display font-extrabold text-gray-900 dark:text-white">Paiement & livraison</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Commande en 2 étapes</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Stepper (étape 1) -->
+                <div class="js-cart-stepper-step1 flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <span class="text-xs font-bold text-gray-700 dark:text-gray-200">Étape</span>
+                    <span class="text-xs font-extrabold text-orange">1/2</span>
+                    <div class="flex items-center gap-1">
+                        <button type="button" disabled
+                                class="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-400 flex items-center justify-center cursor-not-allowed">
+                            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                        </button>
+                        <button type="button"
+                                class="js-cart-stepper-next w-8 h-8 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center hover:opacity-90 transition-opacity">
+                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stepper (étape 2) -->
+                <div class="js-cart-stepper-step2 hidden flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <span class="text-xs font-bold text-gray-700 dark:text-gray-200">Étape</span>
+                    <span class="text-xs font-extrabold text-orange">2/2</span>
+                    <div class="flex items-center gap-1">
+                        <button type="button"
+                                class="js-cart-stepper-prev w-8 h-8 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center hover:opacity-90 transition-opacity">
+                            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                        </button>
+                        <button type="button" disabled
+                                class="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-400 flex items-center justify-center cursor-not-allowed">
+                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button"
+                        class="js-cart-collapse-btn w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <span class="material-symbols-outlined text-gray-700 dark:text-gray-200">close_fullscreen</span>
+                </button>
+            </div>
+        </div>
+
+        <form id="js-cart-form" method="post" action="@Url.Action("Checkout", "Catalog")" class="flex flex-col flex-grow min-h-0">
+            @Html.AntiForgeryToken()
+
+            <!-- Empty -->
+            <div class="js-cart-empty-state p-6 text-center text-gray-600 dark:text-gray-300">
+                <div class="mx-auto w-14 h-14 rounded-2xl bg-orange/10 text-orange flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined">shopping_cart</span>
+                </div>
+                <p class="font-bold text-gray-900 dark:text-white">Votre panier est vide</p>
+                <p class="text-sm mt-1">Sélectionnez un burger ou un menu pour commencer.</p>
+            </div>
+
+            <!-- Content -->
+            <div class="js-cart-content hidden flex flex-col flex-grow min-h-0">
+                <!-- STEP 1 -->
+                <div class="js-cart-step1 flex flex-col flex-grow min-h-0">
+                    <div class="p-4 flex-1 min-h-0 overflow-auto">
+                        <div class="js-cart-lines space-y-3"></div>
+
+                        <!-- Template ligne -->
+                        <template id="js-cart-line-template">
+                            <div class="js-cart-line bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-3 flex gap-3 items-start">
+                                <img class="js-line-img w-16 h-16 rounded-xl object-cover" src="" alt="" />
+
+                                <div class="flex-1">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div>
+                                            <div class="js-line-title font-bold text-gray-900 dark:text-white text-sm"></div>
+                                            <div class="js-line-badge text-[11px] font-extrabold text-orange mt-0.5"></div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="js-line-unit text-xs text-gray-600 dark:text-gray-300"></div>
+                                            <div class="js-line-total font-extrabold text-gray-900 dark:text-white"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3 flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <button type="button"
+                                                    class="js-line-minus w-9 h-9 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                                <span class="material-symbols-outlined text-[18px]">remove</span>
+                                            </button>
+                                            <span class="js-line-qty w-10 text-center font-extrabold text-gray-900 dark:text-white">1</span>
+                                            <button type="button"
+                                                    class="js-line-plus w-9 h-9 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                                <span class="material-symbols-outlined text-[18px]">add</span>
+                                            </button>
+                                        </div>
+
+                                        <button type="button"
+                                                class="js-line-remove hidden text-xs font-bold text-red-600 hover:text-red-700">
+                                            Supprimer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="p-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-gray-700 dark:text-gray-200">Total (articles)</span>
+                            <span class="js-cart-total-text text-lg font-extrabold text-gray-900 dark:text-white">0 F CFA</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button"
+                                    class="js-cart-clear-btn w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                Supprimer
+                            </button>
+
+                            <button type="button"
+                                    class="js-cart-next-step-btn w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity">
+                                Suivant
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div class="js-cart-step2 hidden flex flex-col flex-grow min-h-0">
+                    <div class="p-4 flex-1 min-h-0 overflow-auto space-y-6">
+                        <div>
+                            <h4 class="font-display font-extrabold text-gray-900 dark:text-white mb-3">Mode de récupération</h4>
+                            <div class="grid grid-cols-1 gap-3">
+                                @foreach (var m in Model.ModesRecuperation)
+                                {
+                                    var key = m.Value.ToString();
+                                    var isDelivery = IsDelivery(key, m.Label);
+                                    var icon = RecuperationIcon(key, m.Label);
+
+                                    <label class="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-3 cursor-pointer hover:shadow-sm transition-all">
+                                        <input type="radio"
+                                               name="js-retrieval"
+                                               class="js-cart-retrieval-radio"
+                                               value="@key"
+                                               data-is-delivery="@(isDelivery ? "true" : "false")"
+                                               style="accent-color: #F97316;" />
+                                        <div class="w-10 h-10 rounded-xl bg-white/70 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-gray-900 dark:text-white">@icon</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-bold text-gray-900 dark:text-white text-sm">@m.Label</div>
+                                            <div class="text-xs text-gray-600 dark:text-gray-300">
+                                                @(isDelivery ? "Livraison à domicile" : "Récupération sans livraison")
+                                            </div>
+                                        </div>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="js-cart-delivery-fields hidden">
+                            <h4 class="font-display font-extrabold text-gray-900 dark:text-white mb-3">Adresse de livraison</h4>
+
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Zone & quartier</label>
+                            <select id="js-delivery-zone-select"
+                                    class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-orange">
+                                <option value="" selected disabled>Choisir une zone et un quartier</option>
+                                @foreach (var z in Model.Zones)
+                                {
+                                    foreach (var q in z.Quartiers)
+                                    {
+                                        var label = $"Z: {z.Libelle}, Q: {q.Libelle}, {FormatFcfa(z.PrixLivraison)} F CFA";
+                                        <option value="@($"{z.Id}:{q.Id}")"
+                                                data-zone-id="@z.Id"
+                                                data-quartier-id="@q.Id"
+                                                data-prix-livraison="@z.PrixLivraison">
+                                            @label
+                                        </option>
+                                    }
+                                }
+                            </select>
+
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mt-4 mb-2">Note de livraison (facultatif)</label>
+                            <textarea id="js-delivery-note"
+                                      rows="3"
+                                      class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange"
+                                      placeholder="Ex: Sonnez au portail, 2ème étage à droite..."></textarea>
+                        </div>
+
+                        <div>
+                            <h4 class="font-display font-extrabold text-gray-900 dark:text-white mb-3">Mode de paiement</h4>
+                            <div class="grid grid-cols-1 gap-3">
+                                @foreach (var p in Model.ModesPaiement)
+                                {
+                                    var key = p.Value.ToString();
+                                    var icon = PaiementIcon(key, p.Label);
+
+                                    <label class="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-3 cursor-pointer hover:shadow-sm transition-all">
+                                        <input type="radio"
+                                               name="js-payment"
+                                               class="js-cart-payment-radio"
+                                               value="@key"
+                                               style="accent-color: #F97316;" />
+                                        <div class="w-10 h-10 rounded-xl bg-white/70 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-gray-900 dark:text-white">@icon</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-bold text-gray-900 dark:text-white text-sm">@p.Label</div>
+                                            <div class="text-xs text-gray-600 dark:text-gray-300">Paiement sécurisé</div>
+                                        </div>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="js-cart-submit-message hidden rounded-2xl border p-3 text-sm font-semibold"></div>
+                    </div>
+
+                    <div class="p-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="font-bold text-gray-700 dark:text-gray-200">Sous-total</span>
+                                <span class="js-cart-subtotal-text font-extrabold text-gray-900 dark:text-white">0 F CFA</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="font-bold text-gray-700 dark:text-gray-200">Livraison</span>
+                                <span class="js-cart-delivery-text font-extrabold text-gray-900 dark:text-white">0 F CFA</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-bold text-gray-700 dark:text-gray-200">Total à payer</span>
+                                <span class="js-cart-pay-total-text text-lg font-extrabold text-gray-900 dark:text-white">0 F CFA</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button"
+                                    class="js-cart-clear-btn w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                Supprimer
+                            </button>
+
+                            <button type="submit"
+                                    class="js-cart-submit-btn w-full bg-orange hover:bg-secondary text-white px-4 py-3 rounded-xl font-bold text-sm transition-all">
+                                Finaliser
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden inputs (POST) -->
+            <div class="js-cart-hidden-inputs hidden">
+                <input type="hidden" name="MontantTotal" id="js-cart-montant-total" value="0" />
+                <input type="hidden" name="TypeRecuperation" id="js-cart-type-recuperation" value="" />
+                <input type="hidden" name="ModePaie" id="js-cart-mode-paie" value="" />
+
+                <input type="hidden" name="InfoLivraison.IdZone" id="js-cart-info-zone" value="" disabled />
+                <input type="hidden" name="InfoLivraison.IdQuartier" id="js-cart-info-quartier" value="" disabled />
+                <input type="hidden" name="InfoLivraison.PrixLivraison" id="js-cart-info-prix" value="" disabled />
+                <input type="hidden" name="InfoLivraison.NoteLivraison" id="js-cart-info-note" value="" disabled />
+
+                <!-- Les ArticleQuantifiers[i].* sont injectés ici par JS -->
+            </div>
+        </form>
+    </div>
+</aside>

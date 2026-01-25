@@ -1,22 +1,44 @@
 using BrasilBurger.Client.Infrastructure;
+using BrasilBurger.Client.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Fichier local non versionné (ignore via .gitignore)
+// Fichier local non versionné: variables d'environnement
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 // MVC
 builder.Services.AddControllersWithViews();
 
-// Infra (Neon + Cloudinary probes + options)
+// Session pour TempData
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".BrasilBurger.Session";
+});
+
+// Infrastructure (Neon + Cloudinary probes + options)
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// (Optionnel) Cookie auth pour la suite (connexion/inscription)
+// Web
+builder.Services.AddWeb();
+
+// Cookie Authentication (connexion/inscription)
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", opt =>
     {
-        opt.LoginPath = "/Account/Login";
-        opt.AccessDeniedPath = "/Account/Denied";
+        opt.LoginPath = "/Auth/Login";
+        opt.AccessDeniedPath = "/Auth/Denied";
+        opt.LogoutPath = "/Auth/Logout";
+        
+        // Configuration améliorée
+        opt.ExpireTimeSpan = TimeSpan.FromDays(30);
+        opt.SlidingExpiration = true;
+        opt.Cookie.HttpOnly = true;
+        opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        opt.Cookie.SameSite = SameSiteMode.Lax;
+        opt.Cookie.Name = ".BrasilBurger.Auth";
     });
 
 var app = builder.Build();
@@ -40,6 +62,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Session AVANT Authentication
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

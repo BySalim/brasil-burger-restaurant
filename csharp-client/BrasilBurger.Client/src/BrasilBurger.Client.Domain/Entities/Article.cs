@@ -5,7 +5,7 @@ namespace BrasilBurger.Client.Domain.Entities;
 
 public abstract class Article : Entity
 {
-    protected Article() { } // EF
+    protected Article() { }
 
     protected Article(string code, string libelle, string imagePublicId)
     {
@@ -27,7 +27,6 @@ public abstract class Article : Entity
     public int? Prix { get; protected set; }
     public TypeComplement? TypeComplement { get; protected set; }
 
-    /// <summary>Discriminator logique (TPH), identique à Symfony.</summary>
     public abstract CategorieArticle Categorie { get; }
 
     public abstract int? GetPrix();

@@ -9,7 +9,12 @@ public sealed class UtilisateurRepository : EfRepository<Utilisateur>, IUtilisat
     public UtilisateurRepository(BrasilBurgerDbContext db) : base(db) { }
 
     public Task<Utilisateur?> GetByLoginAsync(string login, CancellationToken ct = default)
-        => Db.Utilisateurs.FirstOrDefaultAsync(u => u.Login == login, ct);
+        => Db.Utilisateurs
+            .FirstOrDefaultAsync(u => u.Login == login, ct);
+
+    public Task<Utilisateur?> GetByTelephoneAsync(string telephone, CancellationToken ct = default)
+        => Db.Utilisateurs
+            .FirstOrDefaultAsync(u => u.Telephone == telephone, ct);
 
     public Task<Utilisateur?> GetWithDefaultsAsync(int utilisateurId, CancellationToken ct = default)
         => Db.Utilisateurs

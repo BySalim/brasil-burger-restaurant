@@ -7,6 +7,8 @@ using BrasilBurger.Client.Infrastructure.External.Payments;
 using BrasilBurger.Client.Infrastructure.Persistence;
 using BrasilBurger.Client.Infrastructure.Persistence.Repositories;
 using BrasilBurger.Client.Infrastructure.Security;
+using BrasilBurger.Client.Application.Abstractions.Services;
+using BrasilBurger.Client.Application.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +23,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
+        
+        // ----------------------------
+        // Options App
+        // ----------------------------
+        services.Configure<AppSettings>(config.GetSection(AppSettings.SectionName));
+        
         // ----------------------------
         // Options Cloudinary
         // ----------------------------
@@ -88,6 +96,11 @@ public static class DependencyInjection
         services.AddScoped<IPaiementRepository, PaiementRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
+        // ----------------------------
+        // Application Services
+        // ----------------------------
+        services.AddScoped<IAuthService, AuthService>();
 
         // ----------------------------
         // Probes (Diagnostics)

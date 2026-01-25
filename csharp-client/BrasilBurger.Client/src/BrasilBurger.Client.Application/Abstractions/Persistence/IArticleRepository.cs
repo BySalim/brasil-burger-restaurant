@@ -13,8 +13,5 @@ public interface IArticleRepository : IRepository<Article>
         bool includeArchives = false,
         CancellationToken ct = default);
 
-    /// <summary>
-    /// Pour l’affichage d’un menu avec sa composition (ArticleQuantifier + Article).
-    /// </summary>
     Task<Menu?> GetMenuWithCompositionAsync(int menuId, CancellationToken ct = default);
 }

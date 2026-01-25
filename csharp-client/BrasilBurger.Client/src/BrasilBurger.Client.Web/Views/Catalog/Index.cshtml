@@ -1,0 +1,69 @@
+@using BrasilBurger.Client.Domain.Enums
+@using BrasilBurger.Client.Web.ViewModels.Pages
+@model CatalogVm
+
+@{
+    ViewData["Title"] = "Catalogue";
+}
+
+<section class="bg-background-light dark:bg-background-dark min-h-screen" data-page="catalog">
+    <div class="container mx-auto px-6 lg:px-12 py-10">
+        <header class="mb-6">
+            <h1 class="font-display text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">
+                Catalogue
+            </h1>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                Sélectionnez un burger ou un menu, puis finalisez votre commande.
+            </p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row items-start gap-6 lg:gap-10">
+            @* Colonne Panier *@
+            @await Html.PartialAsync("_CartPanel", Model)
+
+            @* Séparateur vertical + Colonne Catalogue *@
+            <div class="w-full min-w-0 lg:pl-8 lg:border-l lg:border-gray-200 dark:lg:border-gray-800">
+                @* Filtres *@
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <button type="button"
+                            class="js-filter-btn px-4 py-2 rounded-xl text-sm font-bold border transition-all bg-gray-900 text-white border-gray-900 dark:bg-white dark:text-gray-900 dark:border-white"
+                            data-filter="all">
+                        Tout
+                    </button>
+
+                    <button type="button"
+                            class="js-filter-btn px-4 py-2 rounded-xl text-sm font-bold border transition-all bg-white text-gray-900 border-gray-200 hover:border-gray-400 dark:bg-gray-900 dark:text-white dark:border-gray-800 dark:hover:border-gray-600"
+                            data-filter="burger">
+                        Burgers
+                    </button>
+
+                    <button type="button"
+                            class="js-filter-btn px-4 py-2 rounded-xl text-sm font-bold border transition-all bg-white text-gray-900 border-gray-200 hover:border-gray-400 dark:bg-gray-900 dark:text-white dark:border-gray-800 dark:hover:border-gray-600"
+                            data-filter="menu">
+                        Menus
+                    </button>
+
+                    <button type="button"
+                            class="js-filter-btn js-filter-complements hidden px-4 py-2 rounded-xl text-sm font-bold border transition-all bg-white text-gray-900 border-gray-200 hover:border-gray-400 dark:bg-gray-900 dark:text-white dark:border-gray-800 dark:hover:border-gray-600"
+                            data-filter="complement">
+                        Compléments
+                    </button>
+                </div>
+
+                @* Grille d'articles *@
+                <div class="js-articles-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                    @foreach (var article in Model.Articles)
+                    {
+                        <div class="js-article-item"
+                             data-categorie="@article.TypeCategorieUi.Value"
+                             data-type-complement="@(article.TypeComplementUi?.Value.ToString() ?? "")">
+                            @await Html.PartialAsync("_ArticleCard", article)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="~/js/catalog.js"></script>

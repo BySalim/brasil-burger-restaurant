@@ -1,0 +1,128 @@
+@using System
+@using BrasilBurger.Client.Domain.Enums
+@using BrasilBurger.Client.Web.ViewModels.GetVm
+@model ArticleGetVm
+
+@{
+    var categorie = Model.TypeCategorieUi.Value;
+
+    var isBurgerOrMenu = categorie == CategorieArticle.BURGER
+                         || categorie == CategorieArticle.MENU;
+
+    var isComplement = categorie == CategorieArticle.COMPLEMENT;
+
+    // Texte du badge : pour les compléments on préfère le type de complément (FRITES, BOISSON, …)
+    var badgeText = isComplement
+        ? (Model.TypeComplementUi?.Label ?? Model.TypeCategorieUi.Label)
+        : Model.TypeCategorieUi.Label;
+
+    var badgeBaseClasses =
+        "inline-flex items-center px-3 py-1.5 rounded-md backdrop-blur-sm border border-white/10 text-[10px] font-bold uppercase tracking-wider shadow-sm";
+
+    // Couleurs du badge (adaptées à ton design)
+    var badgeColorClasses = categorie switch
+    {
+        CategorieArticle.BURGER => "bg-[#5D4037] text-white",
+        CategorieArticle.MENU => "bg-[#FBC02D] text-black/80",
+        CategorieArticle.COMPLEMENT when Model.TypeComplementUi?.Value == TypeComplement.BOISSON
+            => "bg-[#0277BD] text-white",
+        CategorieArticle.COMPLEMENT when Model.TypeComplementUi?.Value == TypeComplement.FRITES
+            => "bg-[#FFA000] text-white",
+        _ => "bg-gray-700 text-white"
+    };
+
+    var prixFormate = Model.Prix.ToString(
+        "N0",
+        System.Globalization.CultureInfo.GetCultureInfo("fr-FR"));
+}
+
+<article class="js-article-card group bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-soft hover:shadow-hover border border-card-border dark:border-card-border-dark transition-all duration-300 flex flex-col hover:-translate-y-1 h-full"
+         data-article-id="@Model.Id"
+         data-article-libelle="@Model.Libelle"
+         data-article-image="@Model.ImageUrl"
+         data-article-prix="@Model.Prix"
+         data-article-categorie="@categorie"
+         data-article-category="@categorie"
+         data-badge-text="@badgeText.ToUpperInvariant()"
+         data-badge-classes="@badgeColorClasses">
+
+    <!-- Image + badge + prix -->
+    <div class="relative w-full @(isComplement ? "h-48" : "h-56") overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
+        <img alt="@Model.Libelle"
+             src="@Model.ImageUrl"
+             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+
+        <div class="absolute top-3 left-3">
+            <span class="@badgeBaseClasses @badgeColorClasses">
+                @badgeText.ToUpperInvariant()
+            </span>
+        </div>
+
+        <button class="absolute top-3 right-3 p-2 rounded-full bg-white/20 backdrop-blur-md text-white hover:bg-white hover:text-red-500 transition-colors duration-200 z-10">
+            <span class="material-symbols-outlined text-[18px] block">favorite</span>
+        </button>
+
+        <div class="absolute @(isComplement ? "bottom-2 right-2" : "bottom-3 right-3") bg-white/60 backdrop-blur-md @(isComplement ? "px-3 py-1.5" : "px-4 py-2") rounded-2xl shadow-sm border border-white/40 flex items-baseline gap-1 z-10">
+            <span class="font-display font-extrabold @(isComplement ? "text-base" : "text-xl") text-orange">
+                @prixFormate
+            </span>
+            <span class="@(isComplement ? "text-[10px]" : "text-xs") font-bold text-gray-900 uppercase">
+                F CFA
+            </span>
+        </div>
+    </div>
+
+    <!-- Corps de la carte -->
+    <div class="@(isComplement ? "p-4" : "p-6") flex flex-col flex-grow relative">
+        @if (isBurgerOrMenu)
+        {
+            <div class="flex justify-between items-start mb-4 gap-3">
+                <h3 class="font-display font-bold text-xl text-gray-900 dark:text-white group-hover:text-orange transition-colors">
+                    @Model.Libelle
+                </h3>
+                <div class="flex items-center gap-1 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-lg shrink-0 border border-gray-100 dark:border-gray-700">
+                    <span class="material-symbols-outlined text-[18px] text-yellow-400" style="font-variation-settings: 'FILL' 1">
+                        star
+                    </span>
+                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">4.9</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <h3 class="font-display font-bold text-lg text-gray-900 dark:text-white group-hover:text-orange transition-colors mb-2">
+                @Model.Libelle
+            </h3>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description) && isBurgerOrMenu)
+        {
+            <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6 line-clamp-3">
+                @Model.Description
+            </p>
+        }
+
+        <div class="mt-auto @(isComplement ? "pt-3" : "pt-4") border-t border-gray-100 dark:border-gray-800 w-full">
+            @if (isBurgerOrMenu)
+            {
+                <button type="button"
+                        class="js-article-commande-btn w-full bg-orange hover:bg-secondary text-white px-5 py-3 rounded-xl font-bold text-sm shadow-lg shadow-orange/20 transition-all active:scale-95 flex items-center justify-center gap-2 group/btn"
+                        data-article-id="@Model.Id"
+                        data-article-categorie="@Model.TypeCategorieUi.Value">
+                    <span>Commander</span>
+                    <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+                </button>
+            }
+            else if (isComplement)
+            {
+                <button type="button"
+                        class="js-complement-toggle-btn w-full bg-orange hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-2 group/btn shadow-md hover:shadow-lg transform active:scale-95"
+                        data-article-id="@Model.Id"
+                        data-article-type-complement="@Model.TypeComplementUi?.Value">
+                    <span>Ajouter</span>
+                    <span class="material-symbols-outlined text-[16px]">add</span>
+                </button>
+            }
+        </div>
+    </div>
+</article>

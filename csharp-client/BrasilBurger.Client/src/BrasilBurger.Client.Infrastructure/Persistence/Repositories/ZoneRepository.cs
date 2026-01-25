@@ -8,10 +8,15 @@ public sealed class ZoneRepository : EfRepository<Zone>, IZoneRepository
 {
     public ZoneRepository(BrasilBurgerDbContext db) : base(db) { }
 
-    public async Task<IReadOnlyList<Zone>> ListActivesAsync(CancellationToken ct = default)
-        => await Db.Zones.AsNoTracking()
-            .Where(z => !z.EstArchiver)
-            .ToListAsync(ct);
+    public async Task<IReadOnlyList<Zone>> ListActivesAsync(
+            CancellationToken ct = default
+        )
+    {
+        IQueryable<Zone> query = Db.Zones.AsNoTracking()
+            .Where(z => !z.EstArchiver);
+        query = query.Include(z => z.Quartiers);
+        return await query.ToListAsync(ct);
+    }
 
     public Task<Zone?> GetWithQuartiersAsync(int zoneId, CancellationToken ct = default)
         => Db.Zones.AsNoTracking()

@@ -14,10 +14,10 @@ public class Quartier : Entity
         Nom = Guard.NotNullOrWhiteSpace(nom, nameof(nom));
     }
 
-    public string Nom { get; private set; } = default!;
+    public string Nom { get; private set; } = null!;
 
     public int ZoneId { get; private set; }
-    public Zone Zone { get; private set; } = default!;
+    public Zone Zone { get; private set; } = null!;
 
     public void Renommer(string nom) => Nom = Guard.NotNullOrWhiteSpace(nom, nameof(nom));
 }

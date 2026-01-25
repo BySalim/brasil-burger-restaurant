@@ -1,0 +1,111 @@
+﻿@* 
+   Flash Messages - Version Simple
+   À inclure dans _Layout.cshtml juste avant </body>
+*@
+
+@{
+    var messages = new List<(string Type, string Message, string Bg, string Text, string Icon, string IconBg, string Bar)>();
+
+    if (TempData["SuccessMessage"] is string success)
+        messages.Add(("success", success, 
+            "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800",
+            "text-green-800 dark:text-green-200",
+            "check_circle",
+            "bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300",
+            "bg-green-500"));
+
+    if (TempData["ErrorMessage"] is string error)
+        messages.Add(("error", error,
+            "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800",
+            "text-red-800 dark:text-red-200",
+            "cancel",
+            "bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-300",
+            "bg-red-500"));
+
+    if (TempData["WarningMessage"] is string warning)
+        messages.Add(("warning", warning,
+            "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800",
+            "text-orange-800 dark:text-orange-200",
+            "warning",
+            "bg-orange-100 dark:bg-orange-800 text-orange-600 dark:text-orange-300",
+            "bg-orange-500"));
+
+    if (TempData["InfoMessage"] is string info)
+        messages.Add(("info", info,
+            "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800",
+            "text-blue-800 dark:text-blue-200",
+            "info",
+            "bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300",
+            "bg-blue-500"));
+}
+
+@if (messages.Any())
+{
+    <div id="flashContainer" class="fixed top-6 right-6 z-[99999] space-y-3 max-w-md">
+        @foreach (var (type, message, bg, text, icon, iconBg, bar) in messages)
+        {
+            <div class="flash-toast @bg border rounded-xl shadow-xl overflow-hidden">
+                <div class="flex items-start gap-3 p-4 pr-12">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-lg @iconBg flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[22px]">@icon</span>
+                    </div>
+                    <div class="flex-1 pt-2">
+                        <p class="text-sm font-medium @text leading-relaxed">@Html.Raw(message)</p>
+                    </div>
+                    <button onclick="closeFlash(this)" 
+                            class="absolute top-3 right-3 w-8 h-8 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 @text">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>
+                <div class="h-1 bg-black/5 dark:bg-white/5">
+                    <div class="progress-bar h-full @bar"></div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <style>
+        @@keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @@keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+        .flash-toast {
+            animation: slideIn 0.3s ease-out;
+        }
+        .flash-toast.closing {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+        .progress-bar {
+            width: 100%;
+            transition: width 5s linear;
+        }
+    </style>
+
+    <script>
+        // Fermer un flash message
+        function closeFlash(btn) {
+            const toast = btn.closest('.flash-toast');
+            toast.classList.add('closing');
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        // Auto-init
+        document.addEventListener('DOMContentLoaded', function() {
+            const toasts = document.querySelectorAll('.flash-toast');
+            
+            toasts.forEach((toast, i) => {
+                const bar = toast.querySelector('.progress-bar');
+                setTimeout(() => bar.style.width = '0%', 50);
+                
+                setTimeout(() => {
+                    toast.classList.add('closing');
+                    setTimeout(() => toast.remove(), 300);
+                }, 5000 + (i * 100));
+            });
+        });
+    </script>
+}
