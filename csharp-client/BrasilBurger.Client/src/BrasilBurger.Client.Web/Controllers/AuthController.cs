@@ -231,7 +231,7 @@ public sealed class AuthController : Controller
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync("Cookies");
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Catalog");
     }
 
 
