@@ -1,33 +1,59 @@
-@* Composant Panier – Étape 1 uniquement. 
-   La logique (ajout / quantité / compléments) est entièrement gérée en JS. *@
+@model BrasilBurger.Client.Web.ViewModels.Pages.CatalogVm
 
 <aside class="js-cart-aside shrink-0 sticky top-20 z-30 transition-all duration-300 w-20 lg:pr-4">
     <!-- PANIER OUVERT (développé) -->
-    <div class="js-cart-open-panel hidden bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft border border-card-border dark:border-card-border-dark overflow-hidden flex flex-col transition-all duration-300">
-        <form id="js-cart-form" method="post" class="flex flex-col h-full">
-            <!-- Total pour le POST (PaiementCommandePostVm.MontantTotal) -->
+   <div class="js-cart-open-panel hidden bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft border border-card-border dark:border-card-border-dark overflow-hidden flex flex-col min-h-0 transition-all duration-300 max-h-[calc(100vh-5rem)]">
+        <form id="js-cart-form" method="post" asp-controller="Catalog" asp-action="Payer" class="flex flex-col h-full min-h-0">
+            @Html.AntiForgeryToken()
+            
+            <!-- Champs cachés pour le POST -->
             <input type="hidden" name="MontantTotal" id="js-cart-total-input" value="0" />
+            <input type="hidden" name="Form.TypeRecuperation" id="js-cart-type-recuperation" value="" />
+            <input type="hidden" name="Form.ModePaie" id="js-cart-mode-paie" value="" />
+            <input type="hidden" name="Form.InfoLivraison.Zone" id="js-cart-info-zone" value="" />
+            <input type="hidden" name="Form.InfoLivraison.Quartier" id="js-cart-info-quartier" value="" />
+            <input type="hidden" name="Form.InfoLivraison.PrixLivraison" id="js-cart-info-prix" value="" />
+            <input type="hidden" name="Form.InfoLivraison.Note" id="js-cart-info-note" value="" />
 
             <!-- EN-TÊTE -->
             <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-start bg-gray-50/50 dark:bg-gray-800/30">
                 <div class="flex flex-col gap-3">
-                    <h3 class="font-display font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                    <!-- Titre Step 1 -->
+                    <h3 class="js-cart-title-step1 font-display font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
                         <span class="material-symbols-outlined text-orange">shopping_cart</span>
                         Mon Panier
                     </h3>
+                    
+                    <!-- Titre Step 2 -->
+                    <h3 class="js-cart-title-step2 hidden font-display font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-orange">shopping_cart</span>
+                        Paiement & Livraison
+                    </h3>
 
                     <!-- Stepper Étape 1/2 – caché quand le panier est vide -->
-                    <div class="js-cart-stepper hidden flex items-center gap-2">
+                    <div class="js-cart-stepper js-cart-stepper-step1 hidden flex items-center gap-2">
                         <button type="button"
-                                class="w-7 h-7 rounded-full bg-blue-50 dark:bg-gray-700 text-blue-200 dark:text-gray-500 flex items-center justify-center cursor-not-allowed border border-transparent transition-colors"
+                                class="js-cart-stepper-prev w-7 h-7 rounded-full bg-blue-50 dark:bg-gray-700 text-blue-200 dark:text-gray-500 flex items-center justify-center cursor-not-allowed border border-transparent transition-colors"
                                 disabled>
                             <span class="material-symbols-outlined text-[16px]">chevron_left</span>
                         </button>
-                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400">
-                            1/2
-                        </span>
+                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400">1/2</span>
                         <button type="button"
-                                class="w-7 h-7 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-600/20 transition-all active:scale-95 border border-transparent">
+                                class="js-cart-stepper-next w-7 h-7 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-600/20 transition-all active:scale-95 border border-transparent">
+                            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Stepper Étape 2/2 -->
+                    <div class="js-cart-stepper-step2 hidden flex items-center gap-2">
+                        <button type="button"
+                                class="js-cart-stepper-prev w-7 h-7 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-600/20 transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+                        </button>
+                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400">2/2</span>
+                        <button type="button"
+                                class="js-cart-stepper-next w-7 h-7 rounded-full bg-blue-50 dark:bg-gray-700 text-blue-200 dark:text-gray-500 flex items-center justify-center cursor-not-allowed"
+                                disabled>
                             <span class="material-symbols-outlined text-[16px]">chevron_right</span>
                         </button>
                     </div>
@@ -41,50 +67,168 @@
             </div>
 
             <!-- CORPS : contenu du panier -->
-            <div class="p-4 space-y-4 flex-1 overflow-y-auto">
-                <!-- État vide -->
-                <div class="js-cart-empty-state flex flex-col items-center justify-center py-10 px-4 text-center">
-                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 text-gray-400 dark:text-gray-500">
-                        <span class="material-symbols-outlined text-3xl">shopping_cart_off</span>
+            <div class="p-4 space-y-4 flex-1 min-h-0 overflow-y-auto">
+                <!-- ========== ÉTAPE 1 ========== -->
+                <div class="js-cart-step1">
+                    <!-- État vide -->
+                    <div class="js-cart-empty-state flex flex-col items-center justify-center py-10 px-4 text-center">
+                        <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 text-gray-400 dark:text-gray-500">
+                            <span class="material-symbols-outlined text-3xl">shopping_cart_off</span>
+                        </div>
+                        <h4 class="font-display font-bold text-base text-gray-900 dark:text-white mb-1">
+                            Votre panier est vide
+                        </h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            Sélectionnez un burger ou un menu pour commencer votre commande.
+                        </p>
                     </div>
-                    <h4 class="font-display font-bold text-base text-gray-900 dark:text-white mb-1">
-                        Votre panier est vide
-                    </h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                        Sélectionnez un burger ou un menu pour commencer votre commande.
-                    </p>
+
+                    <!-- Lignes dynamiques (article principal + compléments) - IMPORTANT: directement ici, pas dans un wrapper -->
+                    <div class="js-cart-lines space-y-4 hidden"></div>
                 </div>
 
-                <!-- Lignes dynamiques (article principal + compléments) -->
-                <div class="js-cart-lines space-y-4 hidden"></div>
+                <!-- ========== ÉTAPE 2 ========== -->
+                <div class="js-cart-step2 hidden space-y-5">
+                    <!-- Mode de récupération -->
+                    <div>
+                        <partial name="_ChoiceCards" model="Model.RetrievalMethodCards" />
+                        
+                        <!-- Hidden radios pour JS (js-retrieval) -->
+                        <div class="hidden">
+                            @foreach (var item in Model.RetrievalMethodCards.Items)
+                            {
+                                var isDelivery = item.Value == "LIVRER";
+                                <input type="radio" 
+                                       name="js-retrieval" 
+                                       value="@item.Value"
+                                       data-is-delivery="@isDelivery.ToString().ToLower()"
+                                       @(item.Value == Model.RetrievalMethodCards.SelectedValue ? "checked" : "") />
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Champs de livraison (conditionnels) -->
+                    <div class="js-cart-delivery-fields hidden space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                Zone de livraison
+                            </label>
+                            <select id="js-delivery-zone-select"
+                                    class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-surface-dark text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                <option value="">Sélectionnez...</option>
+                                @foreach (var option in Model.DeliveryZoneOptions)
+                                {
+                                    var parts = option.Value.Split('|');
+                                    var zoneId = parts.Length > 0 ? parts[0] : "";
+                                    var quartierId = parts.Length > 1 ? parts[1] : "";
+                                    var prixLivraison = parts.Length > 2 ? parts[2] : "0";
+                                    
+                                    <option value="@option.Value" 
+                                            data-zone-id="@zoneId"
+                                            data-quartier-id="@quartierId"
+                                            data-prix-livraison="@prixLivraison">
+                                        @option.Text
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Note de livraison -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                Note pour la livraison (optionnel)
+                            </label>
+                            <textarea id="js-delivery-note"
+                                      rows="3"
+                                      placeholder="Ex: Sonnez 2 fois, 3ème étage..."
+                                      class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-surface-dark text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Mode de paiement -->
+                    <div>
+                        <partial name="_ChoiceCards" model="Model.PaymentMethodCards" />
+                        
+                        <!-- Hidden radios pour JS (js-payment) -->
+                        <div class="hidden">
+                            @foreach (var item in Model.PaymentMethodCards.Items)
+                            {
+                                <input type="radio" 
+                                       name="js-payment" 
+                                       value="@item.Value"
+                                       @(item.Value == Model.PaymentMethodCards.SelectedValue ? "checked" : "") />
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Récapitulatif totaux -->
+                    <div class="border-t border-gray-200 dark:border-gray-800 pt-4 space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600 dark:text-gray-400">Sous-total</span>
+                            <span class="font-bold text-gray-900 dark:text-white js-cart-subtotal-text">0 F CFA</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600 dark:text-gray-400">Livraison</span>
+                            <span class="font-bold text-gray-900 dark:text-white js-cart-delivery-text">0 F CFA</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-800">
+                            <span class="text-base font-bold text-gray-900 dark:text-white">Total à payer</span>
+                            <span class="text-xl font-extrabold text-orange js-cart-pay-total-text">0 F CFA</span>
+                        </div>
+                    </div>
+
+                    <!-- Message de soumission (succès/erreur) -->
+                    <div class="js-cart-submit-message hidden rounded-lg p-3 text-sm font-medium"></div>
+                </div>
             </div>
 
             <!-- PIED : total + actions (visible uniquement quand le panier contient des articles) -->
             <div class="js-cart-footer hidden p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
-                <div class="flex justify-between items-center mb-4 px-1">
-                    <span class="text-sm font-bold text-gray-600 dark:text-gray-300">Total</span>
-                    <span class="font-display font-extrabold text-lg text-gray-900 dark:text-white js-cart-total-text">
-                        0 F CFA
-                    </span>
+                <!-- Contenu Step 1 -->
+                <div class="js-cart-step1">
+                    <div class="flex justify-between items-center mb-4 px-1">
+                        <span class="text-sm font-bold text-gray-600 dark:text-gray-300">Total</span>
+                        <span class="font-display font-extrabold text-lg text-gray-900 dark:text-white js-cart-total-text">
+                            0 F CFA
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button type="button"
+                                class="js-cart-next-step-btn w-full py-3.5 rounded-xl bg-orange hover:bg-orange-600 text-white font-bold text-sm shadow-lg shadow-orange/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <span>Suivant</span>
+                            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                        </button>
+
+                        <div class="text-center">
+                            <button type="button"
+                                    class="js-cart-clear-btn text-red-500 hover:text-red-600 text-xs font-bold uppercase tracking-wider hover:underline transition-all">
+                                Supprimer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Champs cachés ArticleQuantifiers[*] pour le POST (remplis en JS) -->
+                    <div class="js-cart-hidden-inputs"></div>
                 </div>
 
-                <div class="flex flex-col gap-3">
-                    <button type="button"
-                            class="js-cart-next-step-btn w-full py-3.5 rounded-xl bg-orange hover:bg-orange-600 text-white font-bold text-sm shadow-lg shadow-orange/20 transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <span>Suivant</span>
-                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                    </button>
-
-                    <div class="text-center">
-                        <button type="button"
-                                class="js-cart-clear-btn text-red-500 hover:text-red-600 text-xs font-bold uppercase tracking-wider hover:underline transition-all">
-                            Supprimer
+                <!-- Contenu Step 2 -->
+                <div class="js-cart-step2 hidden">
+                    <div class="flex flex-col gap-3">
+                        <button type="submit"
+                                class="w-full py-3.5 rounded-xl bg-orange hover:bg-orange-600 text-white font-bold text-sm shadow-lg shadow-orange/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <span>Finaliser la commande</span>
+                            <span class="material-symbols-outlined text-[18px]">check_circle</span>
                         </button>
+
+                        <div class="text-center">
+                            <button type="button"
+                                    class="js-cart-clear-btn text-red-500 hover:text-red-600 text-xs font-bold uppercase tracking-wider hover:underline transition-all">
+                                Supprimer
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Champs cachés ArticleQuantifiers[*] pour le POST (remplis en JS) -->
-                <div class="js-cart-hidden-inputs"></div>
             </div>
         </form>
 

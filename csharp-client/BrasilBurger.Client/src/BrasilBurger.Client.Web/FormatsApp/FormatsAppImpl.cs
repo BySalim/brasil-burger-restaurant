@@ -1,4 +1,5 @@
-﻿using BrasilBurger.Client.Domain.Entities;
+﻿using BrasilBurger.Client.Application.Abstractions.External;
+using BrasilBurger.Client.Domain.Entities;
 using BrasilBurger.Client.Infrastructure;
 using BrasilBurger.Client.Web.ViewModels.Shared;
 using Microsoft.Extensions.Options;
@@ -8,10 +9,17 @@ namespace BrasilBurger.Client.Web.FormatsApp;
 public sealed class FormatsAppImpl : IFormatsApp
 {
     private readonly AppSettings _appSettings;
+    private readonly ICloudinaryUrlService _cloudinaryUrlService;
 
-    public FormatsAppImpl(IOptions<AppSettings> appSettings)
+    public FormatsAppImpl(IOptions<AppSettings> appSettings, ICloudinaryUrlService cloudinaryUrlService)
     {
         _appSettings = appSettings.Value;
+        _cloudinaryUrlService = cloudinaryUrlService;
+    }
+    
+    public string GetPublicUrl(string publicId)
+    {
+        return _cloudinaryUrlService.GetPublicUrl(publicId);
     }
 
     public string FormatPrice(int priceInCents)

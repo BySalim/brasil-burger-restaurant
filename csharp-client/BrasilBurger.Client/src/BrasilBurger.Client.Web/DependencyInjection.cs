@@ -1,5 +1,6 @@
-using BrasilBurger.Client.Web.ViewModels.Mapper;
+using BrasilBurger.Client.Web.ViewModels.MapperVm;
 using BrasilBurger.Client.Web.FormatsApp;
+using BrasilBurger.Client.Web.Mappers;
 
 namespace BrasilBurger.Client.Web;
 
@@ -9,7 +10,7 @@ public static class DependencyInjection
     {
         // Mapper singleton :
         services.AddSingleton<ArticleMapperVm>();
-        services.AddSingleton<ZoneMapperVm>();
+        services.AddSingleton<ArticleCardItemVmMapper>();
         
         services.AddScoped<IFormatsApp, FormatsApp.FormatsAppImpl>();
 

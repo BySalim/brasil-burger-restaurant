@@ -4,6 +4,8 @@
 
 <partial name="~/Views/Shared/_UserNavbar.cshtml" />
 
+<partial name="_LandingCatalog.cshtml" />
+
 <section class="bg-background-light dark:bg-background-dark min-h-screen" data-page="catalog">
     <div class="container mx-auto px-6 lg:px-12 py-10">
         <header class="mb-6">
@@ -24,26 +26,30 @@
                 @* Filtres *@
                 <div class="flex flex-wrap items-center gap-3 mb-6">
                     <button type="button"
-                            class="js-filter-btn px-4 py-2 rounded-xl text-sm font-bold border transition-all bg-gray-900 text-white border-gray-900 dark:bg-white dark:text-gray-900 dark:border-white"
+                            class="js-filter-btn px-6 py-2 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-sm shadow-lg transition-all transform hover:scale-105 flex items-center gap-2 ring-2 ring-transparent hover:ring-offset-2 hover:ring-gray-900 dark:hover:ring-white"
                             data-filter="all">
+                        <span class="material-symbols-outlined text-[20px]">restaurant</span>
                         Tout
                     </button>
 
                     <button type="button"
-                            class="js-filter-btn px-4 py-2 rounded-xl text-sm font-bold border transition-all bg-white text-gray-900 border-gray-200 hover:border-gray-400 dark:bg-gray-900 dark:text-white dark:border-gray-800 dark:hover:border-gray-600"
+                            class="js-filter-btn px-6 py-2 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 font-bold text-sm transition-all flex items-center gap-2 group"
                             data-filter="burger">
+                        <span class="material-symbols-outlined text-[20px] text-orange group-hover:scale-110 transition-transform">lunch_dining</span>
                         Burgers
                     </button>
 
                     <button type="button"
-                            class="js-filter-btn px-4 py-2 rounded-xl text-sm font-bold border transition-all bg-white text-gray-900 border-gray-200 hover:border-gray-400 dark:bg-gray-900 dark:text-white dark:border-gray-800 dark:hover:border-gray-600"
+                            class="js-filter-btn px-6 py-2 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 font-bold text-sm transition-all flex items-center gap-2 group"
                             data-filter="menu">
+                        <span class="material-symbols-outlined text-[20px] text-orange group-hover:scale-110 transition-transform">fastfood</span>
                         Menus
                     </button>
 
                     <button type="button"
-                            class="js-filter-btn js-filter-complements hidden px-4 py-2 rounded-xl text-sm font-bold border transition-all bg-white text-gray-900 border-gray-200 hover:border-gray-400 dark:bg-gray-900 dark:text-white dark:border-gray-800 dark:hover:border-gray-600"
+                            class="js-filter-btn js-filter-complements hidden px-6 py-2 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 font-bold text-sm transition-all flex items-center gap-2 group"
                             data-filter="complement">
+                        <span class="material-symbols-outlined text-[20px] text-orange group-hover:scale-110 transition-transform">local_cafe</span>
                         Compléments
                     </button>
                 </div>

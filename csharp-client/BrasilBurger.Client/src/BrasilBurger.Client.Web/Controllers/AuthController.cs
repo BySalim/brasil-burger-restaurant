@@ -6,8 +6,7 @@ using BrasilBurger.Client.Application.Abstractions.Persistence;
 using BrasilBurger.Client.Domain.Enums;
 using BrasilBurger.Client.Web.Extensions;
 using BrasilBurger.Client.Web.ViewModels.Shared;
-using BrasilBurger.Client.Web.EnumsUi.Helpers;
-using BrasilBurger.Client.Web.Mappers;
+using BrasilBurger.Client.Web.EnumsUi.Options;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using System.Text.Json;
@@ -262,7 +261,9 @@ public sealed class AuthController : Controller
             Name = "Form.PaymentMethod",
             Legend = "Moyen de paiement par défaut",
             SelectedValue = ModePaiementUiExtensions.DefaultSelected().ToString(),
-            Items = ChoiceCardItemVmMapper.ToChoiceCardItems(ModePaiementUiExtensions.AllUi())
+            Items = EnumUiMExtVmMapper.ToChoiceCardItems(ModePaiementUiExtensions.AllUi()),
+            Layout = "inline",
+            Size = "sm",
         };
 
         // Modes de récupération
@@ -271,10 +272,10 @@ public sealed class AuthController : Controller
             Name = "Form.RetrievalMethod",
             Legend = "Mode de récupération préféré",
             SelectedValue = ModeRecuperationUiExtensions.DefaultSelected().ToString(),
-            Items = ChoiceCardItemVmMapper.ToChoiceCardItems(ModeRecuperationUiExtensions.AllUi())
+            Items = EnumUiMExtVmMapper.ToChoiceCardItems(ModeRecuperationUiExtensions.AllUi()),
         };
 
-        // Quartiers avec formatage
+        // DeliveryZoneOptions avec formatage
         var quartiers = await _quartierRepo.ListWithZonesAsync(ct);
 
         // Template pour le formatage des quartiers

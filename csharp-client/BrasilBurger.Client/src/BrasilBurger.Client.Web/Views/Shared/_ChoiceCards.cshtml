@@ -4,56 +4,106 @@
     var groupId = "cc_" + Guid.NewGuid().ToString("N");
     var hiddenId = groupId + "_hidden";
     var legend = Model.Legend ?? Model.Name;
-    
+
     // Paramètres personnalisables via ViewData
-    var layout = ViewData["Layout"] as string ?? "grid"; // grid, inline, stacked
-    var columns = ViewData["Columns"] as string ?? "auto"; // auto, 2, 3, 4, 5
-    var size = ViewData["Size"] as string ?? "sm"; // xs, sm, md
-    var showIcons = ViewData["ShowIcons"] as bool? ?? true;
-    
-    // Classes de grille selon le nombre de colonnes
-    var gridClass = columns switch {
+    // Paramètres venant directement de la VM (plus de ViewData)
+    var layout = Model.Layout ?? "grid";
+    var columns = Model.Columns ?? "auto";
+    var size = Model.Size ?? "sm";
+    var showIcons = Model.ShowIcons;
+
+
+    // Grille : nombre de colonnes
+    var gridClass = columns switch
+    {
         "2" => "grid-cols-2",
-        "3" => "grid-cols-2 sm:grid-cols-3",
-        "4" => "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
-        "5" => "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
-        _ => Model.Items.Count switch {
+        "3" => "grid-cols-3",
+        "4" => "grid-cols-2 sm:grid-cols-4",
+        "5" => "grid-cols-3 sm:grid-cols-5",
+        _ => Model.Items.Count switch
+        {
             <= 2 => "grid-cols-2",
-            <= 3 => "grid-cols-2 sm:grid-cols-3",
+            <= 3 => "grid-cols-3",
             <= 4 => "grid-cols-2 sm:grid-cols-4",
-            _ => "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+            _ => "grid-cols-3 sm:grid-cols-4"
         }
     };
-    
-    var containerClass = layout switch {
+
+    var containerClass = layout switch
+    {
         "inline" => "flex flex-wrap gap-2",
         "stacked" => "flex flex-col gap-2",
         _ => $"grid {gridClass} gap-2"
     };
-    
-    var cardPadding = size switch {
+
+    // Taille : padding / icône / texte
+    var cardPadding = size switch
+    {
         "xs" => "p-2",
         "md" => "p-4",
         _ => "p-3"
     };
-    
-    var iconSize = size switch {
+
+    // En grid, on force un padding plus compact
+    var gridPadding = size switch
+    {
+        "xs" => "p-2",
+        "md" => "p-3",
+        _ => "p-2.5"
+    };
+
+    // IMPORTANT : hauteur contrôlée (au lieu de aspect-square)
+    // -> xs: compact, sm: standard, md: plus grand
+    // -> un peu plus haut sur sm+ pour respirer, sans exploser.
+    var gridHeight = size switch
+    {
+        "xs" => "h-20 sm:h-22", // ~80px / ~88px
+        "md" => "h-28 sm:h-30", // ~112px / ~120px
+        _ => "h-24 sm:h-26" // ~96px / ~104px
+    };
+
+    var iconSize = size switch
+    {
         "xs" => "h-5 w-5 text-xl",
         "md" => "h-8 w-8 text-3xl",
         _ => "h-6 w-6 text-2xl"
     };
-    
-    var textSize = size switch {
+
+    var textSize = size switch
+    {
         "xs" => "text-xs",
         "md" => "text-base",
         _ => "text-sm"
     };
-    
-    var gapSize = size switch {
+
+    var gapSize = size switch
+    {
         "xs" => "gap-2",
         "md" => "gap-4",
         _ => "gap-3"
     };
+
+    // Petits conteneurs “premium” pour icône/image en grid
+    var iconWrap = size switch
+    {
+        "xs" => "w-9 h-9 rounded-xl",
+        "md" => "w-12 h-12 rounded-2xl",
+        _ => "w-10 h-10 rounded-xl"
+    };
+
+    // En inline, on réserve une zone à droite pour l'icône de sélection (sinon elle recouvre le texte)
+    var inlinePadding = size switch
+    {
+        "xs" => "py-2 pl-2 pr-9",
+        "md" => "py-4 pl-4 pr-12",
+        _ => "py-3 pl-3 pr-11"
+    };
+
+
+    var effectivePadding = layout == "grid"
+    ? gridPadding
+    : (layout == "inline" ? inlinePadding : cardPadding);
+
 }
 
 <fieldset class="space-y-2" data-choice-cards data-target-input-id="@hiddenId" aria-label="@legend">
@@ -67,48 +117,85 @@
             var isSelected = string.Equals(item.Value, Model.SelectedValue, StringComparison.OrdinalIgnoreCase);
 
             <button type="button"
-                    class="choice-card @(layout == "inline" ? "flex-shrink-0" : "w-full") text-left rounded-lg @cardPadding relative
-                           bg-white dark:bg-surface-dark
-                           transition-all duration-150
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
-                           @(isSelected ? "is-selected border-2 border-blue-500 bg-blue-50/50 dark:bg-blue-900/10" : "border-2 border-gray-200 dark:border-gray-700")"
-                    role="radio"
-                    aria-checked="@(isSelected.ToString().ToLowerInvariant())"
-                    data-choice-value="@item.Value"
-                    data-is-selected="@isSelected.ToString().ToLowerInvariant()"
-                    onmouseover="if(!this.classList.contains('is-selected')) this.style.borderColor='#EA5B0C'"
-                    onmouseout="if(!this.classList.contains('is-selected')) this.style.borderColor=''">
-                
+                class="choice-card @(layout == "inline" ? "flex-shrink-0" : "w-full")
+                                   @(layout == "grid" ? $"{gridHeight} text-center" : "text-left")
+                                   @effectivePadding relative overflow-hidden
+                                   rounded-2xl
+                                   bg-white dark:bg-surface-dark
+                                   shadow-sm hover:shadow-md
+                                   transition-all duration-150
+                                   hover:-translate-y-0.5 active:translate-y-0
+                                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
+                                   @(isSelected ? "is-selected border-2 border-blue-500 bg-blue-50/50 dark:bg-blue-900/10" : "border-2 border-gray-200 dark:border-gray-700")"
+                role="radio" aria-checked="@(isSelected.ToString().ToLowerInvariant())" data-choice-value="@item.Value"
+                data-is-selected="@isSelected.ToString().ToLowerInvariant()"
+                onmouseover="if(!this.classList.contains('is-selected')) this.style.borderColor='#EA5B0C'"
+                onmouseout="if(!this.classList.contains('is-selected')) this.style.borderColor=''">
+
+                @* IMPORTANT : même classe que le JS (il la crée aussi au clic) *@
                 @if (isSelected)
                 {
-                    <span class="choice-check-icon absolute top-1 right-1 material-symbols-outlined text-base text-blue-600 dark:text-blue-400">
+                    <span
+                        class="choice-check-icon absolute top-1.5 right-1.5 material-symbols-outlined text-lg text-blue-600 dark:text-blue-400">
                         check_circle
                     </span>
                 }
-                
-                <div class="flex items-center justify-start @gapSize" style="align-items: center;">
+
+                <div class="@(layout == "grid"
+                                                                          ? "h-full flex flex-col items-center justify-center gap-2"
+                                                                          : $"flex items-center justify-start {gapSize}")"
+                    style="align-items: center;">
+
                     @if (showIcons)
                     {
-                        @if (!string.IsNullOrWhiteSpace(item.IconUrl))
+                        @* GRID : icône “dans une pastille” propre *@
+                        @if (layout == "grid")
                         {
-                            <img src="@item.IconUrl" alt="" class="@iconSize object-contain flex-shrink-0" />
+                            <div class="@iconWrap bg-gray-50 dark:bg-gray-800/40 flex items-center justify-center">
+                                @if (!string.IsNullOrWhiteSpace(item.IconUrl))
+                                {
+                                    <img src="@item.IconUrl" alt="" class="@iconSize object-contain" />
+                                }
+                                else if (!string.IsNullOrWhiteSpace(item.IconName))
+                                {
+                                    <span class="material-symbols-outlined @iconSize"
+                                        style="display: inline-flex; align-items: center; justify-content: center;
+                                                                                 @(isSelected ? "color: #2563eb;" : "color: #6b7280;")">
+                                        @item.IconName
+                                    </span>
+                                }
+                            </div>
                         }
-                        else if (!string.IsNullOrWhiteSpace(item.IconName))
+                        else
                         {
-                            <span class="material-symbols-outlined @iconSize flex-shrink-0" 
-                                  style="display: inline-flex; align-items: center; justify-content: center;
-                                         @(isSelected ? "color: #2563eb;" : "color: #6b7280;")">
-                                @item.IconName
-                            </span>
+                            @* INLINE/STACKED : rendu horizontal classique *@
+                            @if (!string.IsNullOrWhiteSpace(item.IconUrl))
+                            {
+                                <img src="@item.IconUrl" alt="" class="@iconSize object-contain flex-shrink-0" />
+                            }
+                            else if (!string.IsNullOrWhiteSpace(item.IconName))
+                            {
+                                <span class="material-symbols-outlined @iconSize flex-shrink-0" style="display: inline-flex; align-items: center; justify-content: center;
+                                                                             @(isSelected ? "color: #2563eb;" : "color: #6b7280;")">
+                                    @item.IconName
+                                </span>
+                            }
                         }
                     }
-                    <span class="@textSize font-medium leading-none" style="display: inline-flex; align-items: center;
-                                 @(isSelected ? "color: #1e40af;" : "color: #374151;")">
+
+                    @* IMPORTANT : un seul span label non-material (le JS le cible comme ça) *@
+                    <span class="@(layout == "grid"
+                                                                                        ? (size == "xs" ? "text-xs font-semibold leading-tight px-1" :
+                                                                                           size == "md" ? "text-sm font-semibold leading-tight px-1" :
+                                                                                                          "text-sm font-semibold leading-tight px-1")
+                                                                                        : $"{textSize} font-medium leading-none")" style="display: inline-flex; align-items: center;
+                                         @(isSelected ? "color: #1e40af;" : "color: #374151;")">
                         @item.Label
                     </span>
                 </div>
             </button>
         }
     </div>
+
     <span asp-validation-for="@Model.Name" class="mt-1 text-sm text-red-600 dark:text-red-400"></span>
 </fieldset>

@@ -5,7 +5,7 @@ using BrasilBurger.Client.Web.EnumsUi.Abstractions;
 using BrasilBurger.Client.Web.EnumsUi.Mappings;
 using BrasilBurger.Client.Web.ViewModels.GetVm;
 
-namespace BrasilBurger.Client.Web.ViewModels.Mapper;
+namespace BrasilBurger.Client.Web.ViewModels.MapperVm;
 
 public sealed class ArticleMapperVm
 {
@@ -21,7 +21,7 @@ public sealed class ArticleMapperVm
     public ArticleGetVm ToGetVm(Article article)
         => ToGetVmInternal(article, includeMenuComposition: true);
 
-    public IReadOnlyList<ArticleGetVm> ToGetVms(IEnumerable<Article> articles)
+    public  List<ArticleGetVm> ToGetVms(IEnumerable<Article> articles)
     {
         if (articles is null) throw new ArgumentNullException(nameof(articles));
         return articles.Select(a => ToGetVmInternal(a, includeMenuComposition: true)).ToList();
@@ -30,7 +30,7 @@ public sealed class ArticleMapperVm
     public ArticleQuantifierGetVm ToGetVm(ArticleQuantifier ligne)
         => ToGetVm(ligne, includeMenuArticleComposition: false);
 
-    public IReadOnlyList<ArticleQuantifierGetVm> ToGetVms(IEnumerable<ArticleQuantifier> lignes)
+    public  List<ArticleQuantifierGetVm> ToGetVms(IEnumerable<ArticleQuantifier> lignes)
     {
         if (lignes is null) throw new ArgumentNullException(nameof(lignes));
         return lignes.Select(l => ToGetVm(l, includeMenuArticleComposition: false)).ToList();
@@ -58,7 +58,7 @@ public sealed class ArticleMapperVm
         var imageUrl = _cloudinaryUrlService.GetPublicUrl(article.ImagePublicId);
 
 
-        IReadOnlyList<ArticleQuantifierGetVm>? articleQuantifiers = null;
+         List<ArticleQuantifierGetVm>? articleQuantifiers = null;
 
         if (includeMenuComposition && article is Menu menu)
         {
