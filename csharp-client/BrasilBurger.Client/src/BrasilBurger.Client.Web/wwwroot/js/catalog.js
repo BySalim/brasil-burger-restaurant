@@ -171,6 +171,73 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // -----------------------------
+  // LocalStorage - Sauvegarde temporaire du panier
+  // -----------------------------
+  const CART_STORAGE_KEY = "brasilburger_cart_temp";
+  const CART_EXPIRY_DAYS = 1; // Durée de validité : 1 jour
+
+  // Sauvegarder l'état du panier dans localStorage
+  const saveCartToStorage = () => {
+    try {
+      const cartData = {
+        timestamp: Date.now(),
+        main: state.main,
+        complements: Array.from(state.complements.entries()) // Convertir Map en Array
+      };
+      
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde du panier:", error);
+    }
+  };
+
+  // Charger l'état du panier depuis localStorage
+  const loadCartFromStorage = () => {
+    try {
+      const stored = localStorage.getItem(CART_STORAGE_KEY);
+      if (!stored) return false;
+
+      const cartData = JSON.parse(stored);
+      
+      // Vérifier l'expiration (1 jour = 24 heures = 86400000 ms)
+      const expiryTime = CART_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      
+      if (now - cartData.timestamp > expiryTime) {
+        // Données expirées, supprimer
+        localStorage.removeItem(CART_STORAGE_KEY);
+        return false;
+      }
+
+      // Restaurer uniquement l'état de l'étape 1 (articles du panier)
+      if (cartData.main) {
+        state.main = cartData.main;
+      }
+
+      // Restaurer les compléments (Array -> Map)
+      if (cartData.complements && Array.isArray(cartData.complements)) {
+        state.complements = new Map(cartData.complements);
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Erreur lors du chargement du panier:", error);
+      localStorage.removeItem(CART_STORAGE_KEY);
+      return false;
+    }
+  };
+
+  // Supprimer la sauvegarde du panier
+  const clearCartStorage = () => {
+    try {
+      localStorage.removeItem(CART_STORAGE_KEY);
+    } catch (error) {
+      console.error("Erreur lors de la suppression du panier:", error);
+    }
+  };
+
+
+  // -----------------------------
   // Open / close
   // -----------------------------
   const openCart = () => {
@@ -259,21 +326,25 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTotals();
   };
 
-  if (stepperNextBtn) {
-    stepperNextBtn.addEventListener("click", () => {
+  // Navigation stepper - utiliser la délégation d'événements pour gérer les deux steppers
+  aside?.addEventListener("click", (e) => {
+    const target = e.target.closest("button");
+    if (!target) return;
+    
+    // Bouton suivant dans stepper
+    if (target.classList.contains("js-cart-stepper-next") && !target.disabled) {
       if (cartStateStep2.currentStep === 1) {
         showStep2();
       }
-    });
-  }
-
-  if (stepperPrevBtn) {
-    stepperPrevBtn.addEventListener("click", () => {
+    }
+    
+    // Bouton précédent dans stepper
+    if (target.classList.contains("js-cart-stepper-prev") && !target.disabled) {
       if (cartStateStep2.currentStep === 2) {
         showStep1();
       }
-    });
-  }
+    }
+  });
 
   if (nextStepBtn) {
     nextStepBtn.addEventListener("click", () => showStep2());
@@ -344,7 +415,11 @@ document.addEventListener("DOMContentLoaded", () => {
       emptyState.classList.remove("hidden");
       linesContainer.classList.add("hidden");
       if (cartFooter) cartFooter.classList.add("hidden");
-      if (cartStepper) cartStepper.classList.add("hidden");
+      
+      // Masquer les deux steppers quand le panier est vide
+      if (stepper1) stepper1.classList.add("hidden");
+      if (stepper2) stepper2.classList.add("hidden");
+      
       if (totalStep1Text) totalStep1Text.textContent = "0 F CFA";
       if (hMontantTotal) hMontantTotal.value = "0";
       return;
@@ -353,7 +428,15 @@ document.addEventListener("DOMContentLoaded", () => {
     emptyState.classList.add("hidden");
     linesContainer.classList.remove("hidden");
     if (cartFooter) cartFooter.classList.remove("hidden");
-    if (cartStepper) cartStepper.classList.remove("hidden");
+    
+    // Afficher le stepper approprié selon l'étape actuelle
+    if (cartStateStep2.currentStep === 1) {
+      if (stepper1) stepper1.classList.remove("hidden");
+      if (stepper2) stepper2.classList.add("hidden");
+    } else if (cartStateStep2.currentStep === 2) {
+      if (stepper1) stepper1.classList.add("hidden");
+      if (stepper2) stepper2.classList.remove("hidden");
+    }
 
     if (!lineTpl) return;
 
@@ -401,6 +484,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (totalStep1Text) totalStep1Text.textContent = fmtFcfa(total);
     if (hMontantTotal) hMontantTotal.value = String(total);
     rebuildHiddenArticleQuantifiers();
+    
+    // Sauvegarder l'état du panier après chaque modification
+    saveCartToStorage();
   };
 
   if (linesContainer) {
@@ -514,6 +600,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (iconSpan) iconSpan.textContent = "delete";
         btn.classList.remove("bg-orange", "hover:bg-orange-600");
         btn.classList.add("bg-red-600", "hover:bg-red-700");
+        
+        // Si on est à l'étape 2, revenir à l'étape 1 pour voir le complément ajouté
+        if (cartStateStep2.currentStep === 2) {
+          showStep1();
+        }
       } else {
         state.complements.delete(id);
 
@@ -544,11 +635,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     resetAllComplementButtons();
     showComplementFilter(false);
-    renderCart();
     
+    // Appliquer le filtre "Tout" pour masquer les compléments et afficher burgers/menus
+    applyFilter("all");
+    
+    // Toujours revenir à step1 quand on vide le panier
     if (cartStateStep2.currentStep === 2) {
       showStep1();
     }
+    
+    // Masquer les steppers quand le panier est vide
+    if (stepper1) stepper1.classList.add("hidden");
+    if (stepper2) stepper2.classList.add("hidden");
+    
+    // Supprimer la sauvegarde localStorage
+    clearCartStorage();
+    
+    renderCart();
   };
 
   clearBtns.forEach(b => b.addEventListener("click", clearCart));
@@ -601,12 +704,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (hQuartier) hQuartier.value = String(opt.dataset.quartierId || "");
         if (hPrixLivraison) hPrixLivraison.value = String(opt.dataset.prixLivraison || "0");
         cartStateStep2.deliveryPrice = parseInt(opt.dataset.prixLivraison || "0", 10);
+        cartStateStep2.deliveryZoneId = parseInt(opt.dataset.zoneId || "0", 10) || null;
+        cartStateStep2.deliveryQuartierId = parseInt(opt.dataset.quartierId || "0", 10) || null;
       }
       updateTotals();
     }
 
     if (e.target === noteTextarea) {
       if (hNote) hNote.value = noteTextarea.value || "";
+      cartStateStep2.deliveryNote = noteTextarea.value || "";
     }
   });
 
@@ -776,6 +882,60 @@ document.addEventListener("DOMContentLoaded", () => {
     if (hMontantTotal) hMontantTotal.value = String(total);
   };
 
-  renderCart();
-  updateTotals();
+  // -----------------------------
+  // Restauration du panier au chargement de la page
+  // -----------------------------
+  const restoreCartOnLoad = () => {
+    const hasCartData = loadCartFromStorage();
+    
+    if (hasCartData && state.main) {
+      // Le panier a été restauré depuis localStorage (uniquement étape 1)
+      
+      // Restaurer le filtre de compléments si un burger est sélectionné
+      const isBurger = state.main.categorie === "BURGER";
+      showComplementFilter(isBurger);
+      
+      if (isBurger) {
+        applyFilter("complement");
+      }
+      
+      // Restaurer l'état visuel des boutons de compléments
+      state.complements.forEach((item) => {
+        const btn = Array.from(document.querySelectorAll(".js-complement-toggle-btn"))
+          .find(b => parseInt(b.dataset.articleId) === item.articleId);
+        
+        if (btn) {
+          btn.dataset.state = "added";
+          const labelSpan = btn.querySelector("span:first-child");
+          const iconSpan = btn.querySelector(".material-symbols-outlined");
+          if (labelSpan) labelSpan.textContent = "Supprimer";
+          if (iconSpan) iconSpan.textContent = "delete";
+          btn.classList.remove("bg-orange", "hover:bg-orange-600");
+          btn.classList.add("bg-red-600", "hover:bg-red-700");
+        }
+      });
+      
+      // Restaurer l'état visuel du bouton "Commander" de l'article principal
+      const mainBtn = Array.from(document.querySelectorAll(".js-article-commande-btn"))
+        .find(b => parseInt(b.dataset.articleId) === state.main.articleId);
+      
+      if (mainBtn) {
+        state.selectedCommandeBtn = mainBtn;
+        mainBtn.disabled = true;
+        mainBtn.classList.remove("bg-orange", "hover:bg-secondary");
+        mainBtn.classList.add("bg-gray-400", "cursor-not-allowed", "opacity-70");
+      }
+      
+      // Ouvrir le panier à l'étape 1
+      openCart();
+      showStep1();
+    }
+    
+    // Rendre le panier (vide ou restauré)
+    renderCart();
+    updateTotals();
+  };
+
+  // Appeler la restauration au chargement de la page
+  restoreCartOnLoad();
 });
