@@ -51,10 +51,11 @@ Delivery Header V2 Component (Simplified)
 
     {% if isEnCours %}
         <form
-            action="{{ path('app_order_complete', {id: deliveryId}) }}"
+            action="{{ path('app_deliveries_complete', {id: deliveryId}) }}"
             method="post"
             class="inline"
         >
+            <input type="hidden" name="_token" value="{{ csrf_token('complete-delivery-' ~ deliveryId) }}">
             <button
                 type="submit"
                 class="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white hover:bg-green-700 rounded-lg text-sm font-bold shadow-md transition-all"

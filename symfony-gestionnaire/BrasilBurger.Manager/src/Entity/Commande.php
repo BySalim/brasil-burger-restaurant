@@ -44,7 +44,7 @@ class Commande
     private ?Client $client = null;
 
     #[ORM\OneToOne(targetEntity: InfoLivraison::class, inversedBy: 'commande')]
-    #[ORM\JoinColumn(name: 'id_info_livraison', referencedColumnName: 'id', unique: true, nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'id_info_livraison', referencedColumnName: 'id', unique: true, onDelete: 'CASCADE')]
     private ?InfoLivraison $infoLivraison = null;
 
     #[ORM\OneToOne(targetEntity: Livraison::class, cascade: ['persist', 'remove'])]

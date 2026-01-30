@@ -6,9 +6,9 @@ Zone Orders Table with Assignment
 @param array deliverers - Available deliverers
 #}
 {% import 'macros/table_macros.html.twig' as table %}
-{% set ordersList = orders|default([]) %}
-{% set zoneId = zoneId|default('') %}
-{% set deliverersList = deliverers|default([]) %}
+{% set ordersList = orders %}
+{% set zoneId = zoneId %}
+{% set deliverersList = deliverers %}
 
 <div class="border-t border-gray-100 dark:border-border-dark">
     {# Action Bar #}

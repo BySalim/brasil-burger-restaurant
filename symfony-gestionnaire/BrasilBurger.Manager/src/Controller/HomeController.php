@@ -27,7 +27,7 @@ class HomeController extends AbstractController
     #[Route(['/', '/dashboard'], name: 'app_home')]
     public function index(Request $request, DashboardViewFactory $dashboardView, RevenueCalcService $revunueCalc): Response
     {
-        $dateString = $request->query->get('date', new \DateTime()->format('Y-m-d'));
+        $dateString = $request->query->get('date', (new \DateTime())->format('Y-m-d'));
 
         try {
             // Transformation en Objet

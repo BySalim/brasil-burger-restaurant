@@ -4,13 +4,13 @@ Zone Accordion Component
 @param object zone - Zone object {id, name, ordersCount, orders, isExpanded}
 @param array deliverers - Available deliverers list
 #}
-{% set zoneData = zone|default({}) %}
-{% set zoneId = zoneData.id|default('zone_' ~ random()) %}
-{% set zoneName = zoneData.name|default('Zone') %}
-{% set ordersList = zoneData.orders|default([]) %}
+{% set zoneData = zone %}
+{% set zoneId = zoneData.id %}
+{% set zoneName = zoneData.name %}
+{% set ordersList = zoneData.ordersToDelivered %}
 {% set ordersCount = ordersList|length %}
 {% set isExpanded = zoneData.isExpanded|default(false) %}
-{% set deliverersList = deliverers|default([]) %}
+{% set deliverersList = deliverers %}
 
 <div
     class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm transition-all duration-200 {% if isExpanded %}overflow-visible relative z-10{% endif %}"

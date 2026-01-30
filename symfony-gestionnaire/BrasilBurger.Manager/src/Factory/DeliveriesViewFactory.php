@@ -141,8 +141,9 @@ readonly class DeliveriesViewFactory
 
         return new OrderToDeliveredRowViewModel(
             id: $commande->getId(),
+            idLivraison: $commande->getInfoLivraison()->getId(),
             code: $commande->getNumCmd(),
-            zone: $commande->getInfoLivraison()->getZone()->getNom(),
+            quartier: $commande->getInfoLivraison()->getQuartier()->getNom(),
             client: $clientCard,
         );
     }

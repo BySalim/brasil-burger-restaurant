@@ -162,14 +162,13 @@ final readonly class OrdersViewFactory
         $label = $mode->getLabel() ?? '';
         $icon = $mode->getIcon() ?? '';
         $class = $mode->getColor()->getBadgeClasses() ?? '';
-        $price = $infoLivraison->getPrixLivraison();
         $isDelivered = $mode === ModeRecuperation::LIVRER;
 
         return new DeliveryCardViewModel(
             label: $label,
             icon: $icon,
             color: $class,
-            deliveryPrice: $price,
+            deliveryPrice: $isDelivered ? $infoLivraison->getPrixLivraison() : 0,
             deliveryId: $livraison?->getId(),
             deliveryInfoId: $isDelivered ? $infoLivraison->getId() : null,
             isDelivered: $isDelivered,
