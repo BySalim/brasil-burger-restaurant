@@ -7,15 +7,15 @@ public class Commande : Entity
 {
     private Commande() { } // EF
 
-    public Commande(string numCmd, Client client, ModeRecuperation typeRecuperation, InfoLivraison infoLivraison, Panier? panier)
+    public Commande(string numCmd, Client client, ModeRecuperation typeRecuperation, InfoLivraison? infoLivraison, Panier? panier)
     {
         NumCmd = Guard.NotNullOrWhiteSpace(numCmd, nameof(numCmd));
         Client = client ?? throw new DomainException("Le client est obligatoire.");
         ClientId = client.Id;
 
         TypeRecuperation = typeRecuperation;
-        InfoLivraison = infoLivraison ?? throw new DomainException("Les infos de livraison sont obligatoires.");
-        InfoLivraisonId = infoLivraison.Id;
+        InfoLivraison = infoLivraison;
+        InfoLivraisonId = infoLivraison?.Id;
 
         Panier = panier;
         PanierId = panier?.Id;
@@ -43,8 +43,8 @@ public class Commande : Entity
     public int ClientId { get; private set; }
     public Client Client { get; private set; } = default!;
 
-    public int InfoLivraisonId { get; private set; }
-    public InfoLivraison InfoLivraison { get; private set; } = default!;
+    public int? InfoLivraisonId { get; private set; }
+    public InfoLivraison? InfoLivraison { get; private set; } = default!;
 
     public Paiement? Paiement { get; private set; }
 
@@ -69,7 +69,7 @@ public class Commande : Entity
     public void RecalculerMontant()
     {
         var panierTotal = Panier?.MontantTotal ?? 0;
-        var fraisLivraison = TypeRecuperation == ModeRecuperation.LIVRER ? InfoLivraison.PrixLivraison : 0;
+        var fraisLivraison = TypeRecuperation == ModeRecuperation.LIVRER ? InfoLivraison?.PrixLivraison ?? 0 : 0;
         Montant = Guard.NonNegative(panierTotal + fraisLivraison, nameof(Montant));
     }
 

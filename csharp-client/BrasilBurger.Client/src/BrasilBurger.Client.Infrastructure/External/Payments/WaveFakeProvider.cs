@@ -11,7 +11,7 @@ internal sealed class WaveFakeProvider : IPaymentProvider
     public Task<PaymentInitResult> InitializeAsync(int montant, CancellationToken ct)
     {
         var providerRef = "WAVE_" + Guid.NewGuid().ToString("N");
-        return Task.FromResult(new PaymentInitResult(providerRef, null));
+        return Task.FromResult(new PaymentInitResult(providerRef, null, IsFake));
     }
 
     public Task<PaymentGatewayStatus> GetStatusAsync(string providerReference, CancellationToken ct)

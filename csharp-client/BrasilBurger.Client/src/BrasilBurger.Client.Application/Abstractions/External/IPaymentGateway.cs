@@ -15,7 +15,7 @@ public interface IPaymentGateway
         CancellationToken ct = default);
 }
 
-public sealed record PaymentInitResult(string ProviderReference, string? PaymentUrl);
+public sealed record PaymentInitResult(string ProviderReference, string? PaymentUrl, bool IsFake);
 
 public enum PaymentGatewayStatus
 {

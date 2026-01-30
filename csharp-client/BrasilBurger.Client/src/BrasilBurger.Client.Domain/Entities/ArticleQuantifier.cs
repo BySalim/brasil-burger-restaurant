@@ -52,7 +52,8 @@ public class ArticleQuantifier : Entity
 
         // Règles métier liées à l’article → ici, pas dans Panier.
         if (!EstCompatibleAvecPanier(panier))
-            throw new DomainException("L'article n'est pas compatible avec la catégorie du panier.");
+            throw new DomainException("L'article n'est pas compatible avec la catégorie du panier." + 
+                $" Article.Catégorie={Article.Categorie}, Panier.CatégoriePanier={panier.CategoriePanier}");
 
         CategorieArticleQuantifier = CategorieArticleQuantifier.COMMANDE;
 
@@ -81,7 +82,7 @@ public class ArticleQuantifier : Entity
     {
         return panier.CategoriePanier switch
         {
-            CategoriePanier.BURGER => Article.Categorie == CategorieArticle.BURGER,
+            CategoriePanier.BURGER => Article.Categorie == CategorieArticle.BURGER || Article.Categorie == CategorieArticle.COMPLEMENT,
             CategoriePanier.MENU => Article.Categorie == CategorieArticle.MENU,
             _ => true
         };

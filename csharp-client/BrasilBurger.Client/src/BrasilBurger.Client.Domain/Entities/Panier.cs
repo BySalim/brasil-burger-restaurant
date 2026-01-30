@@ -20,12 +20,10 @@ public class Panier : Entity
 
     public IReadOnlyCollection<ArticleQuantifier> Lignes => _lignes;
 
-    // On ajoute des ArticleQuantifier, pas des Article.
+
     public void AjouterLigne(ArticleQuantifier ligne)
     {
         if (ligne is null) throw new DomainException("La ligne est obligatoire.");
-
-        // Les règles (compatibilité article/panier, catégorie, etc.) sont appliquées par ArticleQuantifier.
         ligne.AffecterAuPanier(this);
 
         _lignes.Add(ligne);

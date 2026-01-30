@@ -19,9 +19,9 @@ public sealed class CommandeRepository : EfRepository<Commande>, ICommandeReposi
                 .ThenInclude(p => p!.Lignes)
                     .ThenInclude(l => l.Article)
             .Include(c => c.InfoLivraison)
-                .ThenInclude(i => i.Zone)
+                .ThenInclude(i => i!.Zone)
             .Include(c => c.InfoLivraison)
-                .ThenInclude(i => i.Quartier)
+                .ThenInclude(i => i!.Quartier)
             .Include(c => c.Paiement)
             .Include(c => c.Livraison)
             .FirstOrDefaultAsync(c => c.Id == commandeId, ct);
@@ -39,10 +39,11 @@ public sealed class CommandeRepository : EfRepository<Commande>, ICommandeReposi
                 .ThenInclude(p => p!.Lignes)
                     .ThenInclude(l => l.Article)
             .Include(c => c.InfoLivraison)
-                .ThenInclude(i => i.Zone)
+                .ThenInclude(i => i!.Zone)
             .Include(c => c.InfoLivraison)
-                .ThenInclude(i => i.Quartier)
+                .ThenInclude(i => i!.Quartier)
             .Include(c => c.Paiement)
             .OrderByDescending(c => c.DateDebut)
             .ToListAsync(ct);
+
 }

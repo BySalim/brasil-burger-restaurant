@@ -101,6 +101,8 @@ public static class DependencyInjection
         // Application Services
         // ----------------------------
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICommandeService, CommandeService>();
+        services.AddScoped<IPaiementService, PaiementService>();
 
         // ----------------------------
         // Probes (Diagnostics)

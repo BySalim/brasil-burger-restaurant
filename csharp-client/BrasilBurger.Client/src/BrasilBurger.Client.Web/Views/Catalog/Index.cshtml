@@ -26,30 +26,33 @@
                 @* Filtres *@
                 <div class="flex flex-wrap items-center gap-3 mb-6">
                     <button type="button"
-                            class="js-filter-btn px-6 py-2 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-sm shadow-lg transition-all transform hover:scale-105 flex items-center gap-2 ring-2 ring-transparent hover:ring-offset-2 hover:ring-gray-900 dark:hover:ring-white"
-                            data-filter="all">
+                        class="js-filter-btn px-6 py-2 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-sm shadow-lg transition-all transform hover:scale-105 flex items-center gap-2 ring-2 ring-transparent hover:ring-offset-2 hover:ring-gray-900 dark:hover:ring-white"
+                        data-filter="all">
                         <span class="material-symbols-outlined text-[20px]">restaurant</span>
                         Tout
                     </button>
 
                     <button type="button"
-                            class="js-filter-btn px-6 py-2 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 font-bold text-sm transition-all flex items-center gap-2 group"
-                            data-filter="burger">
-                        <span class="material-symbols-outlined text-[20px] text-orange group-hover:scale-110 transition-transform">lunch_dining</span>
+                        class="js-filter-btn px-6 py-2 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 font-bold text-sm transition-all flex items-center gap-2 group"
+                        data-filter="burger">
+                        <span
+                            class="material-symbols-outlined text-[20px] text-orange group-hover:scale-110 transition-transform">lunch_dining</span>
                         Burgers
                     </button>
 
                     <button type="button"
-                            class="js-filter-btn px-6 py-2 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 font-bold text-sm transition-all flex items-center gap-2 group"
-                            data-filter="menu">
-                        <span class="material-symbols-outlined text-[20px] text-orange group-hover:scale-110 transition-transform">fastfood</span>
+                        class="js-filter-btn px-6 py-2 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 font-bold text-sm transition-all flex items-center gap-2 group"
+                        data-filter="menu">
+                        <span
+                            class="material-symbols-outlined text-[20px] text-orange group-hover:scale-110 transition-transform">fastfood</span>
                         Menus
                     </button>
 
                     <button type="button"
-                            class="js-filter-btn js-filter-complements hidden px-6 py-2 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 font-bold text-sm transition-all flex items-center gap-2 group"
-                            data-filter="complement">
-                        <span class="material-symbols-outlined text-[20px] text-orange group-hover:scale-110 transition-transform">local_cafe</span>
+                        class="js-filter-btn js-filter-complements hidden px-6 py-2 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 font-bold text-sm transition-all flex items-center gap-2 group"
+                        data-filter="complement">
+                        <span
+                            class="material-symbols-outlined text-[20px] text-orange group-hover:scale-110 transition-transform">local_cafe</span>
                         Compléments
                     </button>
                 </div>
@@ -58,9 +61,8 @@
                 <div class="js-articles-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                     @foreach (var article in Model.Articles)
                     {
-                        <div class="js-article-item"
-                             data-categorie="@article.TypeCategorieUi.Value"
-                             data-type-complement="@(article.TypeComplementUi?.Value.ToString() ?? "")">
+                        <div class="js-article-item" data-categorie="@article.TypeCategorieUi.Value"
+                            data-type-complement="@(article.TypeComplementUi?.Value.ToString() ?? "")">
                             @await Html.PartialAsync("_ArticleCard", article)
                         </div>
                     }
@@ -70,4 +72,19 @@
     </div>
 </section>
 
+<partial name="_OrderConfirmationOverlay" />
+
+@* Supprimer le panier temporaire du localStorage si la commande a été passée avec succès *@
+@if (TempData["ClearCartStorage"] is bool clear && clear)
+{
+    <script>
+        try {
+            localStorage.removeItem("brasilburger_cart_temp");
+        } catch (e) {
+            console.error("Erreur lors de la suppression du panier temporaire :", e);
+        }
+    </script>
+}
+
+<script src="~/js/order-confirmation-overlay.js"></script>
 <script src="~/js/catalog.js"></script>

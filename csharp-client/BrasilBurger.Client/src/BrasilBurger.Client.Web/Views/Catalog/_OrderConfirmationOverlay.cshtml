@@ -1,0 +1,147 @@
+@* Overlay de confirmation de commande — UI minimal *@
+<div id="js-order-confirmation-overlay" class="fixed inset-0 z-50 hidden items-center justify-center p-3">
+    <div class="js-overlay-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
+
+    <!-- Modal -->
+    <div class="js-overlay-content relative w-full max-w-md max-h-[85vh] overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-xl transform transition-all duration-300 scale-95 opacity-0 flex flex-col">
+        <!-- Header -->
+        <div class="border-b border-gray-100 dark:border-gray-800 p-4 flex items-start justify-between gap-3">
+            <div class="min-w-0">
+                <h2 class="font-display font-semibold text-base text-gray-900 dark:text-white leading-tight">
+                    Récapitulatif
+                </h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    Vérifiez avant de confirmer
+                </p>
+            </div>
+
+            <button type="button"
+                    class="js-close-overlay shrink-0 w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+        </div>
+
+        <!-- Body (scroll only if needed) -->
+        <div class="flex-1 min-h-0 overflow-y-auto p-4">
+            <div class="space-y-4">
+                <!-- Articles -->
+                <section class="space-y-2">
+                    <h3 class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Articles
+                    </h3>
+                    <div class="js-overlay-articles space-y-1.5">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                </section>
+
+                <!-- Récupération -->
+                <section class="space-y-2">
+                    <h3 class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Récupération
+                    </h3>
+
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800">
+                        <span class="js-overlay-retrieval-icon material-symbols-outlined text-[20px] text-gray-700 dark:text-gray-200">
+                            store
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                            <p class="js-overlay-retrieval-method text-sm font-medium text-gray-900 dark:text-white leading-tight">
+                                <!-- Rempli par JS -->
+                            </p>
+                            <p class="js-overlay-quartier text-xs text-gray-500 dark:text-gray-400 hidden mt-0.5 truncate">
+                                <!-- Rempli par JS si livraison -->
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Note de livraison -->
+                    <div class="js-overlay-note-container hidden">
+                        <div class="mt-2 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800">
+                            <p class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                                Note
+                            </p>
+                            <p class="js-overlay-note text-sm text-gray-800 dark:text-gray-200 leading-snug break-words">
+                                <!-- Rempli par JS -->
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Paiement -->
+                <section class="space-y-2">
+                    <h3 class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Paiement
+                    </h3>
+
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800">
+                        <span class="js-overlay-payment-icon material-symbols-outlined text-[20px] text-gray-700 dark:text-gray-200">
+                            payments
+                        </span>
+                        <p class="js-overlay-payment-method text-sm font-medium text-gray-900 dark:text-white leading-tight">
+                            <!-- Rempli par JS -->
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Totaux -->
+                <section class="pt-3 border-t border-gray-200 dark:border-gray-800 space-y-2">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Sous-total</span>
+                        <span class="js-overlay-subtotal font-medium text-gray-900 dark:text-white">0 F CFA</span>
+                    </div>
+
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Livraison</span>
+                        <span class="js-overlay-delivery font-medium text-gray-900 dark:text-white">0 F CFA</span>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-800">
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white">Total</span>
+                        <span class="js-overlay-total font-display font-bold text-lg text-orange">0 F CFA</span>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="border-t border-gray-100 dark:border-gray-800 p-4">
+            <div class="flex gap-2">
+                <button type="button"
+                        class="js-close-overlay flex-1 py-2 px-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    Modifier
+                </button>
+
+                <button type="button"
+                        class="js-confirm-order flex-1 py-2 px-3 rounded-lg bg-green-600 hover:bg-green-800 text-white font-semibold text-sm transition-colors active:scale-[0.99] flex items-center justify-center gap-2 shadow-sm">
+                    <span>Confirmer</span>
+                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template pour les lignes d'articles -->
+<template id="js-overlay-article-template">
+    <div class="flex items-center justify-between gap-3 p-2 rounded-lg border border-gray-200 dark:border-gray-800">
+        <div class="flex items-center gap-2 flex-1 min-w-0">
+            <img src="" alt="" class="js-overlay-article-image w-10 h-10 rounded-md object-cover bg-gray-100 dark:bg-gray-800 shrink-0" />
+
+            <div class="min-w-0 flex-1">
+                <p class="js-overlay-article-title text-sm font-medium text-gray-900 dark:text-white leading-tight truncate"></p>
+
+                <div class="flex items-center gap-2 mt-0.5">
+                    <span class="js-overlay-article-badge text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-900 text-white">
+                        <!-- Badge -->
+                    </span>
+                    <span class="js-overlay-article-qty text-xs text-gray-500 dark:text-gray-400">
+                        <!-- Quantité -->
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <p class="js-overlay-article-total text-sm font-semibold text-gray-900 dark:text-white shrink-0"></p>
+    </div>
+</template>

@@ -3,17 +3,15 @@
 <aside class="js-cart-aside shrink-0 sticky top-20 z-30 transition-all duration-300 w-20 lg:pr-4">
     <!-- PANIER OUVERT (développé) -->
    <div class="js-cart-open-panel hidden bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft border border-card-border dark:border-card-border-dark overflow-hidden flex flex-col min-h-0 transition-all duration-300 max-h-[calc(100vh-5rem)]">
-        <form id="js-cart-form" method="post" asp-controller="Catalog" asp-action="Payer" class="flex flex-col h-full min-h-0">
+        <form id="js-cart-form" method="post" asp-controller="Catalog" asp-action="PayerCommande" class="flex flex-col h-full min-h-0">
             @Html.AntiForgeryToken()
             
             <!-- Champs cachés pour le POST -->
-            <input type="hidden" name="MontantTotal" id="js-cart-total-input" value="0" />
-            <input type="hidden" name="Form.TypeRecuperation" id="js-cart-type-recuperation" value="" />
-            <input type="hidden" name="Form.ModePaie" id="js-cart-mode-paie" value="" />
-            <input type="hidden" name="Form.InfoLivraison.Zone" id="js-cart-info-zone" value="" />
-            <input type="hidden" name="Form.InfoLivraison.Quartier" id="js-cart-info-quartier" value="" />
-            <input type="hidden" name="Form.InfoLivraison.PrixLivraison" id="js-cart-info-prix" value="" />
-            <input type="hidden" name="Form.InfoLivraison.Note" id="js-cart-info-note" value="" />
+            <input type="hidden" name="RetrievalMethod" id="js-cart-type-recuperation" value="" />
+            <input type="hidden" name="PaymentMethod" id="js-cart-mode-paie" value="" />
+            <input type="hidden" name="DeliveryQuartierId" id="js-cart-info-quartier" value="" />
+            <input type="hidden" name="DeliveryPrice" id="js-cart-info-prix" value="" />
+            <input type="hidden" name="NoteLivraison" id="js-cart-info-note" value="" />
 
             <!-- EN-TÊTE -->
             <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-start bg-gray-50/50 dark:bg-gray-800/30">

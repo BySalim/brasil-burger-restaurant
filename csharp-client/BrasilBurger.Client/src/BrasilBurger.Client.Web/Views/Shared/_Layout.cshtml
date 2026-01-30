@@ -1,10 +1,12 @@
 ﻿@{
-    var title = ViewData["Title"] is string ? AppSettings.Value.ShortName + " - " + ViewData["Title"] : AppSettings.Value.Name;
+    var title = ViewData["Title"] is string ? AppSettings.Value.ShortName + " - " + ViewData["Title"] :
+    AppSettings.Value.Name;
     var logo = AppSettings.Value.LogoMain;
 }
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -12,58 +14,64 @@
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;family=Open+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;family=Open+Sans:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
 
     <link rel="icon" href="@logo" />
-    
+
     <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              primary: "#2E5239",
-              forest: "#1B4D3E",
-              secondary: "#D48C2B",
-              accent: "#F8CA26",
-              orange: "#EA5B0C",
-              "orange-sun": "#F39C12",
-              "background-light": "#F9FAFB",
-              "background-dark": "#121212",
-              "surface-light": "#FFFFFF",
-              "surface-dark": "#1E1E1E",
-              "card-border": "#E5E7EB",
-              "card-border-dark": "#374151",
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2E5239",
+                        forest: "#1B4D3E",
+                        secondary: "#D48C2B",
+                        accent: "#F8CA26",
+                        orange: "#EA5B0C",
+                        "orange-sun": "#F39C12",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#121212",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E1E1E",
+                        "card-border": "#E5E7EB",
+                        "card-border-dark": "#374151",
+                    },
+                    fontFamily: {
+                        display: ["Montserrat", "sans-serif"],
+                        body: ["Open Sans", "sans-serif"],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
+                    }
+                },
             },
-            fontFamily: {
-              display: ["Montserrat", "sans-serif"],
-              body: ["Open Sans", "sans-serif"],
-            },
-            boxShadow: {
-              'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-              'hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
-            }
-          },
-        },
-      };
+        };
     </script>
 
     @RenderSection("Styles", required: false)
-    
+
     <script src="~/js/choice-cards.js" defer asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </head>
 
-<body class="bg-white dark:bg-background-dark font-body min-h-screen flex flex-col antialiased text-gray-800 dark:text-gray-200">
+<body
+    class="bg-white dark:bg-background-dark font-body min-h-screen flex flex-col antialiased text-gray-800 dark:text-gray-200">
     @RenderSection("Header", required: false)
 
     <main class="flex-grow">
         @RenderBody()
     </main>
-    
+
     <partial name="_Notifications" />
 
     <partial name="~/Views/Shared/_Footer.cshtml" />
 </body>
+
 </html>

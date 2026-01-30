@@ -182,7 +182,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const cartData = {
         timestamp: Date.now(),
         main: state.main,
-        complements: Array.from(state.complements.entries()) // Convertir Map en Array
+        complements: Array.from(state.complements.entries()), // Convertir Map en Array
+        step2Data: {
+          retrievalMethod: cartStateStep2.retrievalMethod,
+          deliveryZoneId: cartStateStep2.deliveryZoneId,
+          deliveryQuartierId: cartStateStep2.deliveryQuartierId,
+          deliveryPrice: cartStateStep2.deliveryPrice,
+          deliveryNote: cartStateStep2.deliveryNote,
+          paymentMethod: cartStateStep2.paymentMethod
+        }
       };
       
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
@@ -209,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return false;
       }
 
-      // Restaurer uniquement l'état de l'étape 1 (articles du panier)
+      // Restaurer l'état de l'étape 1 (articles du panier)
       if (cartData.main) {
         state.main = cartData.main;
       }
@@ -217,6 +225,16 @@ document.addEventListener("DOMContentLoaded", () => {
       // Restaurer les compléments (Array -> Map)
       if (cartData.complements && Array.isArray(cartData.complements)) {
         state.complements = new Map(cartData.complements);
+      }
+
+      // Restaurer l'état de l'étape 2
+      if (cartData.step2Data) {
+        cartStateStep2.retrievalMethod = cartData.step2Data.retrievalMethod || "EMPORTER";
+        cartStateStep2.deliveryZoneId = cartData.step2Data.deliveryZoneId || null;
+        cartStateStep2.deliveryQuartierId = cartData.step2Data.deliveryQuartierId || null;
+        cartStateStep2.deliveryPrice = cartData.step2Data.deliveryPrice || 0;
+        cartStateStep2.deliveryNote = cartData.step2Data.deliveryNote || "";
+        cartStateStep2.paymentMethod = cartData.step2Data.paymentMethod || "OM";
       }
 
       return true;
@@ -687,9 +705,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (hPrixLivraison) hPrixLivraison.value = "";
       if (hNote) hNote.value = "";
       cartStateStep2.deliveryPrice = 0;
+      cartStateStep2.deliveryZoneId = null;
+      cartStateStep2.deliveryQuartierId = null;
+      cartStateStep2.deliveryNote = "";
     }
     
     updateTotals();
+    
+    // Sauvegarder les changements de l'étape 2
+    saveCartToStorage();
   };
 
   document.addEventListener("change", (e) => {
@@ -708,16 +732,18 @@ document.addEventListener("DOMContentLoaded", () => {
         cartStateStep2.deliveryQuartierId = parseInt(opt.dataset.quartierId || "0", 10) || null;
       }
       updateTotals();
+      saveCartToStorage();
     }
 
     if (e.target === noteTextarea) {
       if (hNote) hNote.value = noteTextarea.value || "";
       cartStateStep2.deliveryNote = noteTextarea.value || "";
+      saveCartToStorage();
     }
   });
 
   // -----------------------------
-  // Submit
+  // Submit avec overlay de confirmation
   // -----------------------------
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -750,35 +776,60 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const fd = new FormData(form);
-    try {
-      const res = await fetch(form.action, {
-        method: "POST",
-        body: fd,
-        headers: { "X-Requested-With": "XMLHttpRequest" }
-      });
-
-      if (!res.ok) {
-        let msg = "Une erreur est survenue lors de la finalisation.";
-        try {
-          const data = await res.json();
-          if (data?.errors) {
-            const firstKey = Object.keys(data.errors)[0];
-            const firstVal = data.errors[firstKey];
-            if (Array.isArray(firstVal) && firstVal.length) msg = firstVal[0];
-          }
-        } catch (_) { /* ignore */ }
-        showMessage(false, msg);
-        return;
+    // Préparer les données pour l'overlay de confirmation
+    let subtotal = 0;
+    if (state.main) {
+      subtotal += (state.main.unitPrice || 0) * (state.main.qty || 1);
+    }
+    
+    const complements = [];
+    state.complements.forEach(item => {
+      subtotal += (item.unitPrice || 0) * (item.qty || 1);
+      complements.push(item);
+    });
+    
+    const deliveryPrice = cartStateStep2.deliveryPrice || 0;
+    const total = subtotal + deliveryPrice;
+    
+    let quartier = '';
+    if (isDelivery && zoneSelect) {
+      const selectedOption = zoneSelect.selectedOptions[0];
+      if (selectedOption) {
+        quartier = selectedOption.textContent || '';
       }
-
-      showMessage(true, "Commande enregistrée (mock). Vous pouvez continuer.");
-      clearCart();
-      collapseCart();
-    } catch (err) {
-      showMessage(false, "Impossible d'envoyer la commande. Vérifiez votre connexion.");
+    }
+    
+    const deliveryNote = noteTextarea?.value || '';
+    
+    const orderData = {
+      main: state.main,
+      complements: complements,
+      retrievalMethod: cartStateStep2.retrievalMethod,
+      quartier: quartier,
+      deliveryNote: deliveryNote,
+      paymentMethod: cartStateStep2.paymentMethod,
+      subtotal: subtotal,
+      deliveryPrice: deliveryPrice,
+      total: total
+    };
+    
+    // Afficher l'overlay de confirmation
+    if (typeof window.showOrderConfirmationOverlay === 'function') {
+      window.showOrderConfirmationOverlay(orderData, () => {
+        submitOrderToServer();
+      });
+    } else {
+      // Fallback si l'overlay n'est pas disponible
+      submitOrderToServer();
     }
   });
+
+  // Fonction pour soumettre la commande au serveur (soumission classique avec rechargement)
+  function submitOrderToServer() {
+    // Soumettre le formulaire de manière classique
+    // La page se rechargera et le contrôleur traitera les données
+    form.submit();
+  }
 
   function showMessage(ok, text) {
     if (!submitMessage) return;
@@ -836,14 +887,14 @@ document.addEventListener("DOMContentLoaded", () => {
           hiddenInput.value = value;
           
           const fieldName = hiddenInput.name;
-          if (fieldName === 'Form.RetrievalMethod') {
+          if (fieldName === 'RetrievalMethod') {
             cartStateStep2.retrievalMethod = value;
             const radio = document.querySelector(`input[name="js-retrieval"][value="${value}"]`);
             if (radio) {
               radio.checked = true;
               radio.dispatchEvent(new Event('change', { bubbles: true }));
             }
-          } else if (fieldName === 'Form.PaymentMethod') {
+          } else if (fieldName === 'PaymentMethod') {
             cartStateStep2.paymentMethod = value;
             const radio = document.querySelector(`input[name="js-payment"][value="${value}"]`);
             if (radio) {
@@ -889,7 +940,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const hasCartData = loadCartFromStorage();
     
     if (hasCartData && state.main) {
-      // Le panier a été restauré depuis localStorage (uniquement étape 1)
+      // Le panier a été restauré depuis localStorage (étape 1 + étape 2)
       
       // Restaurer le filtre de compléments si un burger est sélectionné
       const isBurger = state.main.categorie === "BURGER";
@@ -925,6 +976,78 @@ document.addEventListener("DOMContentLoaded", () => {
         mainBtn.classList.remove("bg-orange", "hover:bg-secondary");
         mainBtn.classList.add("bg-gray-400", "cursor-not-allowed", "opacity-70");
       }
+      
+      // Restaurer les choix de l'étape 2 dans les Choice Cards
+      // Attendre que les Choice Cards soient initialisés
+      setTimeout(() => {
+        // Restaurer le mode de récupération dans les Choice Cards
+        if (cartStateStep2.retrievalMethod) {
+          const retrievalInput = document.getElementById('RetrievalMethod');
+          if (retrievalInput) {
+            retrievalInput.value = cartStateStep2.retrievalMethod;
+            
+            // Mettre à jour visuellement les Choice Cards de récupération
+            const retrievalCards = document.querySelectorAll('[data-choice-cards] .choice-card');
+            retrievalCards.forEach(card => {
+              if (card.dataset.choiceValue === cartStateStep2.retrievalMethod) {
+                card.click(); // Déclenche la sélection visuelle
+              }
+            });
+          }
+          
+          // Synchroniser avec les radios
+          const retrievalRadio = retrievalRadios().find(r => r.value === cartStateStep2.retrievalMethod);
+          if (retrievalRadio) {
+            retrievalRadio.checked = true;
+          }
+        }
+        
+        // Restaurer le mode de paiement dans les Choice Cards
+        if (cartStateStep2.paymentMethod) {
+          const paymentInput = document.getElementById('PaymentMethod');
+          if (paymentInput) {
+            paymentInput.value = cartStateStep2.paymentMethod;
+            
+            // Mettre à jour visuellement les Choice Cards de paiement
+            const paymentCards = document.querySelectorAll('[data-choice-cards] .choice-card');
+            paymentCards.forEach(card => {
+              if (card.dataset.choiceValue === cartStateStep2.paymentMethod) {
+                card.click(); // Déclenche la sélection visuelle
+              }
+            });
+          }
+          
+          // Synchroniser avec les radios
+          const paymentRadio = paymentRadios().find(r => r.value === cartStateStep2.paymentMethod);
+          if (paymentRadio) {
+            paymentRadio.checked = true;
+          }
+        }
+        
+        // Restaurer la zone de livraison
+        if (cartStateStep2.deliveryQuartierId && zoneSelect) {
+          const option = Array.from(zoneSelect.options).find(opt => 
+            parseInt(opt.dataset.quartierId) === cartStateStep2.deliveryQuartierId
+          );
+          if (option) {
+            zoneSelect.value = option.value;
+            
+            // Mettre à jour les champs cachés
+            if (hZone) hZone.value = String(option.dataset.zoneId || "");
+            if (hQuartier) hQuartier.value = String(option.dataset.quartierId || "");
+            if (hPrixLivraison) hPrixLivraison.value = String(option.dataset.prixLivraison || "0");
+          }
+        }
+        
+        // Restaurer la note de livraison
+        if (cartStateStep2.deliveryNote && noteTextarea) {
+          noteTextarea.value = cartStateStep2.deliveryNote;
+          if (hNote) hNote.value = cartStateStep2.deliveryNote;
+        }
+        
+        // Synchroniser les bindings de l'étape 2
+        syncStep2Bindings();
+      }, 150); // Délai pour s'assurer que les Choice Cards sont prêts
       
       // Ouvrir le panier à l'étape 1
       openCart();
