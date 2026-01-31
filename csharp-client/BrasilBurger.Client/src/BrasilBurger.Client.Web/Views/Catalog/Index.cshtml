@@ -73,6 +73,7 @@
 </section>
 
 <partial name="_OrderConfirmationOverlay" />
+<partial name="_ArticleDetailsOverlay" />
 
 @* Supprimer le panier temporaire du localStorage si la commande a été passée avec succès *@
 @if (TempData["ClearCartStorage"] is bool clear && clear)
@@ -86,5 +87,6 @@
     </script>
 }
 
+<script src="~/js/article-details-overlay.js"></script>
 <script src="~/js/order-confirmation-overlay.js"></script>
 <script src="~/js/catalog.js"></script>

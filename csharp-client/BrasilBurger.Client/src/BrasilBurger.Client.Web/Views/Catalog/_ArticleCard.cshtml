@@ -1,6 +1,7 @@
 @using System
 @using BrasilBurger.Client.Domain.Enums
 @using BrasilBurger.Client.Web.ViewModels.GetVm
+@using System.Text.Encodings.Web
 @model ArticleGetVm
 
 @{
@@ -34,9 +35,23 @@
     var prixFormate = Model.Prix.ToString(
         "N0",
         System.Globalization.CultureInfo.GetCultureInfo("fr-FR"));
+    
+    // Pour les MENU, sérialiser les items du menu en JSON
+    var menuItemsJson = "";
+    if (categorie == CategorieArticle.MENU && Model.ArticleQuantifiers != null && Model.ArticleQuantifiers.Any())
+    {
+        var menuItems = Model.ArticleQuantifiers.Select(aq => new
+        {
+            title = aq.Article.Libelle,
+            imageUrl = aq.Article.ImageUrl,
+            qty = aq.Quantite
+        });
+        // Sérialiser en JSON sans encoder (l'attribut Razor s'en chargera)
+        menuItemsJson = System.Text.Json.JsonSerializer.Serialize(menuItems);
+    }
 }
 
-<article class="js-article-card group bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-soft hover:shadow-hover border border-card-border dark:border-card-border-dark transition-all duration-300 flex flex-col hover:-translate-y-1 h-full"
+<article class="js-article-card group bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-soft hover:shadow-hover border border-card-border dark:border-card-border-dark transition-all duration-300 flex flex-col hover:-translate-y-1 h-full cursor-pointer"
          data-article-id="@Model.Id"
          data-article-libelle="@Model.Libelle"
          data-article-image="@Model.ImageUrl"
@@ -44,7 +59,11 @@
          data-article-categorie="@categorie"
          data-article-category="@categorie"
          data-badge-text="@badgeText.ToUpperInvariant()"
-         data-badge-classes="@badgeColorClasses">
+         data-badge-classes="@badgeColorClasses"
+         @if (!string.IsNullOrEmpty(menuItemsJson))
+         {
+             @:data-menu-items="@menuItemsJson"
+         }>
 
     <!-- Image + badge + prix -->
     <div class="relative w-full @(isComplement ? "h-48" : "h-56") overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
