@@ -1,0 +1,54 @@
+@using BrasilBurger.Client.Web.ViewModels.Shared
+@model PaginationVm
+
+<div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p class="text-sm text-gray-500 dark:text-gray-400">
+        Affichage de 
+        <span class="font-medium text-gray-900 dark:text-white">@Model.From</span> 
+        à 
+        <span class="font-medium text-gray-900 dark:text-white">@Model.To</span> 
+        sur 
+        <span class="font-medium text-gray-900 dark:text-white">@Model.TotalItems</span> 
+        @Model.ItemsName
+    </p>
+    
+    <div class="flex items-center gap-2">
+        @* Bouton précédent *@
+        <button 
+            type="submit"
+            name="page" 
+            value="@(Model.CurrentPage - 1)"
+            class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
+            @(Model.HasPrevious ? "" : "disabled")>
+            <span class="material-symbols-outlined text-sm">chevron_left</span>
+        </button>
+        
+        <span class="text-sm text-gray-600 dark:text-gray-400">Page</span>
+        
+        @* Select de page *@
+        <select
+            id="@Model.PerPageSelect.Name" 
+            name="@Model.PerPageSelect.Name"
+            @(Model.PerPageSelect.Required ? "required" : "")
+            @(Model.PerPageSelect.Disabled ? "disabled" : "")
+            @(Model.PerPageSelect.AutoSubmit ? "onchange=this.form.submit()" : "")
+            class="px-8 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                <option value="@i" selected="@(i == Model.CurrentPage ? "selected" : null)">@i</option>
+            }
+        </select>
+        
+        <span class="text-sm text-gray-600 dark:text-gray-400">sur @Model.TotalPages</span>
+        
+        @* Bouton suivant *@
+        <button 
+            type="submit"
+            name="page" 
+            value="@(Model.CurrentPage + 1)"
+            class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
+            @(Model.HasNext ? "" : "disabled")>
+            <span class="material-symbols-outlined text-sm">chevron_right</span>
+        </button>
+    </div>
+</div>

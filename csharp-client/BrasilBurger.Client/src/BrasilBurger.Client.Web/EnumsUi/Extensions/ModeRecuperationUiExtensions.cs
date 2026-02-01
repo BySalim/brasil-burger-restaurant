@@ -18,13 +18,13 @@ public static class ModeRecuperationUiExtensions
             nameof(ModeRecuperation.EMPORTER),
             "À emporter",
             new UiIcon("shopping_bag"),
-            UiColor.Orange),
+            UiColor.Indigo),
 
         ModeRecuperation.LIVRER => new(
             nameof(ModeRecuperation.LIVRER),
             "Livraison",
             new UiIcon("local_shipping"),
-            UiColor.Vert),
+            UiColor.Violet),
 
         _ => throw new ArgumentOutOfRangeException(nameof(v), v, "ModeRecuperation non mappé (UI).")
     };
@@ -33,7 +33,7 @@ public static class ModeRecuperationUiExtensions
     
     public static IEnumerable<EnumUiMeta> AllUi() => Items;
     
-    public static ModeRecuperation ToEnum(string value) => EnumUiHelper.ToEnum<ModeRecuperation>(value);
+    public static ModeRecuperation? ToEnum(string value) => EnumUiHelper.ToEnum<ModeRecuperation>(value);
     
     public static ModeRecuperation DefaultSelected() => ModeRecuperation.EMPORTER;
 }

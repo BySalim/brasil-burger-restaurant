@@ -11,6 +11,7 @@ public static class DependencyInjection
         // Mapper singleton :
         services.AddSingleton<ArticleMapperVm>();
         services.AddSingleton<ArticleCardItemVmMapper>();
+        services.AddSingleton<OrderMapper>();
         
         services.AddScoped<IFormatsApp, FormatsApp.FormatsAppImpl>();
 

@@ -1,0 +1,58 @@
+@using BrasilBurger.Client.Web.ViewModels.Orders
+@model OrderListVm
+
+<div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                    <th class="p-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                        Date
+                    </th>
+                    <th class="p-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                        ID
+                    </th>
+                    <th class="p-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                        Code
+                    </th>
+                    <th class="p-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                        Type
+                    </th>
+                    <th class="p-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap text-right">
+                        Montant
+                    </th>
+                    <th class="p-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap text-center">
+                        Statut
+                    </th>
+                    <th class="p-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap text-center">
+                        Récupération
+                    </th>
+                    <th class="p-3 w-10"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                @if (Model.Orders.Any())
+                {
+                    @foreach (var order in Model.Orders)
+                    {
+                        <partial name="_OrderRow" model="order" />
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="p-8 text-center text-gray-500 dark:text-gray-400">
+                            <div class="flex flex-col items-center gap-2">
+                                <span class="material-symbols-outlined text-4xl text-gray-300 dark:text-gray-600">inbox</span>
+                                <p class="text-sm">Aucune commande trouvée</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    @* Pagination *@
+    <partial name="~/Views/Shared/_Pagination.cshtml" model="Model.Pagination" />
+</div>

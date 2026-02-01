@@ -37,6 +37,7 @@ public static class UiColorCss
         UiColor.Turquoise => "bg-teal-50",
         UiColor.Gris      => "bg-slate-50",
         UiColor.Noir      => "bg-zinc-100",
+        UiColor.Indigo    => "bg-indigo-50",
         _ => throw new ArgumentOutOfRangeException(nameof(c), c, "UiColor non supportée.")
     };
 
@@ -52,6 +53,7 @@ public static class UiColorCss
         UiColor.Turquoise => "bg-teal-600",
         UiColor.Gris      => "bg-slate-600",
         UiColor.Noir      => "bg-zinc-900",
+        UiColor.Indigo    => "bg-indigo-600",
         _ => throw new ArgumentOutOfRangeException(nameof(c), c, "UiColor non supportée.")
     };
 
@@ -67,6 +69,7 @@ public static class UiColorCss
         UiColor.Turquoise => "text-teal-600",
         UiColor.Gris      => "text-slate-600",
         UiColor.Noir      => "text-zinc-900",
+        UiColor.Indigo    => "text-indigo-600",
         _ => throw new ArgumentOutOfRangeException(nameof(c), c, "UiColor non supportée.")
     };
 
@@ -82,6 +85,7 @@ public static class UiColorCss
         UiColor.Turquoise => "text-teal-800",
         UiColor.Gris      => "text-slate-700",
         UiColor.Noir      => "text-zinc-900",
+        UiColor.Indigo    => "text-indigo-800",
         _ => throw new ArgumentOutOfRangeException(nameof(c), c, "UiColor non supportée.")
     };
 
@@ -97,6 +101,7 @@ public static class UiColorCss
         UiColor.Turquoise => "ring-teal-600/15",
         UiColor.Gris      => "ring-slate-400/25",
         UiColor.Noir      => "ring-zinc-900/10",
+        UiColor.Indigo    => "ring-indigo-600/15",
         _ => throw new ArgumentOutOfRangeException(nameof(c), c, "UiColor non supportée.")
     };
 
@@ -112,6 +117,7 @@ public static class UiColorCss
         UiColor.Turquoise => "ring-teal-600/30",
         UiColor.Gris      => "ring-slate-500/35",
         UiColor.Noir      => "ring-zinc-900/25",
+        UiColor.Indigo    => "ring-indigo-600/30",
         _ => throw new ArgumentOutOfRangeException(nameof(c), c, "UiColor non supportée.")
     };
 }

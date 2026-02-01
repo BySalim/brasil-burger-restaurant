@@ -27,7 +27,7 @@ public static class RoleUiExtensions
     
     public static IEnumerable<EnumUiMeta> AllUi() => Items;
     
-    public static Role ToEnum(string value) => EnumUiHelper.ToEnum<Role>(value);
+    public static Role? ToEnum(string value) => EnumUiHelper.ToEnum<Role>(value);
     
     public static Role DefaultSelected() => Role.CLIENT;
 }

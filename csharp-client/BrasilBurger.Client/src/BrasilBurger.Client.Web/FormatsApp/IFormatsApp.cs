@@ -20,4 +20,6 @@ public interface IFormatsApp
     string GetAppName();
     
     string GetCurrency();
+
+    SelectVm GetDefaultPerPageSelect();
 }

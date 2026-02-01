@@ -29,7 +29,7 @@ public static class CategorieArticleQuantifierUiExtensions
     
     public static IEnumerable<EnumUiMeta> AllUi() => Items;
     
-    public static CategorieArticleQuantifier ToEnum(string value) => EnumUiHelper.ToEnum<CategorieArticleQuantifier>(value);
+    public static CategorieArticleQuantifier? ToEnum(string value) => EnumUiHelper.ToEnum<CategorieArticleQuantifier>(value);
     
     public static CategorieArticleQuantifier DefaultSelected() => CategorieArticleQuantifier.MENU;
 }

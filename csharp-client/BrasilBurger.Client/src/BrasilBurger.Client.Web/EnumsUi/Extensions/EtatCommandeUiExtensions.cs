@@ -39,7 +39,7 @@ public static class EtatCommandeUiExtensions
     
     public static IEnumerable<EnumUiMeta> AllUi() => Items;
     
-    public static EtatCommande ToEnum(string value) => EnumUiHelper.ToEnum<EtatCommande>(value);
+    public static EtatCommande? ToEnum(string value) => EnumUiHelper.ToEnum<EtatCommande>(value);
     
     public static EtatCommande DefaultSelected() => EtatCommande.ANNULER;
 }

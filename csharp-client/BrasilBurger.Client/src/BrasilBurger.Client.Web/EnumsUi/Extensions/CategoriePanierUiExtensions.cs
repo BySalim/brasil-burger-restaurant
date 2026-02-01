@@ -10,15 +10,15 @@ public static class CategoriePanierUiExtensions
     {
         CategoriePanier.BURGER => new(
             nameof(CategoriePanier.BURGER),
-            "Burger", 
-            new UiIcon("restaurant_menu"), 
-            UiColor.Rouge),
+            "Burger simple", 
+            new UiIcon("lunch_dining"), 
+            UiColor.Bleu),
         
         CategoriePanier.MENU   => new(
             nameof(CategoriePanier.MENU),
             "Menu",
-            new UiIcon("receipt_long"),
-            UiColor.Bleu),
+            new UiIcon("fastfood"),
+            UiColor.Jaune),
 
         _ => throw new ArgumentOutOfRangeException(nameof(v), v, "CategoriePanier non mappée (UI).")
     };
@@ -27,7 +27,7 @@ public static class CategoriePanierUiExtensions
     
     public static IEnumerable<EnumUiMeta> AllUi() => Items;
     
-    public static CategoriePanier ToEnum(string value) => EnumUiHelper.ToEnum<CategoriePanier>(value);
+    public static CategoriePanier? ToEnum(string value) => EnumUiHelper.ToEnum<CategoriePanier>(value);
     
     public static CategoriePanier DefaultSelected() => CategoriePanier.BURGER;
 }

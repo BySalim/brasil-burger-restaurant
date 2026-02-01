@@ -27,7 +27,7 @@ public static class StatutLivraisonUiExtensions
     
     public static IEnumerable<EnumUiMeta> AllUi() => Items;
     
-    public static StatutLivraison ToEnum(string value) => EnumUiHelper.ToEnum<StatutLivraison>(value);
+    public static StatutLivraison? ToEnum(string value) => EnumUiHelper.ToEnum<StatutLivraison>(value);
     
     public static StatutLivraison DefaultSelected() => StatutLivraison.EN_COURS;
 }

@@ -2,6 +2,6 @@
 
 public enum UiColor
 {
-    Rouge, Jaune, Bleu, Vert, Orange, Violet, Rose, Turquoise, Gris, Noir
+    Rouge, Jaune, Bleu, Vert, Orange, Violet, Rose, Turquoise, Gris, Noir, Indigo
 }
 

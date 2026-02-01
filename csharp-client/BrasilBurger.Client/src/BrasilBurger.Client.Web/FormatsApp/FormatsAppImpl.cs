@@ -76,4 +76,24 @@ public sealed class FormatsAppImpl : IFormatsApp
     public string GetAppName() => _appSettings.Name;
 
     public string GetCurrency() => _appSettings.Currency;
+
+    public SelectVm GetDefaultPerPageSelect()
+    {
+        return new SelectVm
+        {
+            Name = "per_page",
+            Options = new List<SelectOptionVm>
+            {
+                new("4", "4"),
+                new("8", "8"),
+                new("10", "10"),
+                new("15", "15"),
+                new("20", "20"),
+                new("50", "50")
+            },
+            SelectedValue = "4",
+            AutoSubmit = true,
+            Size = "sm"
+        };
+    }
 }

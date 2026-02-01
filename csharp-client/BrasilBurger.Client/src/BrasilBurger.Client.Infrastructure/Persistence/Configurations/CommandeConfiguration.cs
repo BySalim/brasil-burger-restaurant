@@ -37,7 +37,7 @@ public sealed class CommandeConfiguration : IEntityTypeConfiguration<Commande>
         builder.Property(x => x.LivraisonId).HasColumnName("id_livraison");
 
         builder.Property(x => x.ClientId).HasColumnName("id_client").IsRequired();
-        builder.Property(x => x.InfoLivraisonId).HasColumnName("id_info_livraison").IsRequired();
+        builder.Property(x => x.InfoLivraisonId).HasColumnName("id_info_livraison");
 
         builder.HasIndex(x => x.InfoLivraisonId).IsUnique();
         builder.HasIndex(x => x.PanierId).IsUnique();

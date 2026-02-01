@@ -33,7 +33,7 @@ public static class CategorieArticleUiExtensions
     
     public static IEnumerable<EnumUiMeta> AllUi() => Items;
     
-    public static CategorieArticle ToEnum(string value) => EnumUiHelper.ToEnum<CategorieArticle>(value);
+    public static CategorieArticle? ToEnum(string value) => EnumUiHelper.ToEnum<CategorieArticle>(value);
     
     public static CategorieArticle DefaultSelected() => CategorieArticle.MENU;
 }

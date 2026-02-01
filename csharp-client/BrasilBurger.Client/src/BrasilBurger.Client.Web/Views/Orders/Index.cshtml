@@ -1,0 +1,52 @@
+@using BrasilBurger.Client.Web.ViewModels.Orders
+@model OrderListVm
+
+@{
+    ViewData["Title"] = "Mes Commandes";
+}
+
+@section Styles {
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+}
+
+<partial name="~/Views/Shared/_UserNavbar.cshtml" />
+
+<div class="p-4 max-w-7xl mx-auto space-y-4 pb-24">
+    @* En-tête de page *@
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white font-display">
+                Gestion des Commandes
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">
+                Gérez et suivez toutes les commandes clients en temps réel.
+            </p>
+        </div>
+        
+        <a href="@Url.Action("Index", "Orders")" 
+           class="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-opacity self-start sm:self-auto w-full sm:w-auto">
+            <span class="material-symbols-outlined text-lg">refresh</span>
+            Réinitialiser
+        </a>
+    </div>
+    
+    @* Formulaire de filtres et tableau *@
+    <form method="get" asp-action="Index" asp-controller="Orders">
+        @* Barre de filtres *@
+        <partial name="_OrderFiltersBar" model="Model" />
+        
+        @* Espacement *@
+        <div class="mt-4">
+            @* Tableau des commandes *@
+            <partial name="_OrdersTable" model="Model" />
+        </div>
+    </form>
+</div>

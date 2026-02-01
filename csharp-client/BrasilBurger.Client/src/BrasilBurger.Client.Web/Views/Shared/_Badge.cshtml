@@ -1,0 +1,17 @@
+@using BrasilBurger.Client.Web.ViewModels.Shared
+@model BadgeVm
+
+@if (Model != null)
+{
+    <span class="@Model.CssClasses">
+        @if (!string.IsNullOrEmpty(Model.IconName))
+        {
+            <span class="material-symbols-outlined @Model.IconCssClasses">@Model.IconName</span>
+        }
+        else if (!string.IsNullOrEmpty(Model.IconUrl))
+        {
+            <img src="@Model.IconUrl" alt="" class="@Model.IconCssClasses" />
+        }
+        @Model.Label
+    </span>
+}

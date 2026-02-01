@@ -1,0 +1,31 @@
+@using BrasilBurger.Client.Web.ViewModels.Shared
+@model SelectVm
+
+<div class="relative">
+    @if (!string.IsNullOrEmpty(Model.Label))
+    {
+        <label for="@Model.Name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            @Model.Label
+        </label>
+    }
+    
+    <select 
+        id="@Model.Name" 
+        name="@Model.Name"
+        class="@Model.CssClasses"
+        @(Model.Required ? "required" : "")
+        @(Model.Disabled ? "disabled" : "")
+        @(Model.AutoSubmit ? "onchange=this.form.submit()" : "")>
+        
+        @if (!string.IsNullOrEmpty(Model.Placeholder))
+        {
+            <option value="">@Model.Placeholder</option>
+        }
+        
+        @foreach (var option in Model.Options)
+        {
+            var isSelected = option.Value == Model.SelectedValue;
+            <option value="@option.Value" selected="@(isSelected ? "selected" : null)">@option.Text</option>
+        }
+    </select>
+</div>

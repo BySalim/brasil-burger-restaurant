@@ -27,7 +27,7 @@ public static class ModePaiementUiExtensions
     
     public static IEnumerable<EnumUiMeta> AllUi() => Items;
     
-    public static ModePaiement ToEnum(string value) => EnumUiHelper.ToEnum<ModePaiement>(value);
+    public static ModePaiement? ToEnum(string value) => EnumUiHelper.ToEnum<ModePaiement>(value);
     
     public static ModePaiement DefaultSelected() => ModePaiement.OM;
 }

@@ -11,9 +11,9 @@ public static class EnumUiHelper
             .Select(map)
             .ToArray();
     
-    public static TEnum ToEnum<TEnum>(string value)
+    public static TEnum? ToEnum<TEnum>(string value)
         where TEnum : struct, Enum
         => Enum.TryParse<TEnum>(value, ignoreCase: true, out var result)
             ? result
-            : throw new ArgumentException($"Valeur invalide: '{value}'.");
+            : null;
 }

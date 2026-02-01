@@ -27,7 +27,7 @@ public static class TypeComplementUiExtensions
     
     public static IEnumerable<EnumUiMeta> AllUi() => Items;
     
-    public static TypeComplement ToEnum(string value) => EnumUiHelper.ToEnum<TypeComplement>(value);
+    public static TypeComplement? ToEnum(string value) => EnumUiHelper.ToEnum<TypeComplement>(value);
     
     public static TypeComplement DefaultSelected() => TypeComplement.BOISSON;
 }
