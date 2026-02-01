@@ -30,6 +30,8 @@ public sealed class PaiementService : IPaiementService
         var montantPanier = commande.Panier?.MontantTotal ?? 0;
         if (montantPanier <= 0)
             throw new DomainException("Le montant du panier est invalide (<= 0).");
+        
+        var PrixLivraison = commande.InfoLivraison?.PrixLivraison ?? 0;
 
         var paieInitResult = await _gateway.InitializeAsync(montantPanier, modePaie.Value, ct);
         var reference = paieInitResult.ProviderReference;
@@ -43,7 +45,7 @@ public sealed class PaiementService : IPaiementService
 
         var paiement = new Paiement(
             commande: commande,
-            montant: montantPanier,
+            montant: montantPanier + PrixLivraison,
             mode: modePaie.Value,
             referenceExterne: reference,
             test: test,
