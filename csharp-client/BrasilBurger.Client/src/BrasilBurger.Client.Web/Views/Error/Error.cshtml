@@ -1,0 +1,57 @@
+@model BrasilBurger.Client.Web.ViewModels.ErrorViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center px-6 py-12">
+    <div class="max-w-md w-full text-center">
+        <!-- Icône d'erreur -->
+        <div class="mb-8">
+            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-red-100 dark:bg-red-900/20">
+                <span class="material-symbols-outlined text-5xl text-red-600 dark:text-red-400">
+                    error
+                </span>
+            </div>
+        </div>
+
+        <!-- Code d'erreur -->
+        <h1 class="font-display text-6xl font-extrabold text-gray-900 dark:text-white mb-4">
+            @Model.StatusCode
+        </h1>
+
+        <!-- Titre -->
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            @Model.Title
+        </h2>
+
+        <!-- Message -->
+        <p class="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+            @Model.Message
+        </p>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="@Url.Action("Index", "Home")" 
+               class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-orange hover:bg-orange-600 text-white font-bold transition-all shadow-lg shadow-orange/20">
+                <span class="material-symbols-outlined text-[20px]">home</span>
+                Retour à l'accueil
+            </a>
+
+            <button onclick="history.back()" 
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                Retour
+            </button>
+        </div>
+
+        <!-- Request ID pour le support -->
+        @if (Model.ShowRequestId)
+        {
+            <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    ID de requête : <code class="font-mono">@Model.RequestId</code>
+                </p>
+            </div>
+        }
+    </div>
+</div>

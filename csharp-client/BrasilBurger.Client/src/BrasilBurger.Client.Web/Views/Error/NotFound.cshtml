@@ -1,0 +1,69 @@
+@model BrasilBurger.Client.Web.ViewModels.ErrorViewModel
+@{
+    ViewData["Title"] = "Page non trouvée";
+}
+
+<div class="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center px-6 py-12">
+    <div class="max-w-2xl w-full text-center">
+        <!-- Illustration 404 -->
+        <div class="mb-8">
+            <div class="inline-flex items-center justify-center w-32 h-32 rounded-full bg-blue-100 dark:bg-blue-900/20">
+                <span class="material-symbols-outlined text-7xl text-blue-600 dark:text-blue-400">
+                    search_off
+                </span>
+            </div>
+        </div>
+
+        <!-- Code d'erreur stylisé -->
+        <h1 class="font-display text-8xl font-extrabold text-gray-900 dark:text-white mb-4">
+            404
+        </h1>
+
+        <!-- Titre -->
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            Oups ! Page introuvable
+        </h2>
+
+        <!-- Message -->
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed max-w-lg mx-auto">
+            La page que vous recherchez n'existe pas ou a été déplacée. 
+            Peut-être avez-vous envie d'un bon burger ? 🍔
+        </p>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="@Url.Action("Index", "Home")" 
+               class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-orange hover:bg-orange-600 text-white font-bold transition-all shadow-xl shadow-orange/30 transform hover:scale-105">
+                <span class="material-symbols-outlined text-[24px]">home</span>
+                Retour à l'accueil
+            </a>
+
+            <a href="@Url.Action("Index", "Catalog")" 
+               class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all shadow-lg transform hover:scale-105">
+                <span class="material-symbols-outlined text-[24px]">restaurant_menu</span>
+                Voir le menu
+            </a>
+        </div>
+
+        <!-- Liens utiles -->
+        <div class="mt-12">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                Liens utiles
+            </p>
+            <div class="flex flex-wrap gap-4 justify-center text-sm">
+                <a href="@Url.Action("Index", "Catalog")" 
+                   class="text-orange hover:underline">
+                    Catalogue
+                </a>
+                <a href="@Url.Action("Index", "Orders")" 
+                   class="text-orange hover:underline">
+                    Mes commandes
+                </a>
+                <a href="@Url.Action("Privacy", "Home")" 
+                   class="text-orange hover:underline">
+                    Confidentialité
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

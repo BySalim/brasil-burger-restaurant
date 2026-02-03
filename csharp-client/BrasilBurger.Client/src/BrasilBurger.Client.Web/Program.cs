@@ -29,7 +29,7 @@ builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", opt =>
     {
         opt.LoginPath = "/Auth/Login";
-        opt.AccessDeniedPath = "/Auth/Denied";
+        opt.AccessDeniedPath = "/Error/403";
         opt.LogoutPath = "/Auth/Logout";
         
         // Configuration améliorée
@@ -51,12 +51,22 @@ if (!string.IsNullOrWhiteSpace(port))
     app.Urls.Add($"http://0.0.0.0:{port}");
 }
 
+// ============================================
+// CONFIGURATION DE LA GESTION DES ERREURS
+// ============================================
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    // Gestion des exceptions non gérées (500)
+    app.UseExceptionHandler("/Error/500");
+    
+    // Gestion des codes de statut HTTP (404, 403, etc.)
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
+    
     app.UseHsts();
 }
-else{
+else
+{
+    // En développement, afficher la page d'exception détaillée
     app.UseDeveloperExceptionPage();
 }
 

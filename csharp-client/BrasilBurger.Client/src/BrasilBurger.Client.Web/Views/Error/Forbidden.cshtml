@@ -1,0 +1,50 @@
+@model BrasilBurger.Client.Web.ViewModels.ErrorViewModel
+@{
+    ViewData["Title"] = "Accès refusé";
+}
+
+<div class="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center px-6 py-12">
+    <div class="max-w-md w-full text-center">
+        <!-- Icône d'accès refusé -->
+        <div class="mb-8">
+            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-yellow-100 dark:bg-yellow-900/20">
+                <span class="material-symbols-outlined text-5xl text-yellow-600 dark:text-yellow-400">
+                    lock
+                </span>
+            </div>
+        </div>
+
+        <!-- Code d'erreur -->
+        <h1 class="font-display text-6xl font-extrabold text-gray-900 dark:text-white mb-4">
+            403
+        </h1>
+
+        <!-- Titre -->
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Accès refusé
+        </h2>
+
+        <!-- Message -->
+        <p class="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+            Vous n'avez pas les permissions nécessaires pour accéder à cette ressource.
+        </p>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="@Url.Action("Index", "Home")" 
+               class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-orange hover:bg-orange-600 text-white font-bold transition-all shadow-lg shadow-orange/20">
+                <span class="material-symbols-outlined text-[20px]">home</span>
+                Retour à l'accueil
+            </a>
+
+            @if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                <a href="@Url.Action("Login", "Auth")" 
+                   class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 border-orange text-orange font-bold hover:bg-orange hover:text-white transition-all">
+                    <span class="material-symbols-outlined text-[20px]">login</span>
+                    Se connecter
+                </a>
+            }
+        </div>
+    </div>
+</div>
