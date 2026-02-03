@@ -142,7 +142,7 @@ public sealed class CommandeService : ICommandeService
 
         CategoriePanier? categoriePanier = null;
         var panier = null as Panier;
-
+        var montantTotal = 0;
         foreach (var (articleId, quantite) in quantitesByArticleId)
         {
             // Charger l'article AVEC ses dépendances (menu -> composition -> articles)
@@ -175,6 +175,7 @@ public sealed class CommandeService : ICommandeService
                 // Build quantifier using a snapshot (id, prix, catégorie) to avoid attaching tracked Article instances
                 var ligne = new ArticleQuantifier(article.Id, quantite, article.GetPrix(), article.Categorie);
                 panier!.AjouterLigne(ligne);
+                montantTotal += ligne.Montant;
             }
             catch (DomainException ex)
             {
@@ -184,7 +185,7 @@ public sealed class CommandeService : ICommandeService
 
         if (panier is null || panier.Lignes.Count == 0)
             return Result<Panier>.Failure($"Aucun article ne correspond. Panier impossible à créer.");
-
+        panier.MontantTotal = montantTotal;
         return Result<Panier>.Success(panier);
     }
 

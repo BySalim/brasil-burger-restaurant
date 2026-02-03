@@ -16,7 +16,7 @@ public class Panier : Entity
     }
 
     public CategoriePanier CategoriePanier { get; private set; }
-    public int MontantTotal { get; private set; }
+    public int MontantTotal { get; set; }
 
     public IReadOnlyCollection<ArticleQuantifier> Lignes => _lignes;
 
