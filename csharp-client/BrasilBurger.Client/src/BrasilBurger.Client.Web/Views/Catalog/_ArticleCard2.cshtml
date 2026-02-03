@@ -13,7 +13,7 @@
         <div class="relative w-full h-48 overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
             <img alt="@Model.Name"
                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                 src="@FormatsApp.GetPublicUrl(Model.ImagePublicId)" />
+                 src="@FormatsApp.GetImageUrl(Model.ImagePublicId)" />
             
             <div class="absolute top-3 left-3">
                 @if (Model.Tag != null)
@@ -67,7 +67,7 @@ else
         <div class="relative w-full h-56 overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
             <img alt="@Model.Name"
                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                 src="@FormatsApp.GetPublicUrl(Model.ImagePublicId)" />
+                 src="@FormatsApp.GetImageUrl(Model.ImagePublicId)" />
             
             <div class="absolute top-3 left-3">
                 @if (Model.Tag != null)

@@ -1,0 +1,103 @@
+@using BrasilBurger.Client.Web.ViewModels.Orders
+@model OrderDetailVm
+
+<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+    <div class="flex items-center gap-2 mb-4 font-bold text-sm text-gray-900">
+        <span class="material-symbols-outlined text-slate-400">local_shipping</span>
+        Mode de récupération
+    </div>
+    
+    @* Badge du mode de récupération *@
+    <div class="w-full">
+        <partial name="_Badge" model="Model.ModeRecuperationBadge" />
+    </div>
+    
+    @* Section livraison (uniquement si livraison existe) *@
+    @if (Model.EstLivraison && Model.Livraison != null)
+    {
+        <div class="my-5 border-t border-gray-200"></div>
+        
+        <div class="space-y-4">
+            <h3 class="text-xs uppercase text-gray-500 font-bold tracking-wide">Informations sur la livraison</h3>
+            
+            <div class="space-y-3 text-sm">
+                @* Prix de livraison *@
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500">Prix</span>
+                    <span class="font-bold text-gray-900">@FormatsApp.FormatPrice(Model.Livraison.PrixLivraison)</span>
+                </div>
+                
+                @* Statut de livraison *@
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500">Statut</span>
+                    @if (Model.Livraison.HasStatut && Model.Livraison.StatutBadge != null)
+                    {
+                        <partial name="_Badge" model="Model.Livraison.StatutBadge" />
+                    }
+                    else
+                    {
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-50 text-gray-500 border border-gray-200">
+                            En attente
+                        </span>
+                    }
+                </div>
+                
+                @* Quartier *@
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500">Quartier</span>
+                    <span class="font-medium text-gray-900">@Model.Livraison.Quartier</span>
+                </div>
+                
+                @* Zone *@
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500">Zone</span>
+                    <span class="font-medium text-gray-900">@Model.Livraison.Zone</span>
+                </div>
+                
+                @* Note de livraison *@
+                @if (!string.IsNullOrEmpty(Model.Livraison.NoteLivraison))
+                {
+                    <div class="pt-1">
+                        <span class="text-xs text-gray-500 block mb-1.5">Note de livraison</span>
+                        <div class="text-sm text-gray-900 bg-gray-50 p-2.5 rounded-lg border border-gray-200 text-xs italic leading-relaxed">
+                            @Model.Livraison.NoteLivraison
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        @* Section livreur *@
+        @if (Model.Livraison.HasLivreur && Model.Livraison.Livreur != null)
+        {
+            <div class="mt-5 pt-5 border-t border-dashed border-gray-200">
+                <h3 class="text-xs uppercase text-gray-500 font-bold tracking-wide mb-3">Livreur</h3>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-sm">
+                        @Model.Livraison.Livreur.Initiales
+                    </div>
+                    <div>
+                        <div class="font-bold text-gray-900 text-sm">@Model.Livraison.Livreur.NomComplet</div>
+                        <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium mt-0.5">
+                            <span class="material-symbols-outlined text-[14px]">call</span>
+                            @FormatsApp.FormatPhoneNumber(Model.Livraison.Livreur.Telephone)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (Model.Livraison.HasStatut)
+        {
+            @* Livraison assignée mais livreur pas encore connu *@
+            <div class="mt-5 pt-5 border-t border-dashed border-gray-200">
+                <h3 class="text-xs uppercase text-gray-500 font-bold tracking-wide mb-3">Livreur</h3>
+                <div class="flex items-center gap-3 text-gray-400">
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                        <span class="material-symbols-outlined text-xl">person_search</span>
+                    </div>
+                    <span class="text-sm">Attribution en cours...</span>
+                </div>
+            </div>
+        }
+    }
+</div>

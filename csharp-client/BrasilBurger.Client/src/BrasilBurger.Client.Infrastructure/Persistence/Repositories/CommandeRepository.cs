@@ -19,12 +19,16 @@ public sealed class CommandeRepository : EfRepository<Commande>, ICommandeReposi
             .Include(c => c.Panier)
                 .ThenInclude(p => p!.Lignes)
                     .ThenInclude(l => l.Article)
+                        .ThenInclude(a => (a as Menu)!.MenuComposition)
+                            .ThenInclude(mc => mc.Article)
             .Include(c => c.InfoLivraison)
                 .ThenInclude(i => i!.Zone)
             .Include(c => c.InfoLivraison)
                 .ThenInclude(i => i!.Quartier)
             .Include(c => c.Paiement)
             .Include(c => c.Livraison)
+                .ThenInclude(l => l!.GroupeLivraison)
+                    .ThenInclude(g => g.Livreur)
             .FirstOrDefaultAsync(c => c.Id == commandeId, ct);
 
     public async Task<IReadOnlyList<Commande>> ListByClientAsync(int clientId, CancellationToken ct = default)
@@ -47,15 +51,15 @@ public sealed class CommandeRepository : EfRepository<Commande>, ICommandeReposi
             .OrderByDescending(c => c.DateDebut)
             .ToListAsync(ct);
 
-        public async Task<(IReadOnlyList<Commande> Items, int TotalCount)> SearchAsync(
-        int clientId,
-        string? code = null,
-        DateTime? date = null,
-        EtatCommande? etat = null,
-        ModeRecuperation? modeRecuperation = null,
-        int skip = 0,
-        int take = 10,
-        CancellationToken ct = default)
+    public async Task<(IReadOnlyList<Commande> Items, int TotalCount)> SearchAsync(
+    int clientId,
+    string? code = null,
+    DateTime? date = null,
+    EtatCommande? etat = null,
+    ModeRecuperation? modeRecuperation = null,
+    int skip = 0,
+    int take = 10,
+    CancellationToken ct = default)
     {
         var query = Db.Commandes.AsNoTracking()
             .Where(c => c.ClientId == clientId);
@@ -87,7 +91,11 @@ public sealed class CommandeRepository : EfRepository<Commande>, ICommandeReposi
             .OrderByDescending(c => c.DateDebut)
             .Skip(skip)
             .Take(take)
+            .Include(c => c.Panier)
+                .ThenInclude(p => p!.Lignes)
+                    .ThenInclude(l => l.Article)
             .Include(c => c.Livraison)
+            .Include(c => c.Paiement)
             .ToListAsync(ct);
 
         return (items, totalCount);

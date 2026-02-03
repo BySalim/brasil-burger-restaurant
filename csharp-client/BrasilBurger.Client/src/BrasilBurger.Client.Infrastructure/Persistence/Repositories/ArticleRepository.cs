@@ -2,12 +2,7 @@ using BrasilBurger.Client.Application.Abstractions.Persistence;
 using BrasilBurger.Client.Domain.Entities;
 using BrasilBurger.Client.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BrasilBurger.Client.Infrastructure.Persistence.Repositories;
 
@@ -86,4 +81,44 @@ public sealed class ArticleRepository : EfRepository<Article>, IArticleRepositor
             .Include(m => m.MenuComposition)
                 .ThenInclude(aq => aq.Article)
             .FirstOrDefaultAsync(m => m.Id == menuId, ct);
+
+    public async Task<Article?> GetWithDependenciesAsync(int articleId, CancellationToken ct = default)
+    {
+        var menu = await Db.Set<Menu>()
+            .AsNoTracking()
+            .Include(m => m.MenuComposition)
+                .ThenInclude(aq => aq.Article)
+            .FirstOrDefaultAsync(m => m.Id == articleId, ct);
+
+        if (menu is not null)
+            return menu;
+
+        return await Db.Articles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == articleId, ct);
+    }
+
+    public Task<Article?> GetByIdNoTrackingAsync(int id, CancellationToken ct = default)
+        => Db.Articles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == id, ct);
+
+    public async Task<Article?> GetByIdWithCompositionNoTrackingAsync(int articleId, CancellationToken ct = default)
+    {
+        var article = await Db.Articles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == articleId, ct);
+
+        if (article is Menu menu)
+        {
+            var menuWithComposition = await Db.Set<Menu>()
+                .AsNoTracking()
+                .Include(m => m.MenuComposition)
+                    .ThenInclude(aq => aq.Article)
+                .FirstOrDefaultAsync(m => m.Id == articleId, ct);
+            return menuWithComposition;
+        }
+
+        return article;
+    }
 }

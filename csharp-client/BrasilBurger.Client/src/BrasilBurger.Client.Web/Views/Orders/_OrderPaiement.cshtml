@@ -1,0 +1,35 @@
+@using BrasilBurger.Client.Web.ViewModels.Orders
+@model OrderPaiementVm?
+
+<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+    <div class="flex items-center gap-2 mb-4 font-bold text-sm text-gray-900">
+        <span class="material-symbols-outlined text-slate-400">payments</span>
+        Paiement
+    </div>
+    
+    @if (Model != null)
+    {
+        <div class="flex justify-between items-end mb-4">
+            <div class="flex flex-col">
+                <span class="text-[10px] uppercase text-gray-500 font-bold tracking-wide">Montant</span>
+                <span class="text-primary font-bold text-xl">@FormatsApp.FormatPrice(Model.Montant)</span>
+            </div>
+            <partial name="_Badge" model="Model.MethodeBadge" />
+        </div>
+        
+        <div class="text-[11px] text-slate-400 flex justify-between items-center font-mono w-full">
+            <span>@Model.FormattedDate</span>
+            @if (!string.IsNullOrEmpty(Model.Reference))
+            {
+                <span class="opacity-70 ml-2">@Model.Reference</span>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="flex flex-col items-center justify-center py-4 text-gray-400">
+            <span class="material-symbols-outlined text-3xl mb-2">pending</span>
+            <span class="text-sm">Paiement en attente</span>
+        </div>
+    }
+</div>

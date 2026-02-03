@@ -18,8 +18,8 @@ public sealed class PaiementService : IPaiementService
 
     public async Task<Result<Paiement>> NewPaiement(Commande commande, string modePaiement, CancellationToken ct = default)
     {
-        if (commande is null || commande.Panier is null || commande.Client is null)
-        throw new DomainException("La commande, le panier et le client ne peuvent pas être nuls pour initier un paiement.");
+        if (commande is null || commande.Panier is null || commande.ClientId <= 0)
+            throw new DomainException("La commande, le panier et le client doivent être valides pour initier un paiement.");
 
         var modePaie = ConvertEnum.FromString<ModePaiement>(modePaiement!);
         if (modePaie is null)
@@ -49,7 +49,7 @@ public sealed class PaiementService : IPaiementService
             mode: modePaie.Value,
             referenceExterne: reference,
             test: test,
-            client: commande.Client
+            clientId: commande.ClientId
         );
         commande.AssocierPaiement(paiement);
         return Result<Paiement>.Success(paiement);

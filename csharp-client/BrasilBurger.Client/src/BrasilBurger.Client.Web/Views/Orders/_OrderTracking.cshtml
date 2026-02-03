@@ -1,0 +1,235 @@
+@using BrasilBurger.Client.Web.ViewModels.Orders
+@model OrderTrackingVm
+
+<div class="bg-white rounded-2xl p-6 md:p-5 shadow-sm border border-gray-100 overflow-hidden">
+    @if (Model.EstAnnulee)
+    {
+        <div class="flex flex-col items-center justify-center gap-4 py-8">
+            <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                <span class="material-symbols-outlined text-red-500 text-4xl">cancel</span>
+            </div>
+            <div class="text-center">
+                <p class="text-red-600 font-bold text-lg">Commande annulée</p>
+                <p class="text-gray-400 text-sm mt-1">Cette commande a été annulée</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="relative" id="tracking-container" data-current-index="@Model.CurrentIndex" data-total-steps="@Model.TotalSteps">
+            
+            @* Barre de progression - fond *@
+            <div class="absolute top-6 left-6 right-6 h-1 bg-gray-100 rounded-full z-0"></div>
+            
+            @* Barre de progression - active avec gradient *@
+            <div class="absolute top-6 left-6 h-1 rounded-full z-10 transition-all duration-700 ease-out overflow-hidden"
+                 id="tracking-progress-bar"
+                 style="width: 0%; background: linear-gradient(90deg, #ea580c 0%, #f97316 50%, #fb923c 100%);">
+                @* Effet brillant animé *@
+                <div class="tracking-shimmer absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
+            </div>
+            
+            @* Conteneur des étapes *@
+            <div class="relative z-20 flex justify-between w-full">
+                @foreach (var step in Model.Steps)
+                {
+                    var stepId = $"tracking-step-{step.Index}";
+                    
+                    <div class="flex flex-col items-center" id="@stepId" data-step-index="@step.Index">
+                        @if (step.IsFinal)
+                        {
+                            @* Étape finale - plus grande avec effet spécial *@
+                            <div class="relative">
+                                @* Cercle de pulse (animation) *@
+                                <div class="tracking-pulse absolute -inset-2 rounded-full opacity-0"></div>
+                                
+                                @* Cercle principal *@
+                                <div class="tracking-step-circle w-14 h-14 rounded-full flex items-center justify-center 
+                                            transition-all duration-500 ease-out transform
+                                            bg-gray-100 text-gray-400 border-4 border-white shadow"
+                                     data-active-class="bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-xl shadow-orange-300/50 scale-110"
+                                     data-inactive-class="bg-gray-100 text-gray-400 shadow scale-100">
+                                    <span class="material-symbols-outlined text-2xl tracking-icon transition-transform duration-500">@step.IconName</span>
+                                </div>
+                            </div>
+                            
+                            @* Label *@
+                            <div class="text-center mt-4">
+                                <p class="tracking-step-label font-bold text-sm transition-all duration-500 text-gray-400"
+                                   data-active-class="text-orange-600"
+                                   data-inactive-class="text-gray-400">
+                                    @step.Label
+                                </p>
+                            </div>
+                        }
+                        else
+                        {
+                            @* Étapes normales *@
+                            <div class="relative">
+                                @* Cercle de pulse (animation) *@
+                                <div class="tracking-pulse absolute -inset-2 rounded-full opacity-0"></div>
+                                
+                                @* Cercle principal *@
+                                <div class="tracking-step-circle w-12 h-12 rounded-full flex items-center justify-center 
+                                            transition-all duration-500 ease-out transform
+                                            bg-gray-100 text-gray-400 border-4 border-white shadow"
+                                     data-active-class="bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-300/40"
+                                     data-inactive-class="bg-gray-100 text-gray-400 shadow">
+                                    <span class="material-symbols-outlined text-xl tracking-icon transition-transform duration-300"
+                                          data-icon="@step.IconName">@step.IconName</span>
+                                </div>
+                            </div>
+                            
+                            @* Label *@
+                            <div class="text-center mt-3">
+                                <p class="tracking-step-label font-semibold text-xs md:text-sm transition-all duration-500 text-gray-400"
+                                   data-active-class="text-gray-900"
+                                   data-inactive-class="text-gray-400">
+                                    @step.Label
+                                </p>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    /* Animation shimmer sur la barre de progression */
+    @@keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(300%); }
+    }
+    
+    .tracking-shimmer {
+        animation: shimmer 2.5s ease-in-out infinite;
+        animation-delay: 1.5s;
+    }
+    
+    /* Animation pulse pour l'étape courante */
+    @@keyframes pulse-ring {
+        0% { transform: scale(1); opacity: 0.6; }
+        50% { transform: scale(1.3); opacity: 0.3; }
+        100% { transform: scale(1.5); opacity: 0; }
+    }
+    
+    .tracking-pulse.active {
+        background: radial-gradient(circle, rgba(249, 115, 22, 0.5) 0%, rgba(249, 115, 22, 0) 70%);
+        animation: pulse-ring 2s ease-out infinite;
+    }
+    
+    /* Animation bounce pour l'icône activée */
+    @@keyframes icon-pop {
+        0% { transform: scale(1) rotate(0deg); }
+        25% { transform: scale(1.3) rotate(-5deg); }
+        50% { transform: scale(1.1) rotate(5deg); }
+        75% { transform: scale(1.2) rotate(-2deg); }
+        100% { transform: scale(1) rotate(0deg); }
+    }
+    
+    .tracking-icon.pop {
+        animation: icon-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    /* Transition douce pour les cercles */
+    .tracking-step-circle {
+        will-change: transform, background, box-shadow;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('tracking-container');
+        if (!container) return;
+        
+        const currentIndex = parseInt(container.dataset.currentIndex);
+        const totalSteps = parseInt(container.dataset.totalSteps);
+        const progressBar = document.getElementById('tracking-progress-bar');
+        
+        if (currentIndex < 0) return;
+        
+        const initialDelay = 400;
+        const stepDuration = 600;
+        
+        function activateStep(stepIndex, isCurrent) {
+            const stepEl = document.getElementById(`tracking-step-${stepIndex}`);
+            if (!stepEl) return;
+            
+            const circle = stepEl.querySelector('.tracking-step-circle');
+            const label = stepEl.querySelector('.tracking-step-label');
+            const icon = stepEl.querySelector('.tracking-icon');
+            const pulse = stepEl.querySelector('.tracking-pulse');
+            
+            // Activer le cercle
+            if (circle) {
+                const activeClass = circle.dataset.activeClass;
+                const inactiveClass = circle.dataset.inactiveClass;
+                
+                if (inactiveClass) {
+                    inactiveClass.split(' ').forEach(c => circle.classList.remove(c));
+                }
+                if (activeClass) {
+                    activeClass.split(' ').forEach(c => circle.classList.add(c));
+                }
+            }
+            
+            // Activer le label
+            if (label) {
+                const activeClass = label.dataset.activeClass;
+                const inactiveClass = label.dataset.inactiveClass;
+                
+                if (inactiveClass) {
+                    inactiveClass.split(' ').forEach(c => label.classList.remove(c));
+                }
+                if (activeClass) {
+                    activeClass.split(' ').forEach(c => label.classList.add(c));
+                }
+            }
+            
+            // Animation pop sur l'icône
+            if (icon) {
+                icon.classList.add('pop');
+                setTimeout(() => icon.classList.remove('pop'), 500);
+            }
+            
+            // Activer le pulse uniquement sur l'étape courante
+            if (pulse && isCurrent) {
+                setTimeout(() => pulse.classList.add('active'), 300);
+            }
+        }
+        
+        function updateProgressBar(stepIndex) {
+            if (!progressBar || totalSteps <= 1) return;
+            
+            // Calculer la largeur en pourcentage
+            // La barre doit aller du centre du premier cercle au centre du cercle actif
+            const containerWidth = progressBar.parentElement.offsetWidth - 48; // moins les paddings left/right (24px * 2)
+            const stepWidth = containerWidth / (totalSteps - 1);
+            const targetWidth = stepIndex * stepWidth;
+            
+            progressBar.style.width = `${(stepIndex / (totalSteps - 1)) * 100}%`;
+        }
+        
+        // Animation séquentielle
+        let animatedStep = 0;
+        
+        function animateNextStep() {
+            if (animatedStep > currentIndex) return;
+            
+            const isCurrent = animatedStep === currentIndex;
+            activateStep(animatedStep, isCurrent);
+            updateProgressBar(animatedStep);
+            
+            animatedStep++;
+            
+            if (animatedStep <= currentIndex) {
+                setTimeout(animateNextStep, stepDuration);
+            }
+        }
+        
+        // Démarrer l'animation
+        setTimeout(animateNextStep, initialDelay);
+    });
+</script>

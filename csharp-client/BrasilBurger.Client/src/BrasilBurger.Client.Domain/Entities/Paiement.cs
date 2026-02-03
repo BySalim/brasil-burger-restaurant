@@ -23,6 +23,23 @@ public class Paiement : Entity
         DatePaie = DateTime.UtcNow;
     }
 
+    // Overload to create a payment with client id without attaching a Client entity
+    public Paiement(Commande commande, int montant, ModePaiement mode, string? referenceExterne, bool test, int? clientId)
+    {
+        Commande = commande ?? throw new DomainException("La commande est obligatoire.");
+        CommandeId = commande.Id;
+
+        MontantPaie = Guard.Positive(montant, nameof(montant));
+        ModePaie = mode;
+        ReferencePaiementExterne = referenceExterne;
+        Test = test;
+
+        Client = null;
+        ClientId = clientId;
+
+        DatePaie = DateTime.UtcNow;
+    }
+
     public DateTime DatePaie { get; private set; }
     public int MontantPaie { get; private set; }
     public ModePaiement ModePaie { get; private set; }

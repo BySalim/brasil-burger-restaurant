@@ -5,7 +5,7 @@ namespace BrasilBurger.Client.Web.FormatsApp;
 
 public interface IFormatsApp
 {
-    string GetPublicUrl(string publicId);
+    string GetImageUrl(string publicId);
     
     string FormatPrice(int priceInCents);
     

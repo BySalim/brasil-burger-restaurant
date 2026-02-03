@@ -17,7 +17,7 @@ public sealed class FormatsAppImpl : IFormatsApp
         _cloudinaryUrlService = cloudinaryUrlService;
     }
     
-    public string GetPublicUrl(string publicId)
+    public string GetImageUrl(string publicId)
     {
         return _cloudinaryUrlService.GetPublicUrl(publicId);
     }

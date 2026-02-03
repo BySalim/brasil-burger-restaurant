@@ -36,11 +36,23 @@ public class OrdersController : Controller
     [HttpGet("")]
     public async Task<IActionResult> Index(OrderFiltersFormVm filters)
     {
-        var page = filters.Page ?? 1;
+        // Reset pagination quand il y a des filtres
+        var hasFilters = !string.IsNullOrWhiteSpace(filters.Search) || 
+                        !string.IsNullOrWhiteSpace(filters.Date) || 
+                        !string.IsNullOrWhiteSpace(filters.OrderStatus) || 
+                        !string.IsNullOrWhiteSpace(filters.PickupMode);
+        
+        var page = hasFilters ? 1 : (filters.Page ?? 1);
         var perPageSelect = BuildPerPageSelect(filters.PerPage);
         var itemsPerPage = int.TryParse(perPageSelect.SelectedValue, out var pp) ? pp : 10;
         var currentPage = page < 1 ? 1 : page;
-        DateTime? dateSelect = DateTime.TryParse(filters.Date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime filterDate) ? filterDate : (DateTime?)null;
+        
+        // Parse pour avoir le même format qu'en base de données (UTC)
+        DateTime? dateSelect = null;
+        if (DateTime.TryParse(filters.Date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime filterDate))
+        {
+            dateSelect = filterDate.ToUniversalTime();
+        }
 
         EtatCommande? etatFilter = ConvertEnum.FromString<EtatCommande>(filters.OrderStatus);
 
@@ -123,7 +135,17 @@ public class OrdersController : Controller
     [HttpGet("Details/{id}")]
     public async Task<IActionResult> Details(int id)
     {
-        // TODO: Implémenter la page de détails
-        return View();
+        var commande = await _commandeRepository.GetWithDetailsAsync(id);
+
+        if (commande == null)
+            return NotFound();
+
+        if (commande.ClientId != _userSession.UserId)
+            return Forbid();
+
+        var viewModel = _orderMapper.MapToOrderDetailVm(commande);
+
+        return View(viewModel);
     }
+
 }

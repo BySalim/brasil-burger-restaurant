@@ -26,6 +26,25 @@ public class Commande : Entity
         RecalculerMontant();
     }
 
+    // Overload that accepts clientId instead of Client instance to avoid attaching a tracked Client
+    public Commande(string numCmd, int clientId, ModeRecuperation typeRecuperation, InfoLivraison? infoLivraison, Panier? panier)
+    {
+        NumCmd = Guard.NotNullOrWhiteSpace(numCmd, nameof(numCmd));
+        ClientId = clientId;
+
+        TypeRecuperation = typeRecuperation;
+        InfoLivraison = infoLivraison;
+        InfoLivraisonId = infoLivraison?.Id;
+
+        Panier = panier;
+        PanierId = panier?.Id;
+
+        DateDebut = DateTime.UtcNow;
+        Etat = EtatCommande.EN_ATTENTE;
+
+        RecalculerMontant();
+    }
+
     public string NumCmd { get; private set; } = default!;
     public DateTime DateDebut { get; private set; }
     public DateTime? DateFin { get; private set; }

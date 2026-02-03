@@ -5,16 +5,33 @@ namespace BrasilBurger.Client.Domain.Entities;
 
 public class ArticleQuantifier : Entity
 {
-    private ArticleQuantifier() { } // EF
+        private int? _prixUnitaireSnapshot;
+        private CategorieArticle? _categorieSnapshot;
 
-    public ArticleQuantifier(Article article, int quantite)
-    {
-        Article = article ?? throw new DomainException("L'article est obligatoire.");
-        ArticleId = article.Id;
+        private ArticleQuantifier() { } // EF
 
-        Quantite = Guard.Positive(quantite, nameof(quantite));
-        RecalculerMontant();
-    }
+        public ArticleQuantifier(Article article, int quantite)
+        {
+            Article = article ?? throw new DomainException("L'article est obligatoire.");
+            ArticleId = article.Id;
+
+            // snapshot useful if entity is later detached
+            _prixUnitaireSnapshot = article.GetPrix();
+            _categorieSnapshot = article.Categorie;
+
+            Quantite = Guard.Positive(quantite, nameof(quantite));
+            RecalculerMontant();
+        }
+
+        public ArticleQuantifier(int articleId, int quantite, int? prixUnitaire, CategorieArticle categorie)
+        {
+            ArticleId = articleId;
+            _prixUnitaireSnapshot = prixUnitaire;
+            _categorieSnapshot = categorie;
+
+            Quantite = Guard.Positive(quantite, nameof(quantite));
+            RecalculerMontant();
+        }
 
     public int Quantite { get; private set; }
     public int Montant { get; private set; }
@@ -27,8 +44,8 @@ public class ArticleQuantifier : Entity
     public int? PanierId { get; private set; }
     public Panier? Panier { get; private set; }
 
-    public int ArticleId { get; private set; }
-    public Article Article { get; private set; } = default!;
+        public int ArticleId { get; private set; }
+        public Article? Article { get; private set; } = null;
 
     public void ChangerQuantite(int quantite)
     {
@@ -38,7 +55,7 @@ public class ArticleQuantifier : Entity
 
     public void RecalculerMontant()
     {
-        var prixUnitaire = Article.GetPrix() ?? 0;
+        var prixUnitaire = Article?.GetPrix() ?? _prixUnitaireSnapshot ?? 0;
         Montant = Guard.NonNegative(prixUnitaire * Quantite, nameof(Montant));
     }
 
@@ -51,9 +68,10 @@ public class ArticleQuantifier : Entity
             throw new DomainException("La ligne est déjà rattachée à un menu. Impossible de la rattacher à un panier.");
 
         // Règles métier liées à l’article → ici, pas dans Panier.
-        if (!EstCompatibleAvecPanier(panier))
+        var categorieArticle = Article?.Categorie ?? _categorieSnapshot ?? CategorieArticle.BURGER;
+        if (!EstCompatibleAvecPanier(panier, categorieArticle))
             throw new DomainException("L'article n'est pas compatible avec la catégorie du panier." + 
-                $" Article.Catégorie={Article.Categorie}, Panier.CatégoriePanier={panier.CategoriePanier}");
+                $" Article.Catégorie={categorieArticle}, Panier.CatégoriePanier={panier.CategoriePanier}");
 
         CategorieArticleQuantifier = CategorieArticleQuantifier.COMMANDE;
 
@@ -69,7 +87,8 @@ public class ArticleQuantifier : Entity
             throw new DomainException("La ligne est déjà rattachée à un panier. Impossible de la rattacher à un menu.");
 
         // Exemple minimal de règle : éviter un menu dans un menu (à ajuster selon votre Symfony/BDD)
-        if (Article.Categorie == CategorieArticle.MENU)
+        var categorieArticle = Article?.Categorie ?? _categorieSnapshot ?? CategorieArticle.BURGER;
+        if (categorieArticle == CategorieArticle.MENU)
             throw new DomainException("Un menu ne peut pas contenir un autre menu.");
 
         CategorieArticleQuantifier = CategorieArticleQuantifier.MENU;
@@ -78,13 +97,13 @@ public class ArticleQuantifier : Entity
         MenuId = menu.Id;
     }
 
-    private bool EstCompatibleAvecPanier(Panier panier)
-    {
-        return panier.CategoriePanier switch
+        private bool EstCompatibleAvecPanier(Panier panier, CategorieArticle categorieArticle)
         {
-            CategoriePanier.BURGER => Article.Categorie == CategorieArticle.BURGER || Article.Categorie == CategorieArticle.COMPLEMENT,
-            CategoriePanier.MENU => Article.Categorie == CategorieArticle.MENU,
-            _ => true
-        };
-    }
+            return panier.CategoriePanier switch
+            {
+                CategoriePanier.BURGER => categorieArticle == CategorieArticle.BURGER || categorieArticle == CategorieArticle.COMPLEMENT,
+                CategoriePanier.MENU => categorieArticle == CategorieArticle.MENU,
+                _ => true
+            };
+        }
 }

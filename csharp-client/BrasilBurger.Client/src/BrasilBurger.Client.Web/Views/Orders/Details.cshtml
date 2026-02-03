@@ -1,0 +1,44 @@
+@using BrasilBurger.Client.Web.ViewModels.Orders
+@model OrderDetailVm
+
+@{
+    ViewData["Title"] = $"Commande {Model.Code}";
+}
+
+<div class="max-w-7xl mx-auto space-y-6 p-4 md:p-8">
+    @* Header de page *@
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex flex-wrap items-baseline gap-2 md:gap-4">
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 font-display">
+                Détails de la Commande
+            </h1>
+            <span class="text-gray-500 font-mono text-sm md:text-base">@Model.Code</span>
+        </div>
+        
+        <a href="@Url.Action("Index", "Orders")" 
+           class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium shadow-sm text-slate-700">
+            <span class="material-symbols-outlined text-lg">arrow_back</span>
+            Retour
+        </a>
+    </header>
+    
+    @* Carte résumé *@
+    <partial name="_OrderDetailHeader" model="Model" />
+    
+    @* Tracking / Parcours *@
+    <partial name="_OrderTracking" model="Model.Tracking" />
+    
+    @* Contenu principal *@
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        @* Colonne gauche: Articles *@
+        <div class="lg:col-span-2 space-y-6">
+            <partial name="_OrderArticles" model="Model" />
+        </div>
+        
+        @* Colonne droite: Paiement & Mode de récupération *@
+        <div class="space-y-6">
+            <partial name="_OrderPaiement" model="Model.Paiement" />
+            <partial name="_OrderModeRecuperation" model="Model" />
+        </div>
+    </div>
+</div>

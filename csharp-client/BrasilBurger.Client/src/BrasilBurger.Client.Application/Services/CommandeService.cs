@@ -65,7 +65,7 @@ public sealed class CommandeService : ICommandeService
 
         var commande = new Commande(
             numCmd: numeroCommande,
-            client: (Domain.Entities.Client)client,
+            clientId: client.Id,
             typeRecuperation: modeRecuperation.Value,
             panier: panier,
             infoLivraison: infoLivraison
@@ -145,20 +145,15 @@ public sealed class CommandeService : ICommandeService
 
         foreach (var (articleId, quantite) in quantitesByArticleId)
         {
-            Article? article = await _db.Articles.GetByIdAsync(articleId, ct);
+            // Charger l'article AVEC ses dépendances (menu -> composition -> articles)
+            // use GetWithDependenciesAsync which performs AsNoTracking on the query
+            Article? article = await _db.Articles.GetWithDependenciesAsync(articleId, ct);
 
             if (article is null)
                 continue;
 
             if (article.EstArchiver)
                 continue;
-
-            if (article is Menu)
-            {
-                var menuFull = await _db.Articles.GetMenuWithCompositionAsync(articleId, ct);
-                if (menuFull is not null)
-                    article = menuFull;
-            }
 
             if (categoriePanier is null)
             {
@@ -177,7 +172,8 @@ public sealed class CommandeService : ICommandeService
 
             try
             {
-                var ligne = new ArticleQuantifier(article, quantite);
+                // Build quantifier using a snapshot (id, prix, catégorie) to avoid attaching tracked Article instances
+                var ligne = new ArticleQuantifier(article.Id, quantite, article.GetPrix(), article.Categorie);
                 panier!.AjouterLigne(ligne);
             }
             catch (DomainException ex)
@@ -187,7 +183,7 @@ public sealed class CommandeService : ICommandeService
         }
 
         if (panier is null || panier.Lignes.Count == 0)
-            return Result<Panier>.Failure($"Aucun article ne correspond. Panier impossible à créer. panier null={panier is null} || lignes count={panier?.Lignes.Count ?? 0}");
+            return Result<Panier>.Failure($"Aucun article ne correspond. Panier impossible à créer.");
 
         return Result<Panier>.Success(panier);
     }

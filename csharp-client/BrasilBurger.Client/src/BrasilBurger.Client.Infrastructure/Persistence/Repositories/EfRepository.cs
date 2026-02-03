@@ -17,7 +17,7 @@ public abstract class EfRepository<TEntity> : IRepository<TEntity>
     }
 
     public virtual Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default)
-        => Set.FirstOrDefaultAsync(e => e.Id == id, ct);
+        => Set.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id, ct);
 
     public virtual async Task<IReadOnlyList<TEntity>> ListAsync(CancellationToken ct = default)
         => await Set.AsNoTracking().ToListAsync(ct);
