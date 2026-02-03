@@ -18,6 +18,7 @@ public class BadgeVm
     
     public string CssClasses => CustomCss ?? BuildDefaultCss();
     public string IconCssClasses => IconCss ?? "text-[14px]";
+    public string ImageCssClasses => BuildImageCss();
     
     private string BuildDefaultCss()
     {
@@ -38,5 +39,19 @@ public class BadgeVm
         var variantClass = Variant.Css(Color);
         
         return $"{baseClass} {sizeClass} {shapeClass} border {variantClass}";
+    }
+    
+    private string BuildImageCss()
+    {
+        var imageHeight = Size switch
+        {
+            "xs" => "h-3",
+            "sm" => "h-3.5",
+            "md" => "h-4",
+            "lg" => "h-5",
+            _ => "h-4"
+        };
+        
+        return $"{imageHeight} w-auto object-contain";
     }
 }

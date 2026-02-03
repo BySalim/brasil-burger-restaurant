@@ -5,33 +5,33 @@ namespace BrasilBurger.Client.Domain.Entities;
 
 public class ArticleQuantifier : Entity
 {
-        private int? _prixUnitaireSnapshot;
-        private CategorieArticle? _categorieSnapshot;
+    private int? _prixUnitaireSnapshot;
+    private CategorieArticle? _categorieSnapshot;
 
-        private ArticleQuantifier() { } // EF
+    private ArticleQuantifier() { } // EF
 
-        public ArticleQuantifier(Article article, int quantite)
-        {
-            Article = article ?? throw new DomainException("L'article est obligatoire.");
-            ArticleId = article.Id;
+    public ArticleQuantifier(Article article, int quantite)
+    {
+        Article = article ?? throw new DomainException("L'article est obligatoire.");
+        ArticleId = article.Id;
 
-            // snapshot useful if entity is later detached
-            _prixUnitaireSnapshot = article.GetPrix();
-            _categorieSnapshot = article.Categorie;
+        // snapshot useful if entity is later detached
+        _prixUnitaireSnapshot = article.GetPrix();
+        _categorieSnapshot = article.Categorie;
 
-            Quantite = Guard.Positive(quantite, nameof(quantite));
-            RecalculerMontant();
-        }
+        Quantite = Guard.Positive(quantite, nameof(quantite));
+        RecalculerMontant();
+    }
 
-        public ArticleQuantifier(int articleId, int quantite, int? prixUnitaire, CategorieArticle categorie)
-        {
-            ArticleId = articleId;
-            _prixUnitaireSnapshot = prixUnitaire;
-            _categorieSnapshot = categorie;
+    public ArticleQuantifier(int articleId, int quantite, int? prixUnitaire, CategorieArticle categorie)
+    {
+        ArticleId = articleId;
+        _prixUnitaireSnapshot = prixUnitaire;
+        _categorieSnapshot = categorie;
 
-            Quantite = Guard.Positive(quantite, nameof(quantite));
-            RecalculerMontant();
-        }
+        Quantite = Guard.Positive(quantite, nameof(quantite));
+        RecalculerMontant();
+    }
 
     public int Quantite { get; private set; }
     public int Montant { get; private set; }
@@ -44,8 +44,8 @@ public class ArticleQuantifier : Entity
     public int? PanierId { get; private set; }
     public Panier? Panier { get; private set; }
 
-        public int ArticleId { get; private set; }
-        public Article? Article { get; private set; } = null;
+    public int ArticleId { get; private set; }
+    public Article? Article { get; private set; } = null;
 
     public void ChangerQuantite(int quantite)
     {
@@ -70,7 +70,7 @@ public class ArticleQuantifier : Entity
         // Règles métier liées à l’article → ici, pas dans Panier.
         var categorieArticle = Article?.Categorie ?? _categorieSnapshot ?? CategorieArticle.BURGER;
         if (!EstCompatibleAvecPanier(panier, categorieArticle))
-            throw new DomainException("L'article n'est pas compatible avec la catégorie du panier." + 
+            throw new DomainException("L'article n'est pas compatible avec la catégorie du panier." +
                 $" Article.Catégorie={categorieArticle}, Panier.CatégoriePanier={panier.CategoriePanier}");
 
         CategorieArticleQuantifier = CategorieArticleQuantifier.COMMANDE;
@@ -97,13 +97,13 @@ public class ArticleQuantifier : Entity
         MenuId = menu.Id;
     }
 
-        private bool EstCompatibleAvecPanier(Panier panier, CategorieArticle categorieArticle)
+    private bool EstCompatibleAvecPanier(Panier panier, CategorieArticle categorieArticle)
+    {
+        return panier.CategoriePanier switch
         {
-            return panier.CategoriePanier switch
-            {
-                CategoriePanier.BURGER => categorieArticle == CategorieArticle.BURGER || categorieArticle == CategorieArticle.COMPLEMENT,
-                CategoriePanier.MENU => categorieArticle == CategorieArticle.MENU,
-                _ => true
-            };
-        }
+            CategoriePanier.BURGER => categorieArticle == CategorieArticle.BURGER || categorieArticle == CategorieArticle.COMPLEMENT,
+            CategoriePanier.MENU => categorieArticle == CategorieArticle.MENU,
+            _ => true
+        };
+    }
 }

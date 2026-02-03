@@ -146,9 +146,9 @@ public sealed class OrderMapper
             Label = meta.Label ?? "Autre",
             IconName = meta.Visual is UiIcon icon ? icon.IconName : null,
             IconUrl = meta.Visual is UiImage image ? image.Path : null,
-            Variant = BadgeVariant.Compact,
+            Variant = BadgeVariant.Solid,
             Color = meta.Color,
-            Size = "md"
+            Size = "lg"
         };
     }
 

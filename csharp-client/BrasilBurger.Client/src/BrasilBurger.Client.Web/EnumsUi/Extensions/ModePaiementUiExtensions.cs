@@ -11,13 +11,13 @@ public static class ModePaiementUiExtensions
         ModePaiement.WAVE => new(
             nameof(ModePaiement.WAVE),
             "Wave",
-            new UiIcon("account_balance_wallet"),
-            UiColor.Vert),
+            new UiImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQm9rYPURKIok7K0ZF22oqFgMbzIHgNCauVQA&s"),
+            UiColor.Bleu),
 
         ModePaiement.OM => new(
             nameof(ModePaiement.OM),
             "Orange Money",
-            new UiIcon("smartphone"),
+            new UiImage("https://dimelo-answers-production.s3-eu-west-1.amazonaws.com/268/6f44dfa59e0bcf0b/om_logo_original.png?09c0932"),
             UiColor.Orange),
 
         _ => throw new ArgumentOutOfRangeException(nameof(v), v, "ModePaiement non mappé (UI).")

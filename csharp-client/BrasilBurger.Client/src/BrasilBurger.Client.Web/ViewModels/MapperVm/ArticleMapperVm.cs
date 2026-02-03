@@ -39,6 +39,7 @@ public sealed class ArticleMapperVm
     private ArticleQuantifierGetVm ToGetVm(ArticleQuantifier ligne, bool includeMenuArticleComposition)
     {
         if (ligne is null) throw new ArgumentNullException(nameof(ligne));
+        if (ligne.Article is null) throw new ArgumentException("Ligne d'article sans article associé.", nameof(ligne));
 
         // on ne descend jamais récursivement sur la composition d’un article enfant
         var articleVm = ToGetVmInternal(ligne.Article, includeMenuComposition: includeMenuArticleComposition);
