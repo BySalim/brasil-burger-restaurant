@@ -118,15 +118,15 @@
 
             <button type="button"
                 class="choice-card @(layout == "inline" ? "flex-shrink-0" : "w-full")
-                                   @(layout == "grid" ? $"{gridHeight} text-center" : "text-left")
-                                   @effectivePadding relative overflow-hidden
-                                   rounded-2xl
-                                   bg-white dark:bg-surface-dark
-                                   shadow-sm hover:shadow-md
-                                   transition-all duration-150
-                                   hover:-translate-y-0.5 active:translate-y-0
-                                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
-                                   @(isSelected ? "is-selected border-2 border-blue-500 bg-blue-50/50 dark:bg-blue-900/10" : "border-2 border-gray-200 dark:border-gray-700")"
+                                       @(layout == "grid" ? $"{gridHeight} text-center" : "text-left")
+                                       @effectivePadding relative overflow-hidden
+                                       rounded-2xl
+                                       bg-white dark:bg-surface-dark
+                                       shadow-sm hover:shadow-md
+                                       transition-all duration-150
+                                       hover:-translate-y-0.5 active:translate-y-0
+                                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
+                                       @(isSelected ? "is-selected border-2 border-blue-500 bg-blue-50/50 dark:bg-blue-900/10" : "border-2 border-gray-200 dark:border-gray-700")"
                 role="radio" aria-checked="@(isSelected.ToString().ToLowerInvariant())" data-choice-value="@item.Value"
                 data-is-selected="@isSelected.ToString().ToLowerInvariant()"
                 onmouseover="if(!this.classList.contains('is-selected')) this.style.borderColor='#EA5B0C'"
@@ -142,8 +142,8 @@
                 }
 
                 <div class="@(layout == "grid"
-                                                                          ? "h-full flex flex-col items-center justify-center gap-2"
-                                                                          : $"flex items-center justify-start {gapSize}")"
+                                                                                               ? "h-full flex flex-col items-center justify-center gap-2"
+                                                                                               : $"flex items-center justify-start {gapSize}")"
                     style="align-items: center;">
 
                     @if (showIcons)
@@ -160,7 +160,7 @@
                                 {
                                     <span class="material-symbols-outlined @iconSize"
                                         style="display: inline-flex; align-items: center; justify-content: center;
-                                                                                 @(isSelected ? "color: #2563eb;" : "color: #6b7280;")">
+                                                                                                 @(isSelected ? "color: #2563eb;" : "color: #6b7280;")">
                                         @item.IconName
                                     </span>
                                 }
@@ -175,8 +175,9 @@
                             }
                             else if (!string.IsNullOrWhiteSpace(item.IconName))
                             {
-                                <span class="material-symbols-outlined @iconSize flex-shrink-0" style="display: inline-flex; align-items: center; justify-content: center;
-                                                                             @(isSelected ? "color: #2563eb;" : "color: #6b7280;")">
+                                <span class="material-symbols-outlined @iconSize flex-shrink-0"
+                                    style="display: inline-flex; align-items: center; justify-content: center;
+                                                                                             @(isSelected ? "color: #2563eb;" : "color: #6b7280;")">
                                     @item.IconName
                                 </span>
                             }
@@ -184,12 +185,14 @@
                     }
 
                     @* IMPORTANT : un seul span label non-material (le JS le cible comme ça) *@
-                    <span class="@(layout == "grid"
-                                                                                        ? (size == "xs" ? "text-xs font-semibold leading-tight px-1" :
-                                                                                           size == "md" ? "text-sm font-semibold leading-tight px-1" :
-                                                                                                          "text-sm font-semibold leading-tight px-1")
-                                                                                        : $"{textSize} font-medium leading-none")" style="display: inline-flex; align-items: center;
-                                         @(isSelected ? "color: #1e40af;" : "color: #374151;")">
+                    <span
+                        class="@(layout == "grid"
+                                                                                                                ? (size == "xs" ? "text-xs font-semibold leading-tight px-1" :
+                                                                                                                   size == "md" ? "text-sm font-semibold leading-tight px-1" :
+                                                                                                                                  "text-sm font-semibold leading-tight px-1")
+                                                                                                                : $"{textSize} font-medium leading-none")"
+                        style="display: inline-flex; align-items: center;
+                                             @(isSelected ? "color: #1e40af;" : "color: #374151;")">
                         @item.Label
                     </span>
                 </div>

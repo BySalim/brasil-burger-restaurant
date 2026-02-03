@@ -59,8 +59,8 @@ public static class EnumUiMExtVmMapper
 
         switch (meta.Visual)
         {
-            case UiIcon icon:  iconName = icon.IconName; break;
             case UiImage img:  iconUrl  = img.Path;      break;
+            case UiIcon icon:  iconName = icon.IconName; break;
             default: throw new InvalidOperationException("UiVisual non supporté.");
         }
 
