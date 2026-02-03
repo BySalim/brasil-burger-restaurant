@@ -72,6 +72,7 @@ readonly class GroupeLivraisonService
         }
 
         $groupe->setStatut(StatutLivraison::TERMINER);
+        $groupe->getLivreur()?->setDisponible(true);
         $this->groupeLivraisonRepository->save($groupe, true);
     }
 
