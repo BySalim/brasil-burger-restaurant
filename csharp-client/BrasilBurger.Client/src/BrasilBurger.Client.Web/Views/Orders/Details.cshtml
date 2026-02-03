@@ -16,27 +16,33 @@
             </h1>
             <span class="text-gray-500 font-mono text-sm md:text-base">@Model.Code</span>
         </div>
-        
-        <a href="@Url.Action("Index", "Orders")" 
-           class="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-opacity self-start sm:self-auto w-full sm:w-auto">
-            <span class="material-symbols-outlined text-lg">arrow_back</span>
-            Retour
-        </a>
+        <span class="flex gap-4">
+            <a href="@Url.Action("Details", "Orders", new { id = Model.Id })"
+                class="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-opacity self-start sm:self-auto w-full sm:w-auto">
+                <span class="material-symbols-outlined text-lg">refresh</span>
+                Actualiser
+            </a>
+            <a href="@Url.Action("Index", "Orders")"
+                class="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-opacity self-start sm:self-auto w-full sm:w-auto">
+                <span class="material-symbols-outlined text-lg">arrow_back</span>
+                Retour
+            </a>
+        </span>
     </header>
-    
+
     @* Carte résumé *@
     <partial name="_OrderDetailHeader" model="Model" />
-    
+
     @* Tracking / Parcours *@
     <partial name="_OrderTracking" model="Model.Tracking" />
-    
+
     @* Contenu principal *@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         @* Colonne gauche: Articles *@
         <div class="lg:col-span-2 space-y-6">
             <partial name="_OrderArticles" model="Model" />
         </div>
-        
+
         @* Colonne droite: Paiement & Mode de récupération *@
         <div class="space-y-6">
             <partial name="_OrderPaiement" model="Model.Paiement" />
