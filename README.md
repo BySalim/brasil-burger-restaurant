@@ -1,6 +1,6 @@
 # Brasil Burger Restaurant
 
-Mon travail pour l'examen de Génie Logiciel Réseaux et Systèmes en L3 Semestre 1 à l'ISM consiste en ce projet. Ce projet consiste à créer une application de gestion des commandes et livraisons destinée au restaurant Brasil Burger, spécialiste en vente de burger.
+Ce projet consiste à créer une application de gestion des commandes et livraisons destinée au restaurant Brasil Burger, spécialiste en vente de burger.
 
 
 
@@ -23,7 +23,7 @@ Tous partagent la même BD.
 - [`symfony`](https://github.com/BySalim/brasil-burger-restaurant/tree/symfony) - Implémentation Symfony/PHP
 
 
-📂 **GitHub :** [github.com/DevByDelta/brasil-burger-restaurant](https://github.com/BySalim/brasil-burger-restaurant)
+📂 **GitHub :** [github.com/BySalim/brasil-burger-restaurant](https://github.com/BySalim/brasil-burger-restaurant)
 
 
 ## Context
