@@ -23,7 +23,7 @@ Tous partagent la même BD.
 - [`symfony`](https://github.com/BySalim/brasil-burger-restaurant/tree/symfony) - Implémentation Symfony/PHP
 
 
-📂 **GitHub :** [github.com/DevByDelta/brasil-burger-restaurant](https://github.com/DevByDelta/brasil-burger-restaurant)
+📂 **GitHub :** [github.com/DevByDelta/brasil-burger-restaurant](https://github.com/BySalim/brasil-burger-restaurant)
 
 
 ## Context
