@@ -16,11 +16,11 @@ Tous partagent la même BD.
 
 ## Branches Git
 
-- [`main`](https://github.com/DevByDelta/brasil-burger-restaurant/tree/main) - Branche principale
-- [`modelisation`](https://github.com/DevByDelta/brasil-burger-restaurant/tree/modelisation) - Modélisation du projet
-- [`java`](https://github.com/DevByDelta/brasil-burger-restaurant/tree/java) - Implémentation Java
-- [`csharp`](https://github.com/DevByDelta/brasil-burger-restaurant/tree/csharp) - Implémentation C#
-- [`symfony`](https://github.com/DevByDelta/brasil-burger-restaurant/tree/symfony) - Implémentation Symfony/PHP
+- [`main`](https://github.com/BySalim/brasil-burger-restaurant/tree/main) - Branche principale
+- [`modelisation`](https://github.com/BySalim/brasil-burger-restaurant/tree/modelisation) - Modélisation du projet
+- [`java`](https://github.com/BySalim/brasil-burger-restaurant/tree/java) - Implémentation Java
+- [`csharp`](https://github.com/BySalim/brasil-burger-restaurant/tree/csharp) - Implémentation C#
+- [`symfony`](https://github.com/BySalim/brasil-burger-restaurant/tree/symfony) - Implémentation Symfony/PHP
 
 
 📂 **GitHub :** [github.com/DevByDelta/brasil-burger-restaurant](https://github.com/DevByDelta/brasil-burger-restaurant)
