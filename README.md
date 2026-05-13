@@ -13,6 +13,11 @@ Ce projet consiste à créer une application de gestion des commandes et livrai
 
 Tous partagent la même BD.
 
+## Interfaces déployées sur Render
+- **Interface client** : [brasil-burger-restaurant-client.onrender.com](https://brasil-burger-restaurant-client.onrender.com)
+    Connexion Test :  Login : `moussa.ndiaye@exemple.com'` | mot de passe : `client123`
+- **Interface gestionnaire** : [brasil-burger-restaurant-manager.onrender.com](https://brasil-burger-restaurant-manager.onrender.com)
+    Connexion Test :  Login : `admin@exemple.com` | mot de passe : `admin123`
 
 ## Branches Git
 
